@@ -386,8 +386,20 @@ export default function Dashboard() {
       }
     }
 
+    setActiveYear(selectedYear);
+    setActiveQuarter(selectedQuarter);
     setIsTrendLoading(false);
     setTrendStatusText(`다년도 추이 조회 완료! (${selectedYear}년 기준 최근 ${trendYears}년 ${selectedQuarter})`);
+  };
+
+  // ---------------------------------------------------------
+  // 캐시 초기화
+  // ---------------------------------------------------------
+  const handleClearCache = () => {
+    apiCacheRef.current.clear();
+    setDartStatusText('캐시 초기화 완료. 다음 조회 시 DART API를 새로 호출합니다.');
+    setDartStatus('READY');
+    setTrendStatusText('');
   };
 
   // ---------------------------------------------------------
@@ -579,6 +591,9 @@ export default function Dashboard() {
               dartStatus === 'SUCCESS' ? 'bg-emerald-400' : dartStatus === 'ERROR' ? 'bg-rose-400' : 'bg-amber-400 animate-pulse'
             }`}></span>
             <span className="text-slate-400 truncate flex-1">{dartStatusText || "DART API 키 자동 바인딩 완료"}</span>
+            <button onClick={handleClearCache} className="text-[9px] text-slate-600 hover:text-rose-400 transition-colors shrink-0 font-semibold">
+              캐시 초기화
+            </button>
           </div>
         </div>
       </header>
@@ -749,7 +764,7 @@ export default function Dashboard() {
                     axisLine={false}
                     tickFormatter={(val) => {
                       const isPercent = ['operatingProfitMargin', 'debtRatio', 'sgaRatio'].includes(activeMetric);
-                      return isPercent ? `${val}%` : `${val.toLocaleString()}M`;
+                      return isPercent ? `${val}%` : `${val.toLocaleString('ko-KR')}M`;
                     }}
                   />
                   <Tooltip 
@@ -763,7 +778,7 @@ export default function Dashboard() {
                     formatter={(value, name) => {
                       const isPercent = ['operatingProfitMargin', 'debtRatio', 'sgaRatio'].includes(activeMetric);
                       const unit = isPercent ? '%' : ' 백만원';
-                      return [`${value.toLocaleString()}${unit}`, name];
+                      return [`${value.toLocaleString('ko-KR')}${unit}`, name];
                     }}
                   />
                   <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} iconType="circle" />
@@ -910,9 +925,9 @@ export default function Dashboard() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" opacity={0.4} />
                   <XAxis dataKey="year" stroke="#94a3b8" fontSize={11} tickLine={false} />
                   <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false}
-                    tickFormatter={v => isPercent ? `${v}%` : `${v.toLocaleString()}M`} />
+                    tickFormatter={v => isPercent ? `${v}%` : `${v.toLocaleString('ko-KR')}M`} />
                   <Tooltip contentStyle={{ backgroundColor: '#0d1224', borderColor: '#1f2954', borderRadius: '12px', color: '#f8fafc', fontSize: '12px' }}
-                    formatter={(value, name) => [`${value.toLocaleString()}${isPercent ? '%' : ' 백만원'}`, name]} />
+                    formatter={(value, name) => [`${value.toLocaleString('ko-KR')}${isPercent ? '%' : ' 백만원'}`, name]} />
                   <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} iconType="circle" />
                   {companies.map((company, index) => (
                     <Line key={company.id} name={company.name} type="monotone" dataKey={company.name}
@@ -1068,17 +1083,17 @@ export default function Dashboard() {
                         </div>
                       </div>
                     </td>
-                    <td className="p-4 text-right font-medium text-slate-100">{sales.toLocaleString()}</td>
+                    <td className="p-4 text-right font-medium text-slate-100">{sales.toLocaleString('ko-KR')}</td>
                     <td className={`p-4 text-right font-semibold ${op < 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
-                      {op >= 0 ? '+' : ''}{op.toLocaleString()}
+                      {op >= 0 ? '+' : ''}{op.toLocaleString('ko-KR')}
                     </td>
                     <td className={`p-4 text-right font-semibold ${parseFloat(opMargin) < 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
                       {parseFloat(opMargin) >= 0 ? '+' : ''}{opMargin}%
                     </td>
                     <td className={`p-4 text-right font-semibold ${oi < 0 ? 'text-rose-400' : 'text-cyan-400'}`}>
-                      {oi >= 0 ? '+' : ''}{oi.toLocaleString()}
+                      {oi >= 0 ? '+' : ''}{oi.toLocaleString('ko-KR')}
                     </td>
-                    <td className="p-4 text-right text-slate-300">{sga.toLocaleString()}</td>
+                    <td className="p-4 text-right text-slate-300">{sga.toLocaleString('ko-KR')}</td>
                     <td className="p-4 text-right text-slate-300 font-semibold">{sgaRatio}%</td>
                     <td className="p-4 text-right">
                       <span className={`inline-block px-2.5 py-1 rounded-lg font-bold border ${
@@ -1086,7 +1101,7 @@ export default function Dashboard() {
                           ? 'bg-rose-500/10 text-rose-400 border-rose-500/20'
                           : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                       }`}>
-                        {net >= 0 ? '+' : ''}{net.toLocaleString()}
+                        {net >= 0 ? '+' : ''}{net.toLocaleString('ko-KR')}
                       </span>
                     </td>
                     <td className={`p-4 text-right font-semibold ${parseFloat(netMargin) < 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
