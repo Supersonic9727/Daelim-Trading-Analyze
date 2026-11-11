@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api-dart/:path*",
-      "destination": "https://opendart.fss.or.kr/:path*"
+      "destination": "/api/proxy?path=:path*"
     }
   ]
 }
