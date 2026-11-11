@@ -159,6 +159,7 @@ export default function Dashboard() {
   const [dartStatusText, setDartStatusText] = useState('');
   const [dartStatus, setDartStatus] = useState('READY'); // READY, SUCCESS, ERROR
   const [dartError, setDartError] = useState(null); // DART 연동 실패 에러 상태
+  const [cfsUnavailableSet, setCfsUnavailableSet] = useState(new Set());
 
   // 시장 동향 브리핑 및 8대 지표 100% 동적 연동 (Sync) 수선 - 연도/분기 드롭다운 변경 즉시 연동
   useEffect(() => {
@@ -202,6 +203,7 @@ export default function Dashboard() {
     
     // 호출 데이터 임시 누적 객체
     let newFinancialData = {};
+    const localCfsUnavail = new Set();
 
     try {
       for (const company of activeCompanies) {
@@ -215,6 +217,7 @@ export default function Dashboard() {
           cfsData = await fetchDartData(trimmedKey, company.corpCode.trim(), selectedYear, reprtCode, 'CFS');
         } catch (e) {
           console.warn(`[DART API WARNING] ${company.name} 연결재무제표 호출 실패:`, e.message);
+          localCfsUnavail.add(company.id);
         }
 
         await delay(300); // DART 초당 트래픽 제한 우회를 위한 0.3초의 지연 시간(Delay) 강제 적용
@@ -281,9 +284,22 @@ export default function Dashboard() {
         setQuarters(prev => sortQuarters([...prev, targetQuarterStr]));
       }
 
-      setDartStatus('SUCCESS');
-      setDartStatusText(`[DART 일괄 조회] ${selectedYear}년 ${selectedQuarter} 전체 기업 동기화 완료!`);
-      setDartError(null);
+      setCfsUnavailableSet(localCfsUnavail);
+      const fetchedCount = Object.keys(newFinancialData).length;
+      if (fetchedCount === 0) {
+        setDartStatus('ERROR');
+        setDartStatusText(`일괄 조회 실패: 모든 기업 데이터 없음 (API 키 오류 또는 해당 연도/분기 미공시)`);
+        setDartError(`DART OpenAPI 일괄 조회 실패:\n- 요청 연도/분기: ${selectedYear}년 ${selectedQuarter}\n- 사유: 조회된 기업 데이터 없음 (전체 ${activeCompanies.length}개 기업 응답 없음)`);
+      } else {
+        const failedCfsCount = localCfsUnavail.size;
+        setDartStatus('SUCCESS');
+        setDartStatusText(
+          failedCfsCount > 0
+            ? `[DART] ${selectedYear}년 ${selectedQuarter} 동기화 완료 — ${fetchedCount}/${activeCompanies.length}개 기업 성공, ${failedCfsCount}개 연결재무 없음(CFS 미제출)`
+            : `[DART 일괄 조회] ${selectedYear}년 ${selectedQuarter} 전체 기업 동기화 완료!`
+        );
+        setDartError(null);
+      }
     } catch (err) {
       setDartStatus('ERROR');
       const errMsg = err.message || '일괄 조회 중 서버 이상';
@@ -504,20 +520,27 @@ export default function Dashboard() {
               {/* 🎛️ 분석 제어 제어 스위치 그룹 */}
               <div className="flex flex-wrap gap-3.5 items-center">
                 {/* 1. 연결 vs 별도 토글 */}
-                <div className="flex items-center gap-1.5 bg-slate-950 p-1.5 rounded-lg border border-slate-800">
-                  <span className="text-[10px] font-bold text-slate-400 px-1">공시구분:</span>
-                  <button 
-                    onClick={() => setIsConsolidated(true)}
-                    className={`px-2 py-1 text-[10px] font-extrabold rounded ${isConsolidated ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500'}`}
-                  >
-                    연결 (CFS)
-                  </button>
-                  <button 
-                    onClick={() => setIsConsolidated(false)}
-                    className={`px-2 py-1 text-[10px] font-extrabold rounded ${!isConsolidated ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500'}`}
-                  >
-                    별도 (OFS)
-                  </button>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-1.5 bg-slate-950 p-1.5 rounded-lg border border-slate-800">
+                    <span className="text-[10px] font-bold text-slate-400 px-1">공시구분:</span>
+                    <button
+                      onClick={() => setIsConsolidated(true)}
+                      className={`px-2 py-1 text-[10px] font-extrabold rounded ${isConsolidated ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500'}`}
+                    >
+                      연결 (CFS)
+                    </button>
+                    <button
+                      onClick={() => setIsConsolidated(false)}
+                      className={`px-2 py-1 text-[10px] font-extrabold rounded ${!isConsolidated ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500'}`}
+                    >
+                      별도 (OFS)
+                    </button>
+                  </div>
+                  {isConsolidated && cfsUnavailableSet.size > 0 && (
+                    <span className="text-[9px] text-amber-400 flex items-center gap-1 px-1">
+                      ⚠ 연결재무 없음: {companies.filter(c => cfsUnavailableSet.has(c.id)).map(c => c.name).join(', ')}
+                    </span>
+                  )}
                 </div>
 
                 {/* 2. 당분기 vs 누계액 토글 */}
