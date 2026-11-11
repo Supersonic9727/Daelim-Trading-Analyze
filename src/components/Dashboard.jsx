@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
-  TrendingUp, 
-  TrendingDown, 
-  DollarSign, 
-  Percent, 
-  Layers, 
-  FileText, 
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  Percent,
+  Layers,
+  FileText,
   Activity,
   Award,
   Zap,
@@ -13,7 +13,8 @@ import {
   Calendar,
   Grid,
   Info,
-  Layers3
+  Layers3,
+  Download
 } from 'lucide-react';
 import { 
   ResponsiveContainer, 
@@ -81,58 +82,58 @@ export default function Dashboard() {
   const [financialData, setFinancialData] = useState({
     "2024 1Q": {
       daelimTrading: {
-        cfs: { sales: 62000, operatingProfit: 2800, netIncome: -1200, debtRatio: 95, sgaExpenses: 9300 },
-        ofs: { sales: 58000, operatingProfit: 2200, netIncome: -900, debtRatio: 90, sgaExpenses: 8700 }
+        cfs: { sales: 62000, operatingProfit: 2800, netIncome: -1200, debtRatio: 95, ordinaryIncome: 0, sgaExpenses: 9300 },
+        ofs: { sales: 58000, operatingProfit: 2200, netIncome: -900, debtRatio: 90, ordinaryIncome: 0, sgaExpenses: 8700 }
       },
       daelimBath: {
-        cfs: { sales: 58000, operatingProfit: 1800, netIncome: 1300, debtRatio: 110, sgaExpenses: 8700 },
-        ofs: { sales: 58000, operatingProfit: 1800, netIncome: 1300, debtRatio: 110, sgaExpenses: 8700 }
+        cfs: { sales: 58000, operatingProfit: 1800, netIncome: 1300, debtRatio: 110, ordinaryIncome: 0, sgaExpenses: 8700 },
+        ofs: { sales: 58000, operatingProfit: 1800, netIncome: 1300, debtRatio: 110, ordinaryIncome: 0, sgaExpenses: 8700 }
       },
       isDongseo: {
-        cfs: { sales: 420000, operatingProfit: 65000, netIncome: -18000, debtRatio: 130, sgaExpenses: 42000 },
-        ofs: { sales: 310000, operatingProfit: 48000, netIncome: -11000, debtRatio: 115, sgaExpenses: 31000 }
+        cfs: { sales: 420000, operatingProfit: 65000, netIncome: -18000, debtRatio: 130, ordinaryIncome: 0, sgaExpenses: 42000 },
+        ofs: { sales: 310000, operatingProfit: 48000, netIncome: -11000, debtRatio: 115, ordinaryIncome: 0, sgaExpenses: 31000 }
       }
     },
     "2024 2Q": {
       daelimTrading: {
-        cfs: { sales: 127000, operatingProfit: 6000, netIncome: -2300, debtRatio: 92, sgaExpenses: 19050 },
-        ofs: { sales: 118000, operatingProfit: 4800, netIncome: -1500, debtRatio: 88, sgaExpenses: 17700 }
+        cfs: { sales: 127000, operatingProfit: 6000, netIncome: -2300, debtRatio: 92, ordinaryIncome: 0, sgaExpenses: 19050 },
+        ofs: { sales: 118000, operatingProfit: 4800, netIncome: -1500, debtRatio: 88, ordinaryIncome: 0, sgaExpenses: 17700 }
       },
       daelimBath: {
-        cfs: { sales: 118000, operatingProfit: 4000, netIncome: 2950, debtRatio: 108, sgaExpenses: 17700 },
-        ofs: { sales: 118000, operatingProfit: 4000, netIncome: 2950, debtRatio: 108, sgaExpenses: 17700 }
+        cfs: { sales: 118000, operatingProfit: 4000, netIncome: 2950, debtRatio: 108, ordinaryIncome: 0, sgaExpenses: 17700 },
+        ofs: { sales: 118000, operatingProfit: 4000, netIncome: 2950, debtRatio: 108, ordinaryIncome: 0, sgaExpenses: 17700 }
       },
       isDongseo: {
-        cfs: { sales: 870000, operatingProfit: 137000, netIncome: -34000, debtRatio: 125, sgaExpenses: 87000 },
-        ofs: { sales: 630000, operatingProfit: 101000, netIncome: -24000, debtRatio: 112, sgaExpenses: 63000 }
+        cfs: { sales: 870000, operatingProfit: 137000, netIncome: -34000, debtRatio: 125, ordinaryIncome: 0, sgaExpenses: 87000 },
+        ofs: { sales: 630000, operatingProfit: 101000, netIncome: -24000, debtRatio: 112, ordinaryIncome: 0, sgaExpenses: 63000 }
       }
     },
     "2024 3Q": {
       daelimTrading: {
-        cfs: { sales: 188000, operatingProfit: 8500, netIncome: -3500, debtRatio: 98, sgaExpenses: 28200 },
-        ofs: { sales: 175500, operatingProfit: 6800, netIncome: -2700, debtRatio: 94, sgaExpenses: 26325 }
+        cfs: { sales: 188000, operatingProfit: 8500, netIncome: -3500, debtRatio: 98, ordinaryIncome: 0, sgaExpenses: 28200 },
+        ofs: { sales: 175500, operatingProfit: 6800, netIncome: -2700, debtRatio: 94, ordinaryIncome: 0, sgaExpenses: 26325 }
       },
       daelimBath: {
-        cfs: { sales: 175000, operatingProfit: 5500, netIncome: 3950, debtRatio: 112, sgaExpenses: 26250 },
-        ofs: { sales: 175000, operatingProfit: 5500, netIncome: 3950, debtRatio: 112, sgaExpenses: 26250 }
+        cfs: { sales: 175000, operatingProfit: 5500, netIncome: 3950, debtRatio: 112, ordinaryIncome: 0, sgaExpenses: 26250 },
+        ofs: { sales: 175000, operatingProfit: 5500, netIncome: 3950, debtRatio: 112, ordinaryIncome: 0, sgaExpenses: 26250 }
       },
       isDongseo: {
-        cfs: { sales: 1280000, operatingProfit: 197000, netIncome: -52000, debtRatio: 132, sgaExpenses: 128000 },
-        ofs: { sales: 935000, operatingProfit: 145000, netIncome: -38000, debtRatio: 118, sgaExpenses: 93500 }
+        cfs: { sales: 1280000, operatingProfit: 197000, netIncome: -52000, debtRatio: 132, ordinaryIncome: 0, sgaExpenses: 128000 },
+        ofs: { sales: 935000, operatingProfit: 145000, netIncome: -38000, debtRatio: 118, ordinaryIncome: 0, sgaExpenses: 93500 }
       }
     },
     "2024 4Q": {
       daelimTrading: {
-        cfs: { sales: 256000, operatingProfit: 12500, netIncome: -5400, debtRatio: 89, sgaExpenses: 38400 },
-        ofs: { sales: 238000, operatingProfit: 10000, netIncome: -4200, debtRatio: 86, sgaExpenses: 35700 }
+        cfs: { sales: 256000, operatingProfit: 12500, netIncome: -5400, debtRatio: 89, ordinaryIncome: 0, sgaExpenses: 38400 },
+        ofs: { sales: 238000, operatingProfit: 10000, netIncome: -4200, debtRatio: 86, ordinaryIncome: 0, sgaExpenses: 35700 }
       },
       daelimBath: {
-        cfs: { sales: 237000, operatingProfit: 8000, netIncome: 5800, debtRatio: 105, sgaExpenses: 35550 },
-        ofs: { sales: 237000, operatingProfit: 8000, netIncome: 5800, debtRatio: 105, sgaExpenses: 35550 }
+        cfs: { sales: 237000, operatingProfit: 8000, netIncome: 5800, debtRatio: 105, ordinaryIncome: 0, sgaExpenses: 35550 },
+        ofs: { sales: 237000, operatingProfit: 8000, netIncome: 5800, debtRatio: 105, ordinaryIncome: 0, sgaExpenses: 35550 }
       },
       isDongseo: {
-        cfs: { sales: 1760000, operatingProfit: 278000, netIncome: -73000, debtRatio: 120, sgaExpenses: 176000 },
-        ofs: { sales: 1285000, operatingProfit: 205000, netIncome: -49000, debtRatio: 107, sgaExpenses: 128500 }
+        cfs: { sales: 1760000, operatingProfit: 278000, netIncome: -73000, debtRatio: 120, ordinaryIncome: 0, sgaExpenses: 176000 },
+        ofs: { sales: 1285000, operatingProfit: 205000, netIncome: -49000, debtRatio: 107, ordinaryIncome: 0, sgaExpenses: 128500 }
       }
     }
   });
@@ -160,6 +161,11 @@ export default function Dashboard() {
   const [dartStatus, setDartStatus] = useState('READY'); // READY, SUCCESS, ERROR
   const [dartError, setDartError] = useState(null); // DART 연동 실패 에러 상태
   const [cfsUnavailableSet, setCfsUnavailableSet] = useState(new Set());
+  const apiCacheRef = useRef(new Map());
+  const [trendYears, setTrendYears] = useState(3);
+  const [trendMetric, setTrendMetric] = useState('sales');
+  const [isTrendLoading, setIsTrendLoading] = useState(false);
+  const [trendStatusText, setTrendStatusText] = useState('');
 
   // 시장 동향 브리핑 및 8대 지표 100% 동적 연동 (Sync) 수선 - 연도/분기 드롭다운 변경 즉시 연동
   useEffect(() => {
@@ -214,7 +220,13 @@ export default function Dashboard() {
         let cfsData = null;
         try {
           const trimmedKey = apiKey.trim();
-          cfsData = await fetchDartData(trimmedKey, company.corpCode.trim(), selectedYear, reprtCode, 'CFS');
+          const cfsCacheKey = `${trimmedKey}-${company.corpCode.trim()}-${selectedYear}-${reprtCode}-CFS`;
+          if (apiCacheRef.current.has(cfsCacheKey)) {
+            cfsData = apiCacheRef.current.get(cfsCacheKey);
+          } else {
+            cfsData = await fetchDartData(trimmedKey, company.corpCode.trim(), selectedYear, reprtCode, 'CFS');
+            apiCacheRef.current.set(cfsCacheKey, cfsData);
+          }
         } catch (e) {
           console.warn(`[DART API WARNING] ${company.name} 연결재무제표 호출 실패:`, e.message);
           localCfsUnavail.add(company.id);
@@ -229,7 +241,13 @@ export default function Dashboard() {
         let ofsData = null;
         try {
           const trimmedKey = apiKey.trim();
-          ofsData = await fetchDartData(trimmedKey, company.corpCode.trim(), selectedYear, reprtCode, 'OFS');
+          const ofsCacheKey = `${trimmedKey}-${company.corpCode.trim()}-${selectedYear}-${reprtCode}-OFS`;
+          if (apiCacheRef.current.has(ofsCacheKey)) {
+            ofsData = apiCacheRef.current.get(ofsCacheKey);
+          } else {
+            ofsData = await fetchDartData(trimmedKey, company.corpCode.trim(), selectedYear, reprtCode, 'OFS');
+            apiCacheRef.current.set(ofsCacheKey, ofsData);
+          }
         } catch (e) {
           console.warn(`[DART API WARNING] ${company.name} 별도재무제표 호출 실패:`, e.message);
         }
@@ -237,8 +255,8 @@ export default function Dashboard() {
         // 받아온 데이터를 임시 객체에 정립
         if (cfsData || ofsData) {
           newFinancialData[company.id] = {
-            cfs: cfsData || { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, sgaExpenses: 0 },
-            ofs: ofsData || { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, sgaExpenses: 0 }
+            cfs: cfsData || { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0 },
+            ofs: ofsData || { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0 }
           };
         }
 
@@ -256,8 +274,8 @@ export default function Dashboard() {
             cleared[q] = {};
             companies.forEach(c => {
               cleared[q][c.id] = {
-                cfs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, sgaExpenses: 0 },
-                ofs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, sgaExpenses: 0 }
+                cfs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0 },
+                ofs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0 }
               };
             });
           });
@@ -311,6 +329,102 @@ export default function Dashboard() {
   };
 
   // ---------------------------------------------------------
+  // 다년도 추이 일괄 조회
+  // ---------------------------------------------------------
+  const handleFetchTrendData = async () => {
+    if (!apiKey) {
+      alert("Open DART API Key가 없습니다. 상단 설정 패널에 입력해주세요.");
+      return;
+    }
+    setIsTrendLoading(true);
+    const rCodeMap = { '1Q': '11013', '2Q': '11012', '3Q': '11014', '4Q': '11011' };
+    const reprtCode = rCodeMap[selectedQuarter];
+    const activeCompanies = companies.filter(c => c.corpCode);
+    const startYear = parseInt(selectedYear) - trendYears + 1;
+    const years = Array.from({ length: trendYears }, (_, i) => String(startYear + i));
+    const totalOps = years.length * activeCompanies.length * 2;
+    let currentOp = 0;
+
+    for (const year of years) {
+      for (const company of activeCompanies) {
+        for (const fsDiv of ['CFS', 'OFS']) {
+          currentOp++;
+          const fsDivLower = fsDiv.toLowerCase();
+          const qKey = `${year} ${selectedQuarter}`;
+          const cacheKey = `${apiKey.trim()}-${company.corpCode.trim()}-${year}-${reprtCode}-${fsDiv}`;
+          setTrendStatusText(`[${year}년 ${company.name} ${fsDiv}] 조회 중 (${currentOp}/${totalOps})`);
+
+          if (apiCacheRef.current.has(cacheKey)) {
+            const cached = apiCacheRef.current.get(cacheKey);
+            if (cached) {
+              setFinancialData(prev => ({
+                ...prev,
+                [qKey]: { ...(prev[qKey] || {}), [company.id]: { ...(prev[qKey]?.[company.id] || {}), [fsDivLower]: cached } }
+              }));
+            }
+          } else {
+            try {
+              const data = await fetchDartData(apiKey.trim(), company.corpCode.trim(), year, reprtCode, fsDiv);
+              apiCacheRef.current.set(cacheKey, data);
+              if (data) {
+                setFinancialData(prev => ({
+                  ...prev,
+                  [qKey]: { ...(prev[qKey] || {}), [company.id]: { ...(prev[qKey]?.[company.id] || {}), [fsDivLower]: data } }
+                }));
+              }
+            } catch (e) {
+              console.warn(`[TREND] ${year}년 ${company.name} ${fsDiv}:`, e.message);
+              apiCacheRef.current.set(cacheKey, null);
+            }
+            await delay(300);
+          }
+        }
+      }
+      const qKey = `${year} ${selectedQuarter}`;
+      if (!quarters.includes(qKey)) {
+        setQuarters(prev => sortQuarters([...prev, qKey]));
+      }
+    }
+
+    setIsTrendLoading(false);
+    setTrendStatusText(`다년도 추이 조회 완료! (${selectedYear}년 기준 최근 ${trendYears}년 ${selectedQuarter})`);
+  };
+
+  // ---------------------------------------------------------
+  // CSV 내보내기
+  // ---------------------------------------------------------
+  const handleExportCSV = () => {
+    const fsDiv = isConsolidated ? 'cfs' : 'ofs';
+    const header = ['기업명', '기간', '공시구분', '집계모드', '매출액(백만)', '영업이익(백만)', '영업이익률(%)', '경상손익(백만)', '판관비(백만)', '판관비율(%)', '총포괄손익(백만)', '순이익률(%)', '부채비율(%)'];
+    const rows = [header.join(',')];
+
+    sortQuarters(quarters).forEach(q => {
+      companies.forEach(company => {
+        const sales = getComputedValue(company.id, q, 'sales', fsDiv);
+        const op = getComputedValue(company.id, q, 'operatingProfit', fsDiv);
+        const oi = getComputedValue(company.id, q, 'ordinaryIncome', fsDiv);
+        const net = getComputedValue(company.id, q, 'netIncome', fsDiv);
+        const sga = getComputedValue(company.id, q, 'sgaExpenses', fsDiv);
+        const debt = getComputedValue(company.id, q, 'debtRatio', fsDiv);
+        const opMargin = sales > 0 ? ((op / sales) * 100).toFixed(2) : '0.00';
+        const sgaR = sales > 0 ? ((sga / sales) * 100).toFixed(2) : '0.00';
+        const netMargin = sales > 0 ? ((net / sales) * 100).toFixed(2) : '0.00';
+        rows.push([company.name, q, isConsolidated ? '연결(CFS)' : '별도(OFS)', isCumulative ? '누계액' : '당분기', sales, op, opMargin, oi, sga, sgaR, net, netMargin, debt < 0 ? '자본잠식' : debt].join(','));
+      });
+    });
+
+    const blob = new Blob(['﻿' + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `DART_재무분석_${activeYear}${activeQuarter}_${isConsolidated ? 'CFS' : 'OFS'}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  // ---------------------------------------------------------
   // 당분기 vs 누계액(누적값) 수학적 역산 연산기 구현
   // ---------------------------------------------------------
   const getComputedValue = (companyId, quarterStr, metric, fsDiv) => {
@@ -353,11 +467,11 @@ export default function Dashboard() {
       if (activeMetric === 'operatingProfitMargin') {
         const sales = getComputedValue(company.id, qKey, 'sales', fsDiv);
         const op = getComputedValue(company.id, qKey, 'operatingProfit', fsDiv);
-        row[company.name] = sales > 0 ? parseFloat(((op / sales) * 100).toFixed(1)) : 0;
+        row[company.name] = sales > 0 ? parseFloat(((op / sales) * 100).toFixed(2)) : 0;
       } else if (activeMetric === 'sgaRatio') {
         const sales = getComputedValue(company.id, qKey, 'sales', fsDiv);
         const sga = getComputedValue(company.id, qKey, 'sgaExpenses', fsDiv);
-        row[company.name] = sales > 0 ? parseFloat(((sga / sales) * 100).toFixed(1)) : 0;
+        row[company.name] = sales > 0 ? parseFloat(((sga / sales) * 100).toFixed(2)) : 0;
       } else {
         row[company.name] = getComputedValue(company.id, qKey, activeMetric, fsDiv);
       }
@@ -374,6 +488,7 @@ export default function Dashboard() {
       case 'sgaExpenses': return `${prefix} 판관비 총계 (단위: 백만원)`;
       case 'sgaRatio': return `${prefix} 판관비율 (단위: %)`;
       case 'debtRatio': return `부채비율 (단위: %) - *기말 잔액 시점기준`;
+      case 'ordinaryIncome': return `${prefix} 경상손익 (법인세차감전순이익) (단위: 백만원)`;
       case 'netIncome': return `${prefix} 총포괄손익 (단위: 백만원) - *적자(손실) 시 마이너스 부호 표기`;
       default: return '';
     }
@@ -570,6 +685,7 @@ export default function Dashboard() {
                 { id: 'operatingProfitMargin', label: '영업이익률 (OP Margin)' },
                 { id: 'sgaExpenses', label: '판관비 총계 (SG&A)' },
                 { id: 'sgaRatio', label: '판관비율 (SG&A Ratio)' },
+                { id: 'ordinaryIncome', label: '경상손익 (Ordinary Income)' },
                 { id: 'netIncome', label: '총포괄손익 (Comprehensive Income)' },
                 { id: 'debtRatio', label: '부채비율 (Debt Ratio)' }
               ].map(tab => (
@@ -610,6 +726,15 @@ export default function Dashboard() {
 
             {/* Recharts 차트 렌더링 */}
             <div className="h-[400px] w-full mt-4">
+              {finalChartData.length === 0 || finalChartData.every(row => companies.every(c => !row[c.name] || row[c.name] === 0)) ? (
+                <div className="h-full flex items-center justify-center">
+                  <div className="text-center text-slate-500">
+                    <Activity className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                    <p className="text-sm font-semibold">데이터 없음</p>
+                    <p className="text-xs mt-1 text-slate-600">DART 일괄 조회를 실행하거나 다른 기간을 선택하세요.</p>
+                  </div>
+                </div>
+              ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart
                   data={finalChartData}
@@ -676,6 +801,7 @@ export default function Dashboard() {
                   })}
                 </ComposedChart>
               </ResponsiveContainer>
+              )}
             </div>
 
           </div>
@@ -691,6 +817,114 @@ export default function Dashboard() {
           </div>
         </section>
       </div>
+
+      {/* 📈 연간 다년도 추이 비교 */}
+      <section className="glass-panel rounded-2xl p-6 mb-8 shadow-md">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-indigo-500/10 rounded-lg text-indigo-400">
+              <TrendingUp className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-slate-100">연간 다년도 추이 비교</h2>
+              <p className="text-slate-400 text-xs">동일 분기 기준 연도별 비교 추이 ({activeQuarter} 기준, {isConsolidated ? '연결' : '별도'})</p>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2 items-center self-start sm:self-auto">
+            <div className="flex items-center gap-1.5 bg-slate-950 p-1.5 rounded-lg border border-slate-800">
+              <span className="text-[10px] font-bold text-slate-400 px-1">조회 범위:</span>
+              {[3, 5].map(n => (
+                <button key={n} onClick={() => setTrendYears(n)}
+                  className={`px-2 py-1 text-[10px] font-extrabold rounded ${trendYears === n ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}>
+                  최근 {n}년
+                </button>
+              ))}
+            </div>
+            <button onClick={handleFetchTrendData} disabled={isTrendLoading || !apiKey}
+              className={`text-xs font-bold px-3 py-2 rounded-lg flex items-center gap-1.5 transition-all ${
+                isTrendLoading || !apiKey ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-cyan-700 hover:bg-cyan-600 text-white'
+              }`}>
+              <Calendar className="w-3.5 h-3.5" />
+              {isTrendLoading ? '조회 중...' : '다년도 일괄 조회'}
+            </button>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-1 bg-slate-950 p-1 rounded-lg border border-slate-800 mb-4">
+          {[
+            { id: 'sales', label: '매출액' },
+            { id: 'operatingProfit', label: '영업이익' },
+            { id: 'operatingProfitMargin', label: '영업이익률' },
+            { id: 'ordinaryIncome', label: '경상손익' },
+            { id: 'netIncome', label: '총포괄손익' },
+            { id: 'debtRatio', label: '부채비율' },
+          ].map(tab => (
+            <button key={tab.id} onClick={() => setTrendMetric(tab.id)}
+              className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${
+                trendMetric === tab.id ? 'bg-slate-800 text-white shadow border border-slate-700' : 'text-slate-400 hover:text-slate-200'
+              }`}>
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {trendStatusText && (
+          <div className="mb-4 text-[10px] text-slate-400 bg-slate-950/60 px-3 py-1.5 rounded-lg border border-slate-800 flex items-center gap-1.5">
+            <span className={`w-1.5 h-1.5 rounded-full ${isTrendLoading ? 'bg-amber-400 animate-pulse' : 'bg-emerald-400'}`}></span>
+            {trendStatusText}
+          </div>
+        )}
+
+        {(() => {
+          const fsDiv = isConsolidated ? 'cfs' : 'ofs';
+          const trendChartData = Array.from({ length: trendYears }, (_, i) => {
+            const year = String(parseInt(activeYear) - (trendYears - 1 - i));
+            const qKey = `${year} ${activeQuarter}`;
+            const row = { year };
+            companies.forEach(company => {
+              const d = financialData[qKey]?.[company.id]?.[fsDiv];
+              const sales = d?.sales ?? 0;
+              const op = d?.operatingProfit ?? 0;
+              if (trendMetric === 'operatingProfitMargin') {
+                row[company.name] = sales > 0 ? parseFloat(((op / sales) * 100).toFixed(2)) : 0;
+              } else {
+                row[company.name] = d?.[trendMetric] ?? 0;
+              }
+            });
+            return row;
+          });
+          const isTrendEmpty = trendChartData.every(row => companies.every(c => !row[c.name] || row[c.name] === 0));
+          const isPercent = ['operatingProfitMargin', 'debtRatio'].includes(trendMetric);
+          return isTrendEmpty ? (
+            <div className="h-[280px] flex items-center justify-center">
+              <div className="text-center text-slate-500">
+                <TrendingUp className="w-10 h-10 mx-auto mb-2 opacity-30" />
+                <p className="text-sm font-semibold">데이터 없음</p>
+                <p className="text-xs mt-1">다년도 일괄 조회를 실행하세요.</p>
+              </div>
+            </div>
+          ) : (
+            <div className="h-[280px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={trendChartData} margin={{ top: 20, right: 10, bottom: 5, left: -10 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" opacity={0.4} />
+                  <XAxis dataKey="year" stroke="#94a3b8" fontSize={11} tickLine={false} />
+                  <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false}
+                    tickFormatter={v => isPercent ? `${v}%` : `${v.toLocaleString()}M`} />
+                  <Tooltip contentStyle={{ backgroundColor: '#0d1224', borderColor: '#1f2954', borderRadius: '12px', color: '#f8fafc', fontSize: '12px' }}
+                    formatter={(value, name) => [`${value.toLocaleString()}${isPercent ? '%' : ' 백만원'}`, name]} />
+                  <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} iconType="circle" />
+                  {companies.map((company, index) => (
+                    <Line key={company.id} name={company.name} type="monotone" dataKey={company.name}
+                      stroke={company.color} strokeWidth={index === 0 ? 3 : 2}
+                      dot={{ r: index === 0 ? 4 : 2.5 }} activeDot={{ r: 6 }} />
+                  ))}
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+          );
+        })()}
+      </section>
 
       {/* 🏡 시장 트렌드 분석 패널 (useEffect를 통해 activeYear, activeQuarter에 100% 동기화됨) */}
       <section className="mb-8">
@@ -782,8 +1016,13 @@ export default function Dashboard() {
               </p>
             </div>
           </div>
-          <div className="text-slate-500 text-[10px] self-start sm:self-auto font-semibold">
-            * 모든 금액 단위: 백만원 / 비율: %
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <span className="text-slate-500 text-[10px] font-semibold">* 모든 금액 단위: 백만원 / 비율: %</span>
+            <button onClick={handleExportCSV}
+              className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 hover:text-emerald-400 bg-slate-900 border border-slate-800 px-2.5 py-1.5 rounded-lg transition-colors">
+              <Download className="w-3.5 h-3.5" />
+              CSV 내보내기
+            </button>
           </div>
         </div>
 
@@ -795,9 +1034,11 @@ export default function Dashboard() {
                 <th className="p-4 text-right">매출액</th>
                 <th className="p-4 text-right">영업이익</th>
                 <th className="p-4 text-right">영업이익률</th>
+                <th className="p-4 text-right">경상손익</th>
                 <th className="p-4 text-right">판관비 총계</th>
                 <th className="p-4 text-right">판관비율</th>
                 <th className="p-4 text-right">총포괄손익</th>
+                <th className="p-4 text-right">순이익률</th>
                 <th className="p-4 text-right">부채비율</th>
               </tr>
             </thead>
@@ -807,12 +1048,14 @@ export default function Dashboard() {
                 const targetQuarterStr = `${activeYear} ${activeQuarter}`;
                 const sales = getComputedValue(company.id, targetQuarterStr, 'sales', fsDiv);
                 const op = getComputedValue(company.id, targetQuarterStr, 'operatingProfit', fsDiv);
+                const oi = getComputedValue(company.id, targetQuarterStr, 'ordinaryIncome', fsDiv);
                 const sga = getComputedValue(company.id, targetQuarterStr, 'sgaExpenses', fsDiv);
                 const net = getComputedValue(company.id, targetQuarterStr, 'netIncome', fsDiv);
                 const debt = getComputedValue(company.id, targetQuarterStr, 'debtRatio', fsDiv);
-                
-                const opMargin = sales > 0 ? ((op / sales) * 100).toFixed(1) : '0.0';
-                const sgaRatio = sales > 0 ? ((sga / sales) * 100).toFixed(1) : '0.0';
+
+                const opMargin = sales > 0 ? ((op / sales) * 100).toFixed(2) : '0.00';
+                const sgaRatio = sales > 0 ? ((sga / sales) * 100).toFixed(2) : '0.00';
+                const netMargin = sales > 0 ? ((net / sales) * 100).toFixed(2) : '0.00';
 
                 return (
                   <tr key={company.id} className="hover:bg-slate-900/40 transition-colors border-b border-slate-800/45">
@@ -832,18 +1075,28 @@ export default function Dashboard() {
                     <td className={`p-4 text-right font-semibold ${parseFloat(opMargin) < 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
                       {parseFloat(opMargin) >= 0 ? '+' : ''}{opMargin}%
                     </td>
+                    <td className={`p-4 text-right font-semibold ${oi < 0 ? 'text-rose-400' : 'text-cyan-400'}`}>
+                      {oi >= 0 ? '+' : ''}{oi.toLocaleString()}
+                    </td>
                     <td className="p-4 text-right text-slate-300">{sga.toLocaleString()}</td>
                     <td className="p-4 text-right text-slate-300 font-semibold">{sgaRatio}%</td>
                     <td className="p-4 text-right">
                       <span className={`inline-block px-2.5 py-1 rounded-lg font-bold border ${
-                        net < 0 
-                          ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' 
+                        net < 0
+                          ? 'bg-rose-500/10 text-rose-400 border-rose-500/20'
                           : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                       }`}>
                         {net >= 0 ? '+' : ''}{net.toLocaleString()}
                       </span>
                     </td>
-                    <td className="p-4 text-right text-slate-300 font-semibold">{debt}%</td>
+                    <td className={`p-4 text-right font-semibold ${parseFloat(netMargin) < 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
+                      {parseFloat(netMargin) >= 0 ? '+' : ''}{netMargin}%
+                    </td>
+                    <td className="p-4 text-right text-slate-300 font-semibold">
+                      {debt < 0 ? (
+                        <span className="text-rose-400 font-bold">자본잠식</span>
+                      ) : `${debt}%`}
+                    </td>
                   </tr>
                 );
               })}

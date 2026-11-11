@@ -117,10 +117,25 @@ const parseList = (list, targetFsDiv) => {
   if (comprehensiveIncomeItem) {
     const rawVal = parseAmount(comprehensiveIncomeItem.thstrm_amount);
     const converted = Math.round(rawVal / 1000000);
-    
+
     const accNm = comprehensiveIncomeItem.account_nm || '';
     const isLoss = (accNm.includes('손실') && !accNm.includes('손익') && !accNm.includes('이익')) || accNm.includes('적자') || rawVal < 0;
     netIncome = isLoss ? -Math.abs(converted) : converted;
+  }
+
+  // 3-2. 경상손익(법인세차감전순이익) 파싱 (IS / CIS 구분)
+  const ordinaryIncomeItem = findItem(
+    ['ifrs-full_ProfitLossBeforeTax', 'ifrs_ProfitLossBeforeTax'],
+    ['법인세차감전순이익', '법인세비용차감전순이익', '경상이익', '세전이익', '법인세차감전순이익(손실)', '세전계속사업이익'],
+    ['IS', 'CIS']
+  );
+  let ordinaryIncome = 0;
+  if (ordinaryIncomeItem) {
+    const rawVal = parseAmount(ordinaryIncomeItem.thstrm_amount);
+    const converted = Math.round(rawVal / 1000000);
+    const accNm = ordinaryIncomeItem.account_nm || '';
+    const isLoss = (accNm.includes('손실') && !accNm.includes('손익') && !accNm.includes('이익')) || rawVal < 0;
+    ordinaryIncome = isLoss ? -Math.abs(converted) : converted;
   }
 
   // 4. 판관비(판매비와관리비) 파싱 (IS / CIS 구분)
@@ -154,7 +169,7 @@ const parseList = (list, targetFsDiv) => {
     }
   }
   
-  return { sales, operatingProfit, netIncome, sgaExpenses, debtRatio };
+  return { sales, operatingProfit, netIncome, sgaExpenses, debtRatio, ordinaryIncome };
 };
 
 export const fetchDartData = async (apiKey, corpCode, year, reprtCode, fsDiv) => {
