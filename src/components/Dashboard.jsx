@@ -861,7 +861,7 @@ export default function Dashboard() {
             </div>
             <div>
               <h2 className="text-lg font-bold text-slate-100">경쟁사 SWOT 분석 매칭 탭</h2>
-              <p className="text-slate-400 text-xs">경쟁 기업별 강점/약점과 자사(대림통상)와의 비교 포인트 매칭</p>
+              <p className="text-slate-400 text-xs">경쟁 기업별 강점/약점과 자사(대림통상)와의 비교 포인트 매칭 <span className="text-amber-500/70">※ 내부 작성 정성 데이터 기준 (DART 미연동)</span></p>
             </div>
           </div>
 
