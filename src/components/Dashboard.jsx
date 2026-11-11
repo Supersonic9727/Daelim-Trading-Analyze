@@ -412,7 +412,7 @@ export default function Dashboard() {
               <Key className="w-4 h-4 text-indigo-400" />
               Open DART API 설정 (환경변수 바인딩)
             </span>
-            <span className="text-[10px] text-slate-500">Vite Config Proxy</span>
+            <span className="text-[10px] text-slate-500">Vercel Serverless Proxy</span>
           </div>
           
           <input 
@@ -430,7 +430,7 @@ export default function Dashboard() {
               onChange={(e) => setSelectedYear(e.target.value)}
               className="bg-slate-900 border border-slate-800 rounded-lg px-2 py-1.5 text-xs text-slate-200 focus:outline-none"
             >
-              {Array.from({ length: 17 }, (_, i) => 2010 + i).map(y => (
+              {Array.from({ length: 16 }, (_, i) => 2010 + i).map(y => (
                 <option key={y} value={y}>{y}년</option>
               ))}
             </select>

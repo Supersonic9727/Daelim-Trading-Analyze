@@ -178,8 +178,15 @@ export const fetchDartData = async (apiKey, corpCode, year, reprtCode, fsDiv) =>
         return parsedData;
       }
     }
+    // 013: DART가 해당 fs_div/연도/분기에 대해 데이터 없음을 명시적으로 응답한 경우
+    // 2차 API로 fallback하면 fs_div 필터 없이 반환된 데이터가 오염될 수 있으므로 즉시 중단
+    if (result.status === '013') {
+      throw new Error(`해당 ${fsDiv} 공시 데이터가 없습니다. (${year}년 ${reprtCode} 미공시 또는 비대상 기업)`);
+    }
     console.warn(`[DART API] 1차 시도 결과 없음 (status: ${result.status}, message: ${result.message || '없음'}). 2차 시도(주요계정조회)로 대체 시도합니다.`);
   } catch (error) {
+    // 013으로 인한 의도적 throw는 그대로 전파 (2차 시도 없이 종료)
+    if (error.message?.includes('미공시') || error.message?.includes('데이터가 없습니다')) throw error;
     console.warn("[DART API] 1차 시도 오류 발생. 2차 시도로 대체합니다.", error);
   }
 
