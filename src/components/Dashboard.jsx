@@ -406,7 +406,7 @@ export default function Dashboard() {
         </div>
 
         {/* 🔑 DART API 설정 및 실시간 조회창 */}
-        <div className="bg-slate-950/80 border border-slate-800/80 rounded-xl p-4 flex flex-col gap-3 w-full lg:w-auto min-w-[360px] shadow-lg">
+        <div className="bg-slate-950/80 border border-slate-800/80 rounded-xl p-4 flex flex-col gap-3 w-full lg:w-auto lg:min-w-[360px] shadow-lg">
           <div className="flex items-center justify-between text-xs font-bold text-slate-200">
             <span className="flex items-center gap-1.5">
               <Key className="w-4 h-4 text-indigo-400" />
@@ -751,7 +751,7 @@ export default function Dashboard() {
 
               {/* 미니 스파크라인 그래픽 */}
               <div className="h-10 w-full mt-2">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height={40}>
                   <LineChart data={card.chartData}>
                     <Line 
                       type="monotone" 
