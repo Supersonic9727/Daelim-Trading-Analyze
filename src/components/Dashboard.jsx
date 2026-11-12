@@ -97,6 +97,9 @@ const LATEST_PERIOD = getLatestFiledPeriod();
 
 // 금액은 원 단위 정밀도(백만원 소수)로 보관하고 표시 시점에만 반올림 — 당분기 역산 시 반올림 오차 방지
 const roundM = (v) => Math.round(v) || 0;
+
+// DART 013(해당 보고서 없음) 응답만 '데이터 없음'으로 캐시 — fetchDartData의 013 오류 문구 기준
+const isNoDataError = (e) => /미공시|데이터가 없습니다|조회된 데이터가 없습니다/.test(e?.message || '');
 const fmtM = (v) => roundM(v).toLocaleString('ko-KR');
 
 export default function Dashboard() {
@@ -122,8 +125,7 @@ export default function Dashboard() {
   const [isConsolidated, setIsConsolidated] = useState(true); // true = 연결(cfs), false = 별도(ofs)
   const [isCumulative, setIsCumulative] = useState(true); // true = 누계액(Cumulative), false = 당분기(Single Q)
   
-  // DART API 호출 매개변수들 - 환경변수 자동 바인딩
-  const [apiKey, setApiKey] = useState(import.meta.env.VITE_DART_API_KEY || '');
+  // DART 조회 기간 (API 키는 서버 프록시에서만 사용)
   const [selectedYear, setSelectedYear] = useState(LATEST_PERIOD.year);
   const [selectedQuarter, setSelectedQuarter] = useState(LATEST_PERIOD.quarter); // 1Q, 2Q, 3Q, 4Q
 
@@ -203,9 +205,8 @@ export default function Dashboard() {
     fetchAllStocks();
   }, []);
 
-  // DART 최근 공시 목록 자동 조회 (apiKey 바인딩 시 자동 실행)
+  // DART 최근 공시 목록 자동 조회
   useEffect(() => {
-    if (!apiKey) return;
     const fetchDisclosures = async () => {
       const result = {};
       // bgn_de 미지정 시 DART는 당일 접수분만 반환하므로 최근 1년으로 지정
@@ -214,7 +215,7 @@ export default function Dashboard() {
       const bgnDe = from.toISOString().slice(0, 10).replace(/-/g, '');
       await Promise.all(companies.filter(c => c.corpCode).map(async (co) => {
         try {
-          const url = `/api-dart/api/list.json?crtfc_key=${apiKey.trim()}&corp_code=${co.corpCode}&bgn_de=${bgnDe}&page_no=1&page_count=5`;
+          const url = `/api-dart/api/list.json?corp_code=${co.corpCode}&bgn_de=${bgnDe}&page_no=1&page_count=5`;
           const data = await fetch(url).then(r => r.json());
           if (data.status === '000' || data.status === '013') result[co.id] = data.list || [];
         } catch (e) { /* 조회 실패 시 해당 탭은 오류 안내 */ }
@@ -223,17 +224,12 @@ export default function Dashboard() {
       setActiveDisclosureTab(prev => prev || companies[0]?.id || '');
     };
     fetchDisclosures();
-  }, [apiKey]);
+  }, []);
 
   // ---------------------------------------------------------
   // DART 실시간 API 일괄 다중 호출 (자동 Looper) 시스템
   // ---------------------------------------------------------
   const handleFetchDartApi = async () => {
-    if (!apiKey) {
-      alert("Open DART API Key가 없습니다. 상단 설정 패널에 입력해주세요.");
-      return;
-    }
-
     setIsDartLoading(true);
     setDartStatus('LOADING');
     setDartError(null);
@@ -260,20 +256,19 @@ export default function Dashboard() {
 
     const newFinancialData = {};
     const localCfsUnavail = new Set();
-    const trimmedKey = apiKey.trim();
 
     const fetchCached = async (company, q, fsDiv) => {
       const reprtCode = rCodeMap[q];
-      const cacheKey = `${trimmedKey}-${company.corpCode.trim()}-${selectedYear}-${reprtCode}-${fsDiv}`;
+      const cacheKey = `${company.corpCode}-${selectedYear}-${reprtCode}-${fsDiv}`;
       if (apiCacheRef.current.has(cacheKey)) return apiCacheRef.current.get(cacheKey);
       try {
-        const data = await fetchDartData(trimmedKey, company.corpCode.trim(), selectedYear, reprtCode, fsDiv);
+        const data = await fetchDartData(company.corpCode, selectedYear, reprtCode, fsDiv);
         apiCacheRef.current.set(cacheKey, data);
         await delay(200); // DART 초당 트래픽 제한 대응
         return data;
       } catch (e) {
         console.warn(`[DART API WARNING] ${company.name} ${selectedYear} ${q} ${fsDiv} 호출 실패:`, e.message);
-        apiCacheRef.current.set(cacheKey, null);
+        if (isNoDataError(e)) apiCacheRef.current.set(cacheKey, null); // 일시 오류는 캐시하지 않아 재조회 가능
         return null;
       }
     };
@@ -306,7 +301,7 @@ export default function Dashboard() {
       const fetchedCount = Object.keys(newFinancialData[targetQuarterStr] || {}).length;
       if (fetchedCount === 0) {
         setDartStatus('ERROR');
-        setDartStatusText(`일괄 조회 실패: 모든 기업 데이터 없음 (API 키 오류 또는 해당 연도/분기 미공시)`);
+        setDartStatusText(`일괄 조회 실패: 모든 기업 데이터 없음 (서버 API 키 미설정 또는 해당 연도/분기 미공시)`);
         setDartError(`DART OpenAPI 일괄 조회 실패:\n- 요청 연도/분기: ${selectedYear}년 ${selectedQuarter}\n- 사유: 조회된 기업 데이터 없음 (전체 ${activeCompanies.length}개 기업 응답 없음)`);
       } else {
         const failedCfsCount = localCfsUnavail.size;
@@ -328,19 +323,15 @@ export default function Dashboard() {
     }
   };
 
-  // 접속 시 API 키가 있으면 기본 연도/분기 실데이터 자동 조회
+  // 접속 시 기본 연도/분기 실데이터 자동 조회
   useEffect(() => {
-    if (apiKey) handleFetchDartApi();
+    handleFetchDartApi();
   }, []);
 
   // ---------------------------------------------------------
   // 다년도 추이 일괄 조회
   // ---------------------------------------------------------
   const handleFetchTrendData = async () => {
-    if (!apiKey) {
-      alert("Open DART API Key가 없습니다. 상단 설정 패널에 입력해주세요.");
-      return;
-    }
     setIsTrendLoading(true);
     // 현재 화면에 확정된 기간(activeYear/activeQuarter) 기준으로 과거 연도 동일 분기 누계를 조회
     const rCodeMap = { '1Q': '11013', '2Q': '11012', '3Q': '11014', '4Q': '11011' };
@@ -355,18 +346,19 @@ export default function Dashboard() {
     await Promise.all(activeCompanies.map(async (company) => {
       for (const year of years) {
         for (const fsDiv of ['CFS', 'OFS']) {
-          const cacheKey = `${apiKey.trim()}-${company.corpCode.trim()}-${year}-${reprtCode}-${fsDiv}`;
+          const cacheKey = `${company.corpCode}-${year}-${reprtCode}-${fsDiv}`;
           let data = null;
           if (apiCacheRef.current.has(cacheKey)) {
             data = apiCacheRef.current.get(cacheKey);
           } else {
             try {
-              data = await fetchDartData(apiKey.trim(), company.corpCode.trim(), year, reprtCode, fsDiv);
+              data = await fetchDartData(company.corpCode, year, reprtCode, fsDiv);
+              apiCacheRef.current.set(cacheKey, data);
               await delay(200);
             } catch (e) {
               console.warn(`[TREND] ${year}년 ${company.name} ${fsDiv}:`, e.message);
+              if (isNoDataError(e)) apiCacheRef.current.set(cacheKey, null);
             }
-            apiCacheRef.current.set(cacheKey, data);
           }
           currentOp++;
           setTrendStatusText(`다년도 재무제표 조회 중 (${currentOp}/${totalOps})`);
@@ -538,18 +530,10 @@ export default function Dashboard() {
           <div className="flex items-center justify-between text-xs font-bold text-slate-200">
             <span className="flex items-center gap-1.5">
               <Key className="w-4 h-4 text-indigo-400" />
-              Open DART API 설정 (환경변수 바인딩)
+              Open DART 조회 기간
             </span>
-            <span className="text-[10px] text-slate-500">Vercel Serverless Proxy</span>
+            <span className="text-[10px] text-slate-500">API 키: 서버 보관</span>
           </div>
-          
-          <input 
-            type="password" 
-            placeholder="DART_API_KEY 입력" 
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            className="w-full bg-slate-900 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-colors"
-          />
 
           {/* 실시간 DART 데이터 호출 폼 */}
           <div className="grid grid-cols-2 gap-1.5">
@@ -591,7 +575,7 @@ export default function Dashboard() {
             <span className={`w-2 h-2 rounded-full ${
               dartStatus === 'SUCCESS' ? 'bg-emerald-400' : dartStatus === 'ERROR' ? 'bg-rose-400' : 'bg-amber-400 animate-pulse'
             }`}></span>
-            <span className="text-slate-400 truncate flex-1">{dartStatusText || "DART API 키 자동 바인딩 완료"}</span>
+            <span className="text-slate-400 truncate flex-1">{dartStatusText || "DART 조회 준비"}</span>
             <button onClick={handleClearCache} className="text-[9px] text-slate-600 hover:text-rose-400 transition-colors shrink-0 font-semibold">
               캐시 초기화
             </button>
@@ -914,9 +898,9 @@ export default function Dashboard() {
                 </button>
               ))}
             </div>
-            <button onClick={handleFetchTrendData} disabled={isTrendLoading || !apiKey}
+            <button onClick={handleFetchTrendData} disabled={isTrendLoading || isDartLoading}
               className={`text-xs font-bold px-3 py-2 rounded-lg flex items-center gap-1.5 transition-all ${
-                isTrendLoading || !apiKey ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-cyan-700 hover:bg-cyan-600 text-white'
+                isTrendLoading || isDartLoading ?'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-cyan-700 hover:bg-cyan-600 text-white'
               }`}>
               <Calendar className="w-3.5 h-3.5" />
               {isTrendLoading ? '조회 중...' : '다년도 일괄 조회'}
@@ -1344,7 +1328,7 @@ export default function Dashboard() {
           <div className="p-2 bg-cyan-500/10 rounded-lg text-cyan-400"><Newspaper className="w-5 h-5" /></div>
           <div>
             <h2 className="text-lg font-bold text-slate-100">DART 최근 공시 목록</h2>
-            <p className="text-slate-400 text-xs">금감원 전자공시 · API 키 입력 시 자동 조회</p>
+            <p className="text-slate-400 text-xs">금감원 전자공시 · 최근 1년 · 클릭 시 DART 원문</p>
           </div>
         </div>
 
@@ -1368,12 +1352,7 @@ export default function Dashboard() {
         </div>
 
         {/* 공시 목록 */}
-        {!apiKey ? (
-          <div className="text-center py-8 text-slate-500 text-sm">
-            <FileText className="w-8 h-8 mx-auto mb-2 opacity-30" />
-            <p>상단 DART API Key 입력 후 자동으로 최근 공시가 표시됩니다.</p>
-          </div>
-        ) : disclosures === null ? (
+        {disclosures === null ? (
           <div className="text-center py-8 text-slate-500 text-sm">
             <RefreshCw className="w-6 h-6 mx-auto mb-2 opacity-30 animate-spin" />
             <p>공시 목록 조회 중...</p>

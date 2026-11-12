@@ -203,14 +203,10 @@ const parseList = (list, targetFsDiv) => {
   return { sales, operatingProfit, netIncome, profitLoss, sgaExpenses, debtRatio, ordinaryIncome, equity: equityMillion, currentAssets, currentLiabilities };
 };
 
-export const fetchDartData = async (apiKey, corpCode, year, reprtCode, fsDiv) => {
-  const finalApiKey = apiKey || import.meta.env.VITE_DART_API_KEY;
-  if (!finalApiKey) {
-    throw new Error("API Key가 누락되었습니다.");
-  }
-
+// API 키는 서버 프록시(/api-dart → api/proxy.js)가 붙이므로 클라이언트는 키를 다루지 않음
+export const fetchDartData = async (corpCode, year, reprtCode, fsDiv) => {
   // 1차 시도: 정기공시 재무제표 전체조회 API (fnlttSinglAcntAll.json)
-  const urlAll = `/api-dart/api/fnlttSinglAcntAll.json?crtfc_key=${finalApiKey}&corp_code=${corpCode}&bsns_year=${year}&reprt_code=${reprtCode}&fs_div=${fsDiv}`;
+  const urlAll = `/api-dart/api/fnlttSinglAcntAll.json?corp_code=${corpCode}&bsns_year=${year}&reprt_code=${reprtCode}&fs_div=${fsDiv}`;
 
   try {
     console.log(`[DART API] 1차 시도 (전체조회 API) 시작: corp_code=${corpCode}, bsns_year=${year}, fs_div=${fsDiv}`);
@@ -237,7 +233,7 @@ export const fetchDartData = async (apiKey, corpCode, year, reprtCode, fsDiv) =>
   }
 
   // 2차 시도: 단일회사 주요계정 조회 API (fnlttSinglAcnt.json) - 대기업/금융업종 및 용량초과 우회용
-  const urlSingle = `/api-dart/api/fnlttSinglAcnt.json?crtfc_key=${finalApiKey}&corp_code=${corpCode}&bsns_year=${year}&reprt_code=${reprtCode}`;
+  const urlSingle = `/api-dart/api/fnlttSinglAcnt.json?corp_code=${corpCode}&bsns_year=${year}&reprt_code=${reprtCode}`;
 
   try {
     console.log(`[DART API] 2차 시도 (주요계정 API) 시작: corp_code=${corpCode}, bsns_year=${year}`);
