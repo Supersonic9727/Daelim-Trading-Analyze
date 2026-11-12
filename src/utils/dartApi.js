@@ -152,8 +152,9 @@ const parseList = (list, targetFsDiv) => {
 
   // 4. 판관비(판매비와관리비) 파싱 (IS / CIS 구분)
   const sgaItem = findItem(
-    ['ifrs-full_SellingGeneralAndAdministrativeExpenses', 'ifrs_SellingGeneralAndAdministrativeExpenses', 'dart_SellingGeneralAdministrativeExpenses'],
-    ['판매비와관리비', '판매비와관리비총계', '판관비', '판매비', '관리비', '임차료및판관비총계'],
+    ['dart_TotalSellingGeneralAdministrativeExpenses', 'ifrs-full_SellingGeneralAndAdministrativeExpense', 'ifrs-full_SellingGeneralAndAdministrativeExpenses', 'dart_SellingGeneralAdministrativeExpenses'],
+    // '판매비'·'관리비' 단독 부분일치는 판매비만 잡혀 과소 집계될 수 있어 제외
+    ['판매비와관리비', '판매비와관리비총계', '판매비및관리비', '판관비'],
     ['IS', 'CIS']
   );
   const sgaExpenses = sgaItem ? Math.round(flowAmount(sgaItem) / 1000000) : 0;

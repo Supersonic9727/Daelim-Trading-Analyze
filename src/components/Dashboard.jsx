@@ -461,13 +461,8 @@ export default function Dashboard() {
     const prevQData = financialData[prevQKey];
     const prevVal = prevQData?.[companyId]?.[fsDiv]?.[metric] ?? 0;
 
-    const diff = currentVal - prevVal;
-    
-    if (metric === 'sales' || metric === 'sgaExpenses') {
-      return diff >= 0 ? diff : (currentVal > 0 ? currentVal : 0);
-    }
-    
-    return diff;
+    // 음수 역산값도 공시 원본(환입·재분류)을 반영한 결과이므로 보정하지 않음
+    return currentVal - prevVal;
   };
 
   // ---------------------------------------------------------
