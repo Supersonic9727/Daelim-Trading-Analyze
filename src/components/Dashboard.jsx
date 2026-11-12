@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import {
   TrendingUp,
   TrendingDown,
@@ -89,7 +89,7 @@ export default function Dashboard() {
     { id: 'daelimTrading', name: '대림통상', displayCode: '00114731', corpCode: '00109824', color: '#6366f1', stockTicker: '006570.KS' },
     { id: 'daelimBath', name: '대림B&Co', displayCode: '00157082', corpCode: '00109754', color: '#06b6d4', stockTicker: '005750.KS' },
     { id: 'isDongseo', name: '아이에스동서', displayCode: '00105344', corpCode: '00115977', color: '#10b981', stockTicker: '010780.KS' },
-    { id: 'lxhausys', name: 'LX하우시스', displayCode: '00759513', corpCode: '00759513', color: '#f59e0b', stockTicker: '072130.KS' },
+    { id: 'lxhausys', name: 'LX하우시스', displayCode: '00759513', corpCode: '00759513', color: '#f59e0b', stockTicker: '108670.KS' },
     { id: 'kcc', name: 'KCC', displayCode: '00105271', corpCode: '00105271', color: '#ec4899', stockTicker: '002380.KS' },
   ]);
 
@@ -225,7 +225,7 @@ export default function Dashboard() {
             if (!chart) return;
             const meta = chart.meta;
             const closes = (chart.indicators?.quote?.[0]?.close || []).filter(v => v !== null);
-            const prevClose = meta.chartPreviousClose || meta.previousClose || meta.regularMarketPrice;
+            const prevClose = meta.previousClose || meta.chartPreviousClose || meta.regularMarketPrice;
             const price = meta.regularMarketPrice;
             const change = price - prevClose;
             const changePct = prevClose ? (change / prevClose * 100) : 0;
