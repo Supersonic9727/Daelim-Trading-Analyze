@@ -49,19 +49,19 @@ const sortQuarters = (qList) => {
 const swotData = {
   lxhausys: {
     name: "LX하우시스",
-    s: ["국내 최대 PVC 창호·바닥재 생산 설비 및 LG그룹 계열 브랜드 신뢰도", "건자재 토탈 솔루션(창호·단열·바닥재·벽재) 풀 패키지 경쟁력"],
-    w: ["수전·위생도기 직접 생산 라인 부재로 욕실 금구류 OEM 의존도 높음", "공동주택 의존도 높아 분양 감소기에 직접적인 수주 타격 체감"],
-    o: ["제로에너지 건물(ZEB) 의무화 확대에 따른 단열창호 정책 수혜", "리모델링 시장 성장과 함께 B2C 창호·욕실 패키지 판매 채널 확대"],
-    t: ["중국산 저가 PVC 창호 국내 유입 증가로 중저가 라인 마진 압박", "원자재(PVC수지, 철강) 국제 가격 변동 직격탄 구조"],
-    compare: "LX하우시스는 창호·바닥재 중심의 대형 건자재 메이커로 욕실 수전/도기 분야에서 직접 경쟁보다는 토탈 패키지 발주처로서의 성격이 강합니다. 대림통상은 LX하우시스의 주택 패키지 납품 채널에 수전 금구 하이엔드 스펙인을 통해 욕실 부문 협력 관계를 강화하는 방향이 유리합니다."
+    s: ["수전·비데(도비도스) 등 욕실 기구 단일 카테고리에 집중한 전문 제조사로서 품목별 제품 대응 속도", "LX하우시스 패키지에 없는 수전·비데 전문 품목을 공급할 수 있는 보완적 위치"],
+    w: ["2024년 연결 매출 기준 대림통상 1,370억원 vs LX하우시스 3조 5,720억원 (약 3.8% 수준)으로 마케팅·유통 투자 여력 열세", "창호·바닥재·벽지까지 묶는 LX Z:IN 토탈 리모델링 패키지에 대응할 자체 토탈 패키지 부재"],
+    o: ["LX Z:IN 욕실 리모델링 패키지에 수전·비데 공급사로 참여하는 협력 가능성", "노후 주택 욕실 리모델링 수요에서 단품 교체 시장(수전·비데) 공략"],
+    t: ["대형 브랜드의 토탈 리모델링 패키지 확대 시 수전이 패키지 내 부품으로 묶여 단가 협상력 약화", "패키지사가 수전을 저가 OEM으로 조달할 경우 가격 경쟁 심화"],
+    compare: "LX하우시스는 2021년 7월 LG그룹에서 계열분리된 LX그룹 계열의 종합 건자재사로, 창호·바닥재·벽지와 LX Z:IN 욕실 리모델링을 함께 운영합니다. 수전·비데 단품에서 직접 맞붙기보다 토탈 패키지 채널에서 경쟁과 협력이 동시에 생기는 관계이므로, 대림통상은 패키지 공급사 진입과 단품 교체 시장 방어를 병행하는 것이 현실적입니다. (규모 수치: DART 2024년 연결 매출)"
   },
   kcc: {
     name: "KCC",
-    s: ["도료·유리·실리콘 등 소재 원천 기술 보유로 건자재 전 분야 수직계열화", "반도체용 실리콘 등 고부가가치 신사업 포트폴리오로 경기 방어력 우수"],
-    w: ["욕실 수전·위생도기 부문 직접 사업 없어 욕실 시장 접근성 낮음", "대형 사업구조 특성상 중소형 리모델링 시장 대응 속도 열세"],
-    o: ["내화·단열 도료 환경규제 강화로 KCC 고성능 도료 의무 적용 수요 증가", "조선·해양·산업 도료 사업 고성장으로 전체 수익성 보완 가능"],
-    t: ["글로벌 도료 메이커(PPG, AkzoNobel) 국내 직접 공략 강화로 프리미엄 시장 압박", "탄소중립 규제에 따른 도료·실리콘 생산 공정 비용 급등"],
-    compare: "KCC는 도료·유리·실리콘 원소재 기반의 종합 건자재 그룹으로 욕실 수전 분야와 직접 경쟁 관계에 있지 않습니다. 대림통상은 KCC의 고급 욕실 마감재(실리콘 실란트 등)와 자사 도비도스 수전을 패키지로 묶어 고급 주거 인테리어 채널을 공동 공략하는 협력 전략이 효과적입니다."
+    s: ["욕실 수전·비데(도비도스) 전문 브랜드 — KCC는 해당 품목 사업이 없음", "욕실 기구 단일 카테고리 집중에 따른 제품·유통 전문성"],
+    w: ["2024년 연결 매출 기준 대림통상 1,370억원 vs KCC 6조 6,588억원으로 규모·자본력 격차가 매우 큼", "건축자재 B2B 영업망(건설사·시공사) 규모에서 열세"],
+    o: ["KCC의 실리콘·실란트 등 욕실 시공 부자재와는 경쟁이 아닌 보완 관계로 공동 영업 가능성", "건설사 B2B 납품 시 마감재·부자재사와 연계한 패키지 제안"],
+    t: ["욕실 리모델링 B2C 채널은 KCC가 아닌 KCC글라스(홈씨씨)가 운영 — 해당 채널 내 경쟁사 수전 채택 시 진입 장벽", "건설 경기 둔화 시 B2B 건자재 전반의 단가 인하 압박"],
+    compare: "KCC는 2020년 1월 유리·홈씨씨·바닥재 사업을 KCC글라스로 인적분할한 뒤 도료·실리콘·건축자재 중심으로 재편되어, 대림통상의 수전·비데와 직접 경쟁하는 품목은 없습니다. 비교 대상이라기보다 B2B 건자재 시장의 참고 지표이며, 욕실 리모델링 채널 관점에서는 KCC글라스(홈씨씨)를 별도로 보는 것이 정확합니다. (규모 수치: DART 2024년 연결 매출)"
   },
   daelimBath: {
     name: "대림바스",
@@ -75,13 +75,25 @@ const swotData = {
     name: "아이에스동서",
     s: ["수전금구 정밀 도금 부문의 오랜 장인 기술력 및 친환경 자체 스펙 특허", "도비도스 대리점 유통 채널 기반 요업 건자재 영업망 우위"],
     w: ["종합 시행/건설 자본력 부재로 초대형 재정비 사업 지분 참여 한계", "아이에스동서 대비 제조 중심 사업구조에 따른 부동산 직접 개발 시너지 부재"],
-    o: ["아이에스동서의 이누스 브랜드 매각 이후 욕실 단독 요업 부문 스펙인 및 시장 잠식 반사 이익", "절수 센서 및 터치식 비접촉 스마트 수전 프리미엄 시장 점유 확대"],
+    o: ["이누스(2020년 아이에스동서가 E&F PE에 2,170억원에 매각)가 2026년 4월 기업회생을 신청, 5월 회생절차 개시 → 위생도기·비데 시장 공급 공백에 따른 대체 수요", "절수 센서 및 터치식 비접촉 스마트 수전 프리미엄 시장 점유 확대"],
     t: ["원자재(구리, 아연) 수입 물가 변동성에 따른 순수 제조 원가율 상승 리스크", "메이저 건설사의 B2B 조달 단가 인하 경쟁 유도에 따른 마진 방어 부담"],
-    compare: "아이에스동서는 대형 건설사 시행 사업을 바탕으로 외형 매출액 규모는 자사보다 현저히 크나, 욕실의 핵심 부품인 수전 및 금구 하드웨어 정밀 도금 기술력은 자사(대림통상)가 명백한 우위에 있습니다. 정비사업 및 특판 자재 수주전 경쟁 시, 자사의 고효율 절수 특허와 친환경 자재 스펙인을 전면에 내세워 이누스 매각 후 약화된 그들의 욕실 자재 틈새시장을 잠식해 가며 원가 마진율을 고수하는 방어 전략을 취합니다."
+    compare: "아이에스동서는 2020년 요업(이누스) 부문을 사모펀드 E&F PE에 매각해 현재는 욕실 자재 사업을 하지 않는 건설 중심 기업으로, 직접 경쟁사라기보다 과거 경쟁 구도의 비교 대상입니다. 실제 욕실 시장 경쟁자였던 이누스는 2026년 4월 기업회생을 신청했으므로, 대림통상은 이누스 거래처(건설사 특판·대리점)의 대체 공급 수요를 선점하는 데 영업력을 집중할 필요가 있습니다."
   }
 };
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// 법정 제출기한(사업 3/31, 1Q 5/15, 반기 8/14, 3Q 11/14)이 지난 가장 최근 보고서 기간
+const getLatestFiledPeriod = (now = new Date()) => {
+  const y = now.getFullYear();
+  const md = (now.getMonth() + 1) * 100 + now.getDate();
+  if (md > 1114) return { year: String(y), quarter: '3Q' };
+  if (md > 814) return { year: String(y), quarter: '2Q' };
+  if (md > 515) return { year: String(y), quarter: '1Q' };
+  if (md > 331) return { year: String(y - 1), quarter: '4Q' };
+  return { year: String(y - 1), quarter: '3Q' };
+};
+const LATEST_PERIOD = getLatestFiledPeriod();
 
 export default function Dashboard() {
   // 1. 기업 리스트 상태 - corpCode: DART 고유번호(company.json 검증), stockTicker: KOSPI 종목코드
@@ -94,8 +106,8 @@ export default function Dashboard() {
   ]);
 
 
-  // 2. 분기 범위 상태 - 기본 2024년 설정
-  const [quarters, setQuarters] = useState(["2024 1Q", "2024 2Q", "2024 3Q", "2024 4Q"]);
+  // 2. 분기 범위 상태 - DART 조회 완료 시 해당 연도 1Q~선택 분기로 설정
+  const [quarters, setQuarters] = useState([]);
 
   // 3. 재무 데이터 상태 (연결/별도 이원화, 백만원 단위) - DART 실조회 값만 저장 (샘플 수치 미사용)
   const [financialData, setFinancialData] = useState({});
@@ -108,12 +120,12 @@ export default function Dashboard() {
   
   // DART API 호출 매개변수들 - 환경변수 자동 바인딩
   const [apiKey, setApiKey] = useState(import.meta.env.VITE_DART_API_KEY || '');
-  const [selectedYear, setSelectedYear] = useState('2024');
-  const [selectedQuarter, setSelectedQuarter] = useState('4Q'); // 1Q, 2Q, 3Q, 4Q
-  
-  // 최종 조회 확정 연도/분기 상태 변수 (시장 트렌드 정밀 패널 및 차트 동기화 버그 해결책)
-  const [activeYear, setActiveYear] = useState('2024');
-  const [activeQuarter, setActiveQuarter] = useState('4Q');
+  const [selectedYear, setSelectedYear] = useState(LATEST_PERIOD.year);
+  const [selectedQuarter, setSelectedQuarter] = useState(LATEST_PERIOD.quarter); // 1Q, 2Q, 3Q, 4Q
+
+  // 최종 조회 확정 연도/분기 (테이블·차트·시장 패널 기준)
+  const [activeYear, setActiveYear] = useState(LATEST_PERIOD.year);
+  const [activeQuarter, setActiveQuarter] = useState(LATEST_PERIOD.quarter);
 
   const [marketSummary, setMarketSummary] = useState('');
   const [trendCards, setTrendCards] = useState([]);
@@ -133,12 +145,12 @@ export default function Dashboard() {
   const [isTrendLoading, setIsTrendLoading] = useState(false);
   const [trendStatusText, setTrendStatusText] = useState('');
 
-  // 시장 동향 브리핑 및 8대 지표 100% 동적 연동 (Sync) 수선 - 연도/분기 드롭다운 변경 즉시 연동
+  // 시장 지표 패널은 조회 확정 기간(activeYear/activeQuarter)에 맞춰 갱신
   useEffect(() => {
-    const { summary, list } = getMarketTrendsData(selectedYear, selectedQuarter);
+    const { summary, list } = getMarketTrendsData(activeYear, activeQuarter);
     setMarketSummary(summary);
     setTrendCards(list);
-  }, [selectedYear, selectedQuarter]);
+  }, [activeYear, activeQuarter]);
 
   // 주가 실시간 조회 (Yahoo Finance 프록시 → /api/stock)
   useEffect(() => {
@@ -282,7 +294,8 @@ export default function Dashboard() {
         }
       }));
 
-      setFinancialData(newFinancialData);
+      // 다년도 추이 데이터는 유지하고 이번 조회 분기만 갱신
+      setFinancialData(prev => ({ ...prev, ...newFinancialData }));
       setQuarters(qList.map(q => `${selectedYear} ${q}`));
 
       setCfsUnavailableSet(localCfsUnavail);
@@ -325,59 +338,53 @@ export default function Dashboard() {
       return;
     }
     setIsTrendLoading(true);
+    // 현재 화면에 확정된 기간(activeYear/activeQuarter) 기준으로 과거 연도 동일 분기 누계를 조회
     const rCodeMap = { '1Q': '11013', '2Q': '11012', '3Q': '11014', '4Q': '11011' };
-    const reprtCode = rCodeMap[selectedQuarter];
+    const reprtCode = rCodeMap[activeQuarter];
     const activeCompanies = companies.filter(c => c.corpCode);
-    const startYear = parseInt(selectedYear) - trendYears + 1;
+    const startYear = parseInt(activeYear) - trendYears + 1;
     const years = Array.from({ length: trendYears }, (_, i) => String(startYear + i));
     const totalOps = years.length * activeCompanies.length * 2;
     let currentOp = 0;
+    const fetched = {};
 
-    for (const year of years) {
-      for (const company of activeCompanies) {
+    await Promise.all(activeCompanies.map(async (company) => {
+      for (const year of years) {
         for (const fsDiv of ['CFS', 'OFS']) {
-          currentOp++;
-          const fsDivLower = fsDiv.toLowerCase();
-          const qKey = `${year} ${selectedQuarter}`;
           const cacheKey = `${apiKey.trim()}-${company.corpCode.trim()}-${year}-${reprtCode}-${fsDiv}`;
-          setTrendStatusText(`[${year}년 ${company.name} ${fsDiv}] 조회 중 (${currentOp}/${totalOps})`);
-
+          let data = null;
           if (apiCacheRef.current.has(cacheKey)) {
-            const cached = apiCacheRef.current.get(cacheKey);
-            if (cached) {
-              setFinancialData(prev => ({
-                ...prev,
-                [qKey]: { ...(prev[qKey] || {}), [company.id]: { ...(prev[qKey]?.[company.id] || {}), [fsDivLower]: cached } }
-              }));
-            }
+            data = apiCacheRef.current.get(cacheKey);
           } else {
             try {
-              const data = await fetchDartData(apiKey.trim(), company.corpCode.trim(), year, reprtCode, fsDiv);
-              apiCacheRef.current.set(cacheKey, data);
-              if (data) {
-                setFinancialData(prev => ({
-                  ...prev,
-                  [qKey]: { ...(prev[qKey] || {}), [company.id]: { ...(prev[qKey]?.[company.id] || {}), [fsDivLower]: data } }
-                }));
-              }
+              data = await fetchDartData(apiKey.trim(), company.corpCode.trim(), year, reprtCode, fsDiv);
+              await delay(200);
             } catch (e) {
               console.warn(`[TREND] ${year}년 ${company.name} ${fsDiv}:`, e.message);
-              apiCacheRef.current.set(cacheKey, null);
             }
-            await delay(300);
+            apiCacheRef.current.set(cacheKey, data);
+          }
+          currentOp++;
+          setTrendStatusText(`다년도 재무제표 조회 중 (${currentOp}/${totalOps})`);
+          if (data) {
+            const qKey = `${year} ${activeQuarter}`;
+            fetched[qKey] = fetched[qKey] || {};
+            fetched[qKey][company.id] = { ...(fetched[qKey][company.id] || {}), [fsDiv.toLowerCase()]: data };
           }
         }
       }
-      const qKey = `${year} ${selectedQuarter}`;
-      if (!quarters.includes(qKey)) {
-        setQuarters(prev => sortQuarters([...prev, qKey]));
-      }
-    }
+    }));
 
-    setActiveYear(selectedYear);
-    setActiveQuarter(selectedQuarter);
+    setFinancialData(prev => {
+      const next = { ...prev };
+      Object.entries(fetched).forEach(([qKey, byCompany]) => {
+        next[qKey] = { ...(prev[qKey] || {}) };
+        Object.entries(byCompany).forEach(([cid, v]) => { next[qKey][cid] = { ...(prev[qKey]?.[cid] || {}), ...v }; });
+      });
+      return next;
+    });
     setIsTrendLoading(false);
-    setTrendStatusText(`다년도 추이 조회 완료! (${selectedYear}년 기준 최근 ${trendYears}년 ${selectedQuarter})`);
+    setTrendStatusText(`다년도 추이 조회 완료 (${activeYear}년 기준 최근 ${trendYears}년, 매년 ${activeQuarter} 누계)`);
   };
 
   // ---------------------------------------------------------
@@ -395,7 +402,7 @@ export default function Dashboard() {
   // ---------------------------------------------------------
   const handleExportCSV = () => {
     const fsDiv = isConsolidated ? 'cfs' : 'ofs';
-    const header = ['기업명', '기간', '공시구분', '집계모드', '매출액(백만)', '영업이익(백만)', '영업이익률(%)', '경상손익(백만)', '경상손익률(%)', '판관비(백만)', '판관비율(%)', '총포괄손익(백만)', '순이익률(%)', '부채비율(%)', 'ROE(%)', '유동비율(%)'];
+    const header = ['기업명', '기간', '공시구분', '집계모드', '매출액(백만)', '영업이익(백만)', '영업이익률(%)', '경상손익(백만)', '경상손익률(%)', '판관비(백만)', '판관비율(%)', '당기순이익(백만)', '순이익률(%)', '총포괄손익(백만)', '부채비율(%)', 'ROE(%)', '유동비율(%)'];
     const rows = [header.join(',')];
 
     sortQuarters(quarters).forEach(q => {
@@ -409,14 +416,14 @@ export default function Dashboard() {
         const eq = getComputedValue(company.id, q, 'equity', fsDiv);
         const curA = getComputedValue(company.id, q, 'currentAssets', fsDiv);
         const curL = getComputedValue(company.id, q, 'currentLiabilities', fsDiv);
-        const opMargin = sales > 0 ? ((op / sales) * 100).toFixed(2) : '0.00';
-        const oiMarginCsv = sales > 0 ? ((oi / sales) * 100).toFixed(2) : '0.00';
-        const sgaR = sales > 0 ? ((sga / sales) * 100).toFixed(2) : '0.00';
-        const netMargin = sales > 0 ? ((net / sales) * 100).toFixed(2) : '0.00';
+        const opMargin = sales > 0 ? ((op / sales) * 100).toFixed(2) : '';
+        const oiMarginCsv = sales > 0 ? ((oi / sales) * 100).toFixed(2) : '';
+        const sgaR = sales > 0 ? ((sga / sales) * 100).toFixed(2) : '';
         const pl = getComputedValue(company.id, q, 'profitLoss', fsDiv);
+        const netMargin = sales > 0 ? ((pl / sales) * 100).toFixed(2) : '';
         const roeCsv = eq > 0 ? ((pl / eq) * 100).toFixed(2) : '';
         const currentRatioCsv = curL > 0 ? ((curA / curL) * 100).toFixed(2) : '';
-        rows.push([company.name, q, isConsolidated ? '연결(CFS)' : '별도(OFS)', isCumulative ? '누계액' : '당분기', sales, op, opMargin, oi, oiMarginCsv, sga, sgaR, net, netMargin, debt < 0 ? '자본잠식' : debt, roeCsv, currentRatioCsv].join(','));
+        rows.push([company.name, q, isConsolidated ? '연결(CFS)' : '별도(OFS)', isCumulative ? '누계액' : '당분기', sales, op, opMargin, oi, oiMarginCsv, sga, sgaR, pl, netMargin, net, debt < 0 ? '자본잠식' : debt, roeCsv, currentRatioCsv].join(','));
       });
     });
 
@@ -512,7 +519,7 @@ export default function Dashboard() {
         <div>
           <div className="flex flex-wrap items-center gap-2 mb-1.5">
             <span className="bg-indigo-500/10 text-indigo-400 text-xs px-2.5 py-1 rounded-full font-semibold border border-indigo-500/20 tracking-wider">
-              REAL-TIME FACT SYSTEM
+              DART 공시 기반
             </span>
             <span className="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 text-xs px-2.5 py-1 rounded-full font-semibold border border-emerald-500/20">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -552,7 +559,7 @@ export default function Dashboard() {
               onChange={(e) => setSelectedYear(e.target.value)}
               className="bg-slate-900 border border-slate-800 rounded-lg px-2 py-1.5 text-xs text-slate-200 focus:outline-none"
             >
-              {Array.from({ length: 17 }, (_, i) => 2010 + i).map(y => (
+              {Array.from({ length: new Date().getFullYear() - 2015 + 1 }, (_, i) => 2015 + i).map(y => (
                 <option key={y} value={y}>{y}년</option>
               ))}
             </select>
@@ -633,7 +640,7 @@ export default function Dashboard() {
             <div className="p-2 bg-amber-500/10 rounded-lg text-amber-400"><BarChart2 className="w-5 h-5" /></div>
             <div>
               <h2 className="text-lg font-bold text-slate-100">KOSPI 주가 현황</h2>
-              <p className="text-slate-400 text-xs">Yahoo Finance 실시간 연동 · 전일비 등락 기준</p>
+              <p className="text-slate-400 text-xs">Yahoo Finance 시세 (약 15~20분 지연) · 전일 종가 대비 등락</p>
             </div>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
@@ -656,9 +663,9 @@ export default function Dashboard() {
                       <div className="text-xl font-extrabold text-slate-100 mb-0.5">
                         ₩{s.price.toLocaleString('ko-KR')}
                       </div>
-                      <div className={`text-xs font-bold flex items-center gap-1 ${s.change >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                        {s.change >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                        {s.change >= 0 ? '+' : ''}{s.change.toLocaleString('ko-KR')} ({s.changePct >= 0 ? '+' : ''}{s.changePct.toFixed(2)}%)
+                      <div className={`text-xs font-bold flex items-center gap-1 ${s.change > 0 ? 'text-red-400' : s.change < 0 ? 'text-blue-400' : 'text-slate-400'}`}>
+                        {s.change > 0 ? <TrendingUp className="w-3 h-3" /> : s.change < 0 ? <TrendingDown className="w-3 h-3" /> : null}
+                        {s.change > 0 ? '▲' : s.change < 0 ? '▼' : ''}{Math.abs(s.change).toLocaleString('ko-KR')} ({s.changePct > 0 ? '+' : ''}{s.changePct.toFixed(2)}%)
                       </div>
                       {s.sparkline?.length > 0 && (
                         <div className="mt-2 h-10 w-full">
@@ -778,15 +785,15 @@ export default function Dashboard() {
                   <Info className="w-4 h-4" />
                 </span>
                 <div className="flex-1">
-                  <div className="text-xs font-bold text-amber-400">DART 실시간 조회 실패 - 시뮬레이션 모드로 전환되었습니다</div>
-                  <p className="text-[10px] text-slate-300 mt-0.5 leading-relaxed font-semibold">
-                    {dartError.split('\n')[0]}
+                  <div className="text-xs font-bold text-amber-400">DART 조회 실패 - 표시할 실데이터가 없습니다</div>
+                  <p className="text-[10px] text-slate-300 mt-0.5 leading-relaxed font-semibold whitespace-pre-line">
+                    {dartError}
                   </p>
-                  <button 
+                  <button
                     onClick={() => setDartError(null)}
                     className="mt-1.5 text-[9px] font-extrabold text-amber-400 hover:text-amber-300 underline cursor-pointer"
                   >
-                    경고 지우기 및 샘플 데이터 복원
+                    경고 닫기
                   </button>
                 </div>
               </div>
@@ -895,7 +902,7 @@ export default function Dashboard() {
             </div>
             <div>
               <h2 className="text-lg font-bold text-slate-100">연간 다년도 추이 비교</h2>
-              <p className="text-slate-400 text-xs">동일 분기 기준 연도별 비교 추이 ({activeQuarter} 기준, {isConsolidated ? '연결' : '별도'})</p>
+              <p className="text-slate-400 text-xs">매년 {activeQuarter} 누계 기준 연도별 비교 ({isConsolidated ? '연결' : '별도'}, 당분기 토글 미적용)</p>
             </div>
           </div>
           <div className="flex flex-wrap gap-2 items-center self-start sm:self-auto">
@@ -947,25 +954,28 @@ export default function Dashboard() {
 
         {(() => {
           const fsDiv = isConsolidated ? 'cfs' : 'ofs';
+          // 연도 간 동일 기간 비교이므로 당분기 토글과 무관하게 누계값 사용 (과거 연도는 직전 분기 미조회)
+          const raw = (cid, qKey, metric) => financialData[qKey]?.[cid]?.[fsDiv]?.[metric] ?? 0;
+          const hasData = (cid, qKey) => Object.keys(financialData[qKey]?.[cid]?.[fsDiv] || {}).length > 0;
           const trendChartData = Array.from({ length: trendYears }, (_, i) => {
             const year = String(parseInt(activeYear) - (trendYears - 1 - i));
             const qKey = `${year} ${activeQuarter}`;
             const row = { year };
             companies.forEach(company => {
-              const sales = getComputedValue(company.id, qKey, 'sales', fsDiv);
-              const op = getComputedValue(company.id, qKey, 'operatingProfit', fsDiv);
+              if (!hasData(company.id, qKey)) { row[company.name] = null; return; }
+              const sales = raw(company.id, qKey, 'sales');
               if (trendMetric === 'operatingProfitMargin') {
-                row[company.name] = sales > 0 ? parseFloat(((op / sales) * 100).toFixed(2)) : 0;
+                row[company.name] = sales > 0 ? parseFloat(((raw(company.id, qKey, 'operatingProfit') / sales) * 100).toFixed(2)) : null;
               } else if (trendMetric === 'sgaRatio') {
-                const sga = getComputedValue(company.id, qKey, 'sgaExpenses', fsDiv);
-                row[company.name] = sales > 0 ? parseFloat(((sga / sales) * 100).toFixed(2)) : 0;
+                row[company.name] = sales > 0 ? parseFloat(((raw(company.id, qKey, 'sgaExpenses') / sales) * 100).toFixed(2)) : null;
               } else {
-                row[company.name] = getComputedValue(company.id, qKey, trendMetric, fsDiv);
+                row[company.name] = raw(company.id, qKey, trendMetric);
               }
             });
             return row;
           });
-          const isTrendEmpty = trendChartData.every(row => companies.every(c => !row[c.name] || row[c.name] === 0));
+          const yearsWithData = trendChartData.filter(row => companies.some(c => row[c.name] != null)).length;
+          const isTrendEmpty = yearsWithData < 2;
           const isPercent = ['operatingProfitMargin', 'debtRatio', 'sgaRatio'].includes(trendMetric);
           return isTrendEmpty ? (
             <div className="h-[280px] flex items-center justify-center">
@@ -984,7 +994,7 @@ export default function Dashboard() {
                   <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false}
                     tickFormatter={v => isPercent ? `${v}%` : `${v.toLocaleString('ko-KR')}M`} />
                   <Tooltip contentStyle={{ backgroundColor: '#0d1224', borderColor: '#1f2954', borderRadius: '12px', color: '#f8fafc', fontSize: '12px' }}
-                    formatter={(value, name) => [`${value.toLocaleString('ko-KR')}${isPercent ? '%' : ' 백만원'}`, name]} />
+                    formatter={(value, name) => [value == null ? '데이터 없음' : `${value.toLocaleString('ko-KR')}${isPercent ? '%' : ' 백만원'}`, name]} />
                   <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} iconType="circle" />
                   {companies.map((company, index) => (
                     <Line key={company.id} name={company.name} type="monotone" dataKey={company.name}
@@ -1006,13 +1016,13 @@ export default function Dashboard() {
               <Layers3 className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-100">시장 트렌드 정밀 패널 (8대 지표)</h2>
-              <p className="text-slate-400 text-xs">확정 조회 기준 연도/분기에 따라 실시간 동기화된 선행 지표들</p>
+              <h2 className="text-lg font-bold text-slate-100">시장 트렌드 참고 패널 (8대 지표)</h2>
+              <p className="text-amber-400/90 text-xs font-semibold">⚠ 실제 통계가 아닌 연도별 경기 국면 가정에 따른 추정 시뮬레이션 값입니다. 의사결정에 인용하지 마세요.</p>
             </div>
           </div>
-          
+
           <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-xl px-3 py-1 text-xs text-indigo-400 font-bold self-start md:self-auto">
-            동기화 기준 기간: {selectedYear}년 {selectedQuarter}
+            기준 기간: {activeYear}년 {activeQuarter}
           </div>
         </div>
 
@@ -1110,11 +1120,12 @@ export default function Dashboard() {
                 <th className="p-4 text-right">경상손익률</th>
                 <th className="p-4 text-right">판관비 총계</th>
                 <th className="p-4 text-right">판관비율</th>
+                <th className="p-4 text-right">당기순이익</th>
+                <th className="p-4 text-right" title="당기순이익 ÷ 매출액">순이익률</th>
                 <th className="p-4 text-right">총포괄손익</th>
-                <th className="p-4 text-right">순이익률</th>
-                <th className="p-4 text-right">부채비율</th>
-                <th className="p-4 text-right">ROE</th>
-                <th className="p-4 text-right">유동비율</th>
+                <th className="p-4 text-right" title="부채총계 ÷ 자본총계 (기말)">부채비율</th>
+                <th className="p-4 text-right" title="당기순이익 ÷ 기말 자본총계 (연환산 아님)">ROE</th>
+                <th className="p-4 text-right" title="유동자산 ÷ 유동부채 (기말)">유동비율</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/50 text-slate-300 text-xs">
@@ -1134,8 +1145,8 @@ export default function Dashboard() {
                 const opMargin = sales > 0 ? ((op / sales) * 100).toFixed(2) : null;
                 const oiMargin = sales > 0 ? ((oi / sales) * 100).toFixed(2) : null;
                 const sgaRatio = sales > 0 ? ((sga / sales) * 100).toFixed(2) : null;
-                const netMargin = sales > 0 ? ((net / sales) * 100).toFixed(2) : null;
                 const pl = getComputedValue(company.id, targetQuarterStr, 'profitLoss', fsDiv);
+                const netMargin = sales > 0 ? ((pl / sales) * 100).toFixed(2) : null;
                 const roe = eq > 0 ? ((pl / eq) * 100).toFixed(2) : null;
                 const currentRatio = curL > 0 ? ((curA / curL) * 100).toFixed(1) : null;
 
@@ -1169,15 +1180,18 @@ export default function Dashboard() {
                     </td>
                     <td className="p-4 text-right">
                       <span className={`inline-block px-2.5 py-1 rounded-lg font-bold border ${
-                        net < 0
+                        pl < 0
                           ? 'bg-rose-500/10 text-rose-400 border-rose-500/20'
                           : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                       }`}>
-                        {net >= 0 ? '+' : ''}{net.toLocaleString('ko-KR')}
+                        {pl >= 0 ? '+' : ''}{pl.toLocaleString('ko-KR')}
                       </span>
                     </td>
                     <td className={`p-4 text-right font-semibold ${netMargin === null ? 'text-slate-500' : parseFloat(netMargin) < 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
                       {netMargin === null ? '-' : `${parseFloat(netMargin) >= 0 ? '+' : ''}${netMargin}%`}
+                    </td>
+                    <td className={`p-4 text-right font-semibold ${net < 0 ? 'text-rose-400' : 'text-slate-300'}`}>
+                      {net >= 0 ? '+' : ''}{net.toLocaleString('ko-KR')}
                     </td>
                     <td className="p-4 text-right text-slate-300 font-semibold">
                       {debt < 0 ? (
