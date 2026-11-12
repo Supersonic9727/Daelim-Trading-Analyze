@@ -82,58 +82,58 @@ export default function Dashboard() {
   const [financialData, setFinancialData] = useState({
     "2024 1Q": {
       daelimTrading: {
-        cfs: { sales: 62000, operatingProfit: 2800, netIncome: -1200, debtRatio: 95, ordinaryIncome: 0, sgaExpenses: 9300 },
-        ofs: { sales: 58000, operatingProfit: 2200, netIncome: -900, debtRatio: 90, ordinaryIncome: 0, sgaExpenses: 8700 }
+        cfs: { sales: 62000, operatingProfit: 2800, netIncome: -1200, debtRatio: 95, ordinaryIncome: 800, sgaExpenses: 9300 },
+        ofs: { sales: 58000, operatingProfit: 2200, netIncome: -900, debtRatio: 90, ordinaryIncome: 600, sgaExpenses: 8700 }
       },
       daelimBath: {
-        cfs: { sales: 58000, operatingProfit: 1800, netIncome: 1300, debtRatio: 110, ordinaryIncome: 0, sgaExpenses: 8700 },
-        ofs: { sales: 58000, operatingProfit: 1800, netIncome: 1300, debtRatio: 110, ordinaryIncome: 0, sgaExpenses: 8700 }
+        cfs: { sales: 58000, operatingProfit: 1800, netIncome: 1300, debtRatio: 110, ordinaryIncome: 1680, sgaExpenses: 8700 },
+        ofs: { sales: 58000, operatingProfit: 1800, netIncome: 1300, debtRatio: 110, ordinaryIncome: 1680, sgaExpenses: 8700 }
       },
       isDongseo: {
-        cfs: { sales: 420000, operatingProfit: 65000, netIncome: -18000, debtRatio: 130, ordinaryIncome: 0, sgaExpenses: 42000 },
-        ofs: { sales: 310000, operatingProfit: 48000, netIncome: -11000, debtRatio: 115, ordinaryIncome: 0, sgaExpenses: 31000 }
+        cfs: { sales: 420000, operatingProfit: 65000, netIncome: -18000, debtRatio: 130, ordinaryIncome: 20000, sgaExpenses: 42000 },
+        ofs: { sales: 310000, operatingProfit: 48000, netIncome: -11000, debtRatio: 115, ordinaryIncome: 14500, sgaExpenses: 31000 }
       }
     },
     "2024 2Q": {
       daelimTrading: {
-        cfs: { sales: 127000, operatingProfit: 6000, netIncome: -2300, debtRatio: 92, ordinaryIncome: 0, sgaExpenses: 19050 },
-        ofs: { sales: 118000, operatingProfit: 4800, netIncome: -1500, debtRatio: 88, ordinaryIncome: 0, sgaExpenses: 17700 }
+        cfs: { sales: 127000, operatingProfit: 6000, netIncome: -2300, debtRatio: 92, ordinaryIncome: 1800, sgaExpenses: 19050 },
+        ofs: { sales: 118000, operatingProfit: 4800, netIncome: -1500, debtRatio: 88, ordinaryIncome: 1400, sgaExpenses: 17700 }
       },
       daelimBath: {
-        cfs: { sales: 118000, operatingProfit: 4000, netIncome: 2950, debtRatio: 108, ordinaryIncome: 0, sgaExpenses: 17700 },
-        ofs: { sales: 118000, operatingProfit: 4000, netIncome: 2950, debtRatio: 108, ordinaryIncome: 0, sgaExpenses: 17700 }
+        cfs: { sales: 118000, operatingProfit: 4000, netIncome: 2950, debtRatio: 108, ordinaryIncome: 3800, sgaExpenses: 17700 },
+        ofs: { sales: 118000, operatingProfit: 4000, netIncome: 2950, debtRatio: 108, ordinaryIncome: 3800, sgaExpenses: 17700 }
       },
       isDongseo: {
-        cfs: { sales: 870000, operatingProfit: 137000, netIncome: -34000, debtRatio: 125, ordinaryIncome: 0, sgaExpenses: 87000 },
-        ofs: { sales: 630000, operatingProfit: 101000, netIncome: -24000, debtRatio: 112, ordinaryIncome: 0, sgaExpenses: 63000 }
+        cfs: { sales: 870000, operatingProfit: 137000, netIncome: -34000, debtRatio: 125, ordinaryIncome: 43000, sgaExpenses: 87000 },
+        ofs: { sales: 630000, operatingProfit: 101000, netIncome: -24000, debtRatio: 112, ordinaryIncome: 32000, sgaExpenses: 63000 }
       }
     },
     "2024 3Q": {
       daelimTrading: {
-        cfs: { sales: 188000, operatingProfit: 8500, netIncome: -3500, debtRatio: 98, ordinaryIncome: 0, sgaExpenses: 28200 },
-        ofs: { sales: 175500, operatingProfit: 6800, netIncome: -2700, debtRatio: 94, ordinaryIncome: 0, sgaExpenses: 26325 }
+        cfs: { sales: 188000, operatingProfit: 8500, netIncome: -3500, debtRatio: 98, ordinaryIncome: 2600, sgaExpenses: 28200 },
+        ofs: { sales: 175500, operatingProfit: 6800, netIncome: -2700, debtRatio: 94, ordinaryIncome: 2000, sgaExpenses: 26325 }
       },
       daelimBath: {
-        cfs: { sales: 175000, operatingProfit: 5500, netIncome: 3950, debtRatio: 112, ordinaryIncome: 0, sgaExpenses: 26250 },
-        ofs: { sales: 175000, operatingProfit: 5500, netIncome: 3950, debtRatio: 112, ordinaryIncome: 0, sgaExpenses: 26250 }
+        cfs: { sales: 175000, operatingProfit: 5500, netIncome: 3950, debtRatio: 112, ordinaryIncome: 5100, sgaExpenses: 26250 },
+        ofs: { sales: 175000, operatingProfit: 5500, netIncome: 3950, debtRatio: 112, ordinaryIncome: 5100, sgaExpenses: 26250 }
       },
       isDongseo: {
-        cfs: { sales: 1280000, operatingProfit: 197000, netIncome: -52000, debtRatio: 132, ordinaryIncome: 0, sgaExpenses: 128000 },
-        ofs: { sales: 935000, operatingProfit: 145000, netIncome: -38000, debtRatio: 118, ordinaryIncome: 0, sgaExpenses: 93500 }
+        cfs: { sales: 1280000, operatingProfit: 197000, netIncome: -52000, debtRatio: 132, ordinaryIncome: 62000, sgaExpenses: 128000 },
+        ofs: { sales: 935000, operatingProfit: 145000, netIncome: -38000, debtRatio: 118, ordinaryIncome: 46000, sgaExpenses: 93500 }
       }
     },
     "2024 4Q": {
       daelimTrading: {
-        cfs: { sales: 256000, operatingProfit: 12500, netIncome: -5400, debtRatio: 89, ordinaryIncome: 0, sgaExpenses: 38400 },
-        ofs: { sales: 238000, operatingProfit: 10000, netIncome: -4200, debtRatio: 86, ordinaryIncome: 0, sgaExpenses: 35700 }
+        cfs: { sales: 256000, operatingProfit: 12500, netIncome: -5400, debtRatio: 89, ordinaryIncome: 3800, sgaExpenses: 38400 },
+        ofs: { sales: 238000, operatingProfit: 10000, netIncome: -4200, debtRatio: 86, ordinaryIncome: 3000, sgaExpenses: 35700 }
       },
       daelimBath: {
-        cfs: { sales: 237000, operatingProfit: 8000, netIncome: 5800, debtRatio: 105, ordinaryIncome: 0, sgaExpenses: 35550 },
-        ofs: { sales: 237000, operatingProfit: 8000, netIncome: 5800, debtRatio: 105, ordinaryIncome: 0, sgaExpenses: 35550 }
+        cfs: { sales: 237000, operatingProfit: 8000, netIncome: 5800, debtRatio: 105, ordinaryIncome: 7500, sgaExpenses: 35550 },
+        ofs: { sales: 237000, operatingProfit: 8000, netIncome: 5800, debtRatio: 105, ordinaryIncome: 7500, sgaExpenses: 35550 }
       },
       isDongseo: {
-        cfs: { sales: 1760000, operatingProfit: 278000, netIncome: -73000, debtRatio: 120, ordinaryIncome: 0, sgaExpenses: 176000 },
-        ofs: { sales: 1285000, operatingProfit: 205000, netIncome: -49000, debtRatio: 107, ordinaryIncome: 0, sgaExpenses: 128500 }
+        cfs: { sales: 1760000, operatingProfit: 278000, netIncome: -73000, debtRatio: 120, ordinaryIncome: 87000, sgaExpenses: 176000 },
+        ofs: { sales: 1285000, operatingProfit: 205000, netIncome: -49000, debtRatio: 107, ordinaryIncome: 64000, sgaExpenses: 128500 }
       }
     }
   });
