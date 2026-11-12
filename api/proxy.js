@@ -55,6 +55,7 @@ export default async function handler(req, res) {
     // 정상(000)·데이터없음(013)만 엣지 캐시 — 사용한도 초과(020) 등 일시 오류가 캐시되지 않도록
     if (data?.status === '000' || data?.status === '013') {
       res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400');
+      res.setHeader('Vercel-CDN-Cache-Control', 'max-age=3600, stale-while-revalidate=86400');
     }
     return res.status(response.status).json(data);
   } catch (error) {
