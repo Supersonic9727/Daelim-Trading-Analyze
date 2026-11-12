@@ -224,9 +224,18 @@ export default function Dashboard() {
             const chart = data?.chart?.result?.[0];
             if (!chart) return;
             const meta = chart.meta;
-            const closes = (chart.indicators?.quote?.[0]?.close || []).filter(v => v !== null);
-            const prevClose = meta.previousClose || meta.chartPreviousClose || meta.regularMarketPrice;
+            const rawCloses = chart.indicators?.quote?.[0]?.close || [];
+            const bars = (chart.timestamp || [])
+              .map((t, i) => ({ t, c: rawCloses[i] }))
+              .filter(b => b.c != null);
+            const closes = bars.map(b => b.c);
             const price = meta.regularMarketPrice;
+            // chartPreviousClose는 조회 구간(1개월) 시작 전 종가라 전일비 기준이 아님 → 일봉에서 직전 거래일 종가 사용
+            const kstDate = (sec) => new Date((sec + 9 * 3600) * 1000).toISOString().slice(0, 10);
+            const lastBar = bars[bars.length - 1];
+            const lastIsToday = lastBar && meta.regularMarketTime && kstDate(lastBar.t) === kstDate(meta.regularMarketTime);
+            const prevBar = lastIsToday ? bars[bars.length - 2] : lastBar;
+            const prevClose = prevBar?.c || price;
             const change = price - prevClose;
             const changePct = prevClose ? (change / prevClose * 100) : 0;
             results[company.id] = {
