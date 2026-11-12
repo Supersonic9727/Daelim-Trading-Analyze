@@ -51,7 +51,7 @@ export const getMarketTrendsData = (yearNum, quarterName) => {
   if (phase === "transition") cbsiVal = 74.8;
   // 분기별 난수적 보정
   cbsiVal = parseFloat((cbsiVal + (qMultiplier - 1) * 8).toFixed(1));
-  const cbsiPrev = parseFloat((cbsiVal * 1.02).toFixed(1));
+  const cbsiPrev = parseFloat(((phase === "slump" || phase === "recession" ? cbsiVal * 1.03 : cbsiVal * 0.97)).toFixed(1));
 
   // 3. 건자재 가격 지수 (2015=100)
   let materialVal = 85 + yearOffset * 2.8;
@@ -65,14 +65,14 @@ export const getMarketTrendsData = (yearNum, quarterName) => {
   if (phase === "boom") ordersVal *= 1.5;
   if (phase === "slump") ordersVal *= 0.7;
   ordersVal = parseFloat((ordersVal * qMultiplier).toFixed(1));
-  const ordersPrev = parseFloat((ordersVal * 0.92).toFixed(1));
+  const ordersPrev = parseFloat(((phase === "slump" || phase === "recession" ? ordersVal * 1.08 : ordersVal * 0.92)).toFixed(1));
 
   // 5. 아파트 분양 물량 (천호)
   let supplyVal = 30 + yearOffset * 1.8;
   if (phase === "boom") supplyVal *= 1.6;
   if (phase === "slump") supplyVal *= 0.55;
   supplyVal = Math.round(supplyVal * qMultiplier);
-  const supplyPrev = Math.round(supplyVal * 0.95);
+  const supplyPrev = Math.round(phase === "slump" || phase === "recession" ? supplyVal * 1.08 : supplyVal * 0.95);
 
   // 6. 수도권 주택 매매가격지수 (전월비 %)
   let priceIdx = 0.1;
@@ -90,7 +90,7 @@ export const getMarketTrendsData = (yearNum, quarterName) => {
   if (phase === "slump") unsoldVal = 75000;
   if (phase === "transition") unsoldVal = 64000;
   unsoldVal = Math.round(unsoldVal * (1 + (q === "1Q" ? 0.05 : -0.03)));
-  const unsoldPrev = Math.round(unsoldVal * 1.03);
+  const unsoldPrev = Math.round(phase === "slump" || phase === "recession" ? unsoldVal * 0.93 : unsoldVal * 1.07);
 
   // 8. 상위 10대 대형 건설사 수주 비중 (%)
   let bigRatio = 45;

@@ -71,8 +71,6 @@ export default function Dashboard() {
     { id: 'isDongseo', name: '아이에스동서', displayCode: '00105344', corpCode: '00115977', color: '#10b981' },
   ]);
 
-  // 실시간 DART 연동 성공 시 기존 가짜 Mock 데이터 일괄 청소를 위한 상태 변수
-  const [isMockCleared, setIsMockCleared] = useState(false);
 
   // 2. 분기 범위 상태 - 기본 2024년 설정
   const [quarters, setQuarters] = useState(["2024 1Q", "2024 2Q", "2024 3Q", "2024 4Q"]);
@@ -263,38 +261,13 @@ export default function Dashboard() {
         await delay(300); // 딜레이 안전장치
       }
 
-      // 최종 데이터 바인딩
+      // 최종 데이터 바인딩 - 조회한 분기의 데이터만 실데이터로 교체 (다른 분기 목 데이터 유지)
       setFinancialData(prev => {
-        let baseData = prev;
-        
-        // 첫 성공 시 기존 Mock 데이터 전체 청소
-        if (!isMockCleared) {
-          const cleared = {};
-          quarters.forEach(q => {
-            cleared[q] = {};
-            companies.forEach(c => {
-              cleared[q][c.id] = {
-                cfs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0 },
-                ofs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0 }
-              };
-            });
-          });
-          baseData = cleared;
-          setIsMockCleared(true);
-        }
-
-        const qData = baseData[targetQuarterStr] || {};
-        
-        // 루프 돌며 받아온 실데이터 병합
-        const updatedQData = { ...qData };
+        const updatedQData = { ...(prev[targetQuarterStr] || {}) };
         Object.keys(newFinancialData).forEach(compId => {
           updatedQData[compId] = newFinancialData[compId];
         });
-
-        return {
-          ...baseData,
-          [targetQuarterStr]: updatedQData
-        };
+        return { ...prev, [targetQuarterStr]: updatedQData };
       });
 
       // 새로운 분기 범위 등록
@@ -407,7 +380,7 @@ export default function Dashboard() {
   // ---------------------------------------------------------
   const handleExportCSV = () => {
     const fsDiv = isConsolidated ? 'cfs' : 'ofs';
-    const header = ['기업명', '기간', '공시구분', '집계모드', '매출액(백만)', '영업이익(백만)', '영업이익률(%)', '경상손익(백만)', '판관비(백만)', '판관비율(%)', '총포괄손익(백만)', '순이익률(%)', '부채비율(%)'];
+    const header = ['기업명', '기간', '공시구분', '집계모드', '매출액(백만)', '영업이익(백만)', '영업이익률(%)', '경상손익(백만)', '경상손익률(%)', '판관비(백만)', '판관비율(%)', '총포괄손익(백만)', '순이익률(%)', '부채비율(%)'];
     const rows = [header.join(',')];
 
     sortQuarters(quarters).forEach(q => {
@@ -419,9 +392,10 @@ export default function Dashboard() {
         const sga = getComputedValue(company.id, q, 'sgaExpenses', fsDiv);
         const debt = getComputedValue(company.id, q, 'debtRatio', fsDiv);
         const opMargin = sales > 0 ? ((op / sales) * 100).toFixed(2) : '0.00';
+        const oiMarginCsv = sales > 0 ? ((oi / sales) * 100).toFixed(2) : '0.00';
         const sgaR = sales > 0 ? ((sga / sales) * 100).toFixed(2) : '0.00';
         const netMargin = sales > 0 ? ((net / sales) * 100).toFixed(2) : '0.00';
-        rows.push([company.name, q, isConsolidated ? '연결(CFS)' : '별도(OFS)', isCumulative ? '누계액' : '당분기', sales, op, opMargin, oi, sga, sgaR, net, netMargin, debt < 0 ? '자본잠식' : debt].join(','));
+        rows.push([company.name, q, isConsolidated ? '연결(CFS)' : '별도(OFS)', isCumulative ? '누계액' : '당분기', sales, op, opMargin, oi, oiMarginCsv, sga, sgaR, net, netMargin, debt < 0 ? '자본잠식' : debt].join(','));
       });
     });
 
@@ -557,7 +531,7 @@ export default function Dashboard() {
               onChange={(e) => setSelectedYear(e.target.value)}
               className="bg-slate-900 border border-slate-800 rounded-lg px-2 py-1.5 text-xs text-slate-200 focus:outline-none"
             >
-              {Array.from({ length: 16 }, (_, i) => 2010 + i).map(y => (
+              {Array.from({ length: 17 }, (_, i) => 2010 + i).map(y => (
                 <option key={y} value={y}>{y}년</option>
               ))}
             </select>
