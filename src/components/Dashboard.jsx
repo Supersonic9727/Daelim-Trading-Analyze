@@ -42,7 +42,6 @@ const sortQuarters = (qList) => {
 };
 
 // SWOT 분석 및 자사 주체 비교 포인트 데이터 (대림통상 주체 180도 전면 전환)
-// SWOT 분석 및 자사 주체 비교 포인트 데이터 (대림통상 주체 180도 전면 전환)
 const swotData = {
   daelimBath: {
     name: "대림바스",
@@ -223,6 +222,7 @@ export default function Dashboard() {
           const cfsCacheKey = `${trimmedKey}-${company.corpCode.trim()}-${selectedYear}-${reprtCode}-CFS`;
           if (apiCacheRef.current.has(cfsCacheKey)) {
             cfsData = apiCacheRef.current.get(cfsCacheKey);
+            if (cfsData === null) localCfsUnavail.add(company.id);
           } else {
             cfsData = await fetchDartData(trimmedKey, company.corpCode.trim(), selectedYear, reprtCode, 'CFS');
             apiCacheRef.current.set(cfsCacheKey, cfsData);
@@ -870,6 +870,8 @@ export default function Dashboard() {
             { id: 'sales', label: '매출액' },
             { id: 'operatingProfit', label: '영업이익' },
             { id: 'operatingProfitMargin', label: '영업이익률' },
+            { id: 'sgaExpenses', label: '판관비' },
+            { id: 'sgaRatio', label: '판관비율' },
             { id: 'ordinaryIncome', label: '경상손익' },
             { id: 'netIncome', label: '총포괄손익' },
             { id: 'debtRatio', label: '부채비율' },
@@ -897,19 +899,21 @@ export default function Dashboard() {
             const qKey = `${year} ${activeQuarter}`;
             const row = { year };
             companies.forEach(company => {
-              const d = financialData[qKey]?.[company.id]?.[fsDiv];
-              const sales = d?.sales ?? 0;
-              const op = d?.operatingProfit ?? 0;
+              const sales = getComputedValue(company.id, qKey, 'sales', fsDiv);
+              const op = getComputedValue(company.id, qKey, 'operatingProfit', fsDiv);
               if (trendMetric === 'operatingProfitMargin') {
                 row[company.name] = sales > 0 ? parseFloat(((op / sales) * 100).toFixed(2)) : 0;
+              } else if (trendMetric === 'sgaRatio') {
+                const sga = getComputedValue(company.id, qKey, 'sgaExpenses', fsDiv);
+                row[company.name] = sales > 0 ? parseFloat(((sga / sales) * 100).toFixed(2)) : 0;
               } else {
-                row[company.name] = d?.[trendMetric] ?? 0;
+                row[company.name] = getComputedValue(company.id, qKey, trendMetric, fsDiv);
               }
             });
             return row;
           });
           const isTrendEmpty = trendChartData.every(row => companies.every(c => !row[c.name] || row[c.name] === 0));
-          const isPercent = ['operatingProfitMargin', 'debtRatio'].includes(trendMetric);
+          const isPercent = ['operatingProfitMargin', 'debtRatio', 'sgaRatio'].includes(trendMetric);
           return isTrendEmpty ? (
             <div className="h-[280px] flex items-center justify-center">
               <div className="text-center text-slate-500">
@@ -955,7 +959,7 @@ export default function Dashboard() {
           </div>
           
           <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-xl px-3 py-1 text-xs text-indigo-400 font-bold self-start md:self-auto">
-            동기화 기준 기간: {activeYear}년 {activeQuarter}
+            동기화 기준 기간: {selectedYear}년 {selectedQuarter}
           </div>
         </div>
 
@@ -1050,6 +1054,7 @@ export default function Dashboard() {
                 <th className="p-4 text-right">영업이익</th>
                 <th className="p-4 text-right">영업이익률</th>
                 <th className="p-4 text-right">경상손익</th>
+                <th className="p-4 text-right">경상손익률</th>
                 <th className="p-4 text-right">판관비 총계</th>
                 <th className="p-4 text-right">판관비율</th>
                 <th className="p-4 text-right">총포괄손익</th>
@@ -1068,9 +1073,10 @@ export default function Dashboard() {
                 const net = getComputedValue(company.id, targetQuarterStr, 'netIncome', fsDiv);
                 const debt = getComputedValue(company.id, targetQuarterStr, 'debtRatio', fsDiv);
 
-                const opMargin = sales > 0 ? ((op / sales) * 100).toFixed(2) : '0.00';
-                const sgaRatio = sales > 0 ? ((sga / sales) * 100).toFixed(2) : '0.00';
-                const netMargin = sales > 0 ? ((net / sales) * 100).toFixed(2) : '0.00';
+                const opMargin = sales > 0 ? ((op / sales) * 100).toFixed(2) : null;
+                const oiMargin = sales > 0 ? ((oi / sales) * 100).toFixed(2) : null;
+                const sgaRatio = sales > 0 ? ((sga / sales) * 100).toFixed(2) : null;
+                const netMargin = sales > 0 ? ((net / sales) * 100).toFixed(2) : null;
 
                 return (
                   <tr key={company.id} className="hover:bg-slate-900/40 transition-colors border-b border-slate-800/45">
@@ -1087,14 +1093,19 @@ export default function Dashboard() {
                     <td className={`p-4 text-right font-semibold ${op < 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
                       {op >= 0 ? '+' : ''}{op.toLocaleString('ko-KR')}
                     </td>
-                    <td className={`p-4 text-right font-semibold ${parseFloat(opMargin) < 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
-                      {parseFloat(opMargin) >= 0 ? '+' : ''}{opMargin}%
+                    <td className={`p-4 text-right font-semibold ${opMargin === null ? 'text-slate-500' : parseFloat(opMargin) < 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
+                      {opMargin === null ? '-' : `${parseFloat(opMargin) >= 0 ? '+' : ''}${opMargin}%`}
                     </td>
                     <td className={`p-4 text-right font-semibold ${oi < 0 ? 'text-rose-400' : 'text-cyan-400'}`}>
                       {oi >= 0 ? '+' : ''}{oi.toLocaleString('ko-KR')}
                     </td>
+                    <td className={`p-4 text-right font-semibold ${oiMargin === null ? 'text-slate-500' : parseFloat(oiMargin) < 0 ? 'text-rose-400' : 'text-cyan-400'}`}>
+                      {oiMargin === null ? '-' : `${parseFloat(oiMargin) >= 0 ? '+' : ''}${oiMargin}%`}
+                    </td>
                     <td className="p-4 text-right text-slate-300">{sga.toLocaleString('ko-KR')}</td>
-                    <td className="p-4 text-right text-slate-300 font-semibold">{sgaRatio}%</td>
+                    <td className={`p-4 text-right font-semibold ${sgaRatio === null ? 'text-slate-500' : 'text-slate-300'}`}>
+                      {sgaRatio === null ? '-' : `${sgaRatio}%`}
+                    </td>
                     <td className="p-4 text-right">
                       <span className={`inline-block px-2.5 py-1 rounded-lg font-bold border ${
                         net < 0
@@ -1104,12 +1115,14 @@ export default function Dashboard() {
                         {net >= 0 ? '+' : ''}{net.toLocaleString('ko-KR')}
                       </span>
                     </td>
-                    <td className={`p-4 text-right font-semibold ${parseFloat(netMargin) < 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
-                      {parseFloat(netMargin) >= 0 ? '+' : ''}{netMargin}%
+                    <td className={`p-4 text-right font-semibold ${netMargin === null ? 'text-slate-500' : parseFloat(netMargin) < 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
+                      {netMargin === null ? '-' : `${parseFloat(netMargin) >= 0 ? '+' : ''}${netMargin}%`}
                     </td>
                     <td className="p-4 text-right text-slate-300 font-semibold">
                       {debt < 0 ? (
                         <span className="text-rose-400 font-bold">자본잠식</span>
+                      ) : debt === 0 ? (
+                        <span className="text-slate-500">-</span>
                       ) : `${debt}%`}
                     </td>
                   </tr>
