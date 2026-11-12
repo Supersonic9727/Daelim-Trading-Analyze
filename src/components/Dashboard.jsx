@@ -50,18 +50,18 @@ const swotData = {
   lxhausys: {
     name: "LX하우시스",
     s: ["수전·비데(도비도스) 등 욕실 기구 단일 카테고리에 집중한 전문 제조사로서 품목별 제품 대응 속도", "LX하우시스 패키지에 없는 수전·비데 전문 품목을 공급할 수 있는 보완적 위치"],
-    w: ["2024년 연결 매출 기준 대림통상 1,370억원 vs LX하우시스 3조 5,720억원 (약 3.8% 수준)으로 마케팅·유통 투자 여력 열세", "창호·바닥재·벽지까지 묶는 LX Z:IN 토탈 리모델링 패키지에 대응할 자체 토탈 패키지 부재"],
+    w: ["2025년 연결 매출 기준 대림통상 1,262억원 vs LX하우시스 3조 1,787억원 (약 4.0% 수준)으로 마케팅·유통 투자 여력 열세", "창호·바닥재·벽지까지 묶는 LX Z:IN 토탈 리모델링 패키지에 대응할 자체 토탈 패키지 부재"],
     o: ["LX Z:IN 욕실 리모델링 패키지에 수전·비데 공급사로 참여하는 협력 가능성", "노후 주택 욕실 리모델링 수요에서 단품 교체 시장(수전·비데) 공략"],
     t: ["대형 브랜드의 토탈 리모델링 패키지 확대 시 수전이 패키지 내 부품으로 묶여 단가 협상력 약화", "패키지사가 수전을 저가 OEM으로 조달할 경우 가격 경쟁 심화"],
-    compare: "LX하우시스는 2021년 7월 LG그룹에서 계열분리된 LX그룹 계열의 종합 건자재사로, 창호·바닥재·벽지와 LX Z:IN 욕실 리모델링을 함께 운영합니다. 수전·비데 단품에서 직접 맞붙기보다 토탈 패키지 채널에서 경쟁과 협력이 동시에 생기는 관계이므로, 대림통상은 패키지 공급사 진입과 단품 교체 시장 방어를 병행하는 것이 현실적입니다. (규모 수치: DART 2024년 연결 매출)"
+    compare: "LX하우시스는 2021년 7월 LG그룹에서 계열분리된 LX그룹 계열의 종합 건자재사로, 창호·바닥재·벽지와 LX Z:IN 욕실 리모델링을 함께 운영합니다. 수전·비데 단품에서 직접 맞붙기보다 토탈 패키지 채널에서 경쟁과 협력이 동시에 생기는 관계이므로, 대림통상은 패키지 공급사 진입과 단품 교체 시장 방어를 병행하는 것이 현실적입니다. (규모 수치: DART 2025년 연결 매출)"
   },
   kcc: {
     name: "KCC",
     s: ["욕실 수전·비데(도비도스) 전문 브랜드 — KCC는 해당 품목 사업이 없음", "욕실 기구 단일 카테고리 집중에 따른 제품·유통 전문성"],
-    w: ["2024년 연결 매출 기준 대림통상 1,370억원 vs KCC 6조 6,588억원으로 규모·자본력 격차가 매우 큼", "건축자재 B2B 영업망(건설사·시공사) 규모에서 열세"],
+    w: ["2025년 연결 매출 기준 대림통상 1,262억원 vs KCC 6조 4,838억원으로 규모·자본력 격차가 매우 큼", "건축자재 B2B 영업망(건설사·시공사) 규모에서 열세"],
     o: ["KCC의 실리콘·실란트 등 욕실 시공 부자재와는 경쟁이 아닌 보완 관계로 공동 영업 가능성", "건설사 B2B 납품 시 마감재·부자재사와 연계한 패키지 제안"],
     t: ["욕실 리모델링 B2C 채널은 KCC가 아닌 KCC글라스(홈씨씨)가 운영 — 해당 채널 내 경쟁사 수전 채택 시 진입 장벽", "건설 경기 둔화 시 B2B 건자재 전반의 단가 인하 압박"],
-    compare: "KCC는 2020년 1월 유리·홈씨씨·바닥재 사업을 KCC글라스로 인적분할한 뒤 도료·실리콘·건축자재 중심으로 재편되어, 대림통상의 수전·비데와 직접 경쟁하는 품목은 없습니다. 비교 대상이라기보다 B2B 건자재 시장의 참고 지표이며, 욕실 리모델링 채널 관점에서는 KCC글라스(홈씨씨)를 별도로 보는 것이 정확합니다. (규모 수치: DART 2024년 연결 매출)"
+    compare: "KCC는 2020년 1월 유리·홈씨씨·바닥재 사업을 KCC글라스로 인적분할한 뒤 도료·실리콘·건축자재 중심으로 재편되어, 대림통상의 수전·비데와 직접 경쟁하는 품목은 없습니다. 비교 대상이라기보다 B2B 건자재 시장의 참고 지표이며, 욕실 리모델링 채널 관점에서는 KCC글라스(홈씨씨)를 별도로 보는 것이 정확합니다. (규모 수치: DART 2025년 연결 매출)"
   },
   daelimBath: {
     name: "대림바스",
@@ -71,13 +71,13 @@ const swotData = {
     t: ["건설경기 인허가 급감에 따른 특판 시장 납품 단가 인하 압박 심화", "대형 종합 홈인테리어 가구 기업들의 욕실 자재 유통 시장 진출 확대"],
     compare: "자사(대림통상)는 위생도기 부문에 특화된 대림바스에 비해 메탈 수전 및 비데 OEM 생산 정밀성 및 원가 제어력에서 확실한 공인 품질 우위를 점하고 있습니다. 향후 리모델링 패키지 세트 납품 시, 자사의 도비도스 브랜드 가격 경쟁력을 앞세워 대림바스 브랜드 유통 대리점망 내에 자사 수전 금구 제품 침투율을 끌어올리는 특판 및 대리점 영업 연계를 집중 확대할 계획입니다."
   },
-  isDongseo: {
-    name: "아이에스동서",
-    s: ["수전금구 정밀 도금 부문의 오랜 장인 기술력 및 친환경 자체 스펙 특허", "도비도스 대리점 유통 채널 기반 요업 건자재 영업망 우위"],
-    w: ["종합 시행/건설 자본력 부재로 초대형 재정비 사업 지분 참여 한계", "아이에스동서 대비 제조 중심 사업구조에 따른 부동산 직접 개발 시너지 부재"],
-    o: ["이누스(2020년 아이에스동서가 E&F PE에 2,170억원에 매각)가 2026년 4월 기업회생을 신청, 5월 회생절차 개시 → 위생도기·비데 시장 공급 공백에 따른 대체 수요", "절수 센서 및 터치식 비접촉 스마트 수전 프리미엄 시장 점유 확대"],
-    t: ["원자재(구리, 아연) 수입 물가 변동성에 따른 순수 제조 원가율 상승 리스크", "메이저 건설사의 B2B 조달 단가 인하 경쟁 유도에 따른 마진 방어 부담"],
-    compare: "아이에스동서는 2020년 요업(이누스) 부문을 사모펀드 E&F PE에 매각해 현재는 욕실 자재 사업을 하지 않는 건설 중심 기업으로, 직접 경쟁사라기보다 과거 경쟁 구도의 비교 대상입니다. 실제 욕실 시장 경쟁자였던 이누스는 2026년 4월 기업회생을 신청했으므로, 대림통상은 이누스 거래처(건설사 특판·대리점)의 대체 공급 수요를 선점하는 데 영업력을 집중할 필요가 있습니다."
+  watos: {
+    name: "와토스코리아",
+    s: ["2025년 별도 매출 1,022억원으로 와토스코리아(141억원) 대비 약 7배 규모", "수전·비데(도비도스)까지 갖춘 제품 폭 — 와토스코리아는 양변기 부속이 매출의 약 47~48%를 차지하는 부속 중심 구조"],
+    w: ["2025년 별도 부채비율 약 190%로, 부채비율 약 7%인 와토스코리아 대비 재무 안정성 열세", "2025년 별도 영업손실 88억원(와토스코리아 영업손실 43억원) — 양사 모두 수익성 회복 과제"],
+    o: ["이누스(2020년 아이에스동서가 E&F PE에 매각)가 2026년 4월 기업회생 신청·5월 회생절차 개시 → 위생도기·욕실 부속 대체 수요", "수전·부속을 묶은 교체용 욕실 세트 제안으로 부속 단품 업체 대비 객단가 확대"],
+    t: ["세면기 폽업·샤워기 헤드 등 교체용 욕실 부속 품목이 와토스코리아와 겹쳐 가격 경쟁 발생", "주택 착공 둔화 시 신축 납품 감소 — 양사 공통 리스크"],
+    compare: "와토스코리아(코스닥 079000)는 양변기 탱크 부속을 주력으로 세면기 폽업·양변기 시트·샤워기 헤드까지 만드는 욕실 부속 전문 상장사로, 교체용 욕실 부속 품목에서 대림통상과 직접 겹칩니다. 규모는 대림통상이 약 7배 크지만, 와토스코리아는 부채비율이 약 7%에 불과해 재무구조가 매우 보수적입니다. 대림통상은 수전·비데까지 아우르는 제품 폭을 살린 세트 영업으로 부속 단품 경쟁을 피하면서 재무 안정성 격차를 줄이는 것이 과제입니다. (수치: DART 2025년 사업보고서 별도 기준, 와토스코리아는 연결재무 미작성)"
   }
 };
 
@@ -107,7 +107,7 @@ export default function Dashboard() {
   const [companies, setCompanies] = useState([
     { id: 'daelimTrading', name: '대림통상', corpCode: '00109824', color: '#6366f1', stockTicker: '006570.KS' },
     { id: 'daelimBath', name: '대림바스', corpCode: '00109754', color: '#06b6d4', stockTicker: '005750.KS' },
-    { id: 'isDongseo', name: '아이에스동서', corpCode: '00115977', color: '#10b981', stockTicker: '010780.KS' },
+    { id: 'watos', name: '와토스코리아', corpCode: '00455875', color: '#10b981', stockTicker: '079000.KQ' },
     { id: 'lxhausys', name: 'LX하우시스', corpCode: '00759513', color: '#f59e0b', stockTicker: '108670.KS' },
     { id: 'kcc', name: 'KCC', corpCode: '00105271', color: '#ec4899', stockTicker: '002380.KS' },
   ]);
@@ -192,7 +192,7 @@ export default function Dashboard() {
               sparkline: closes.map(v => ({ v: Math.round(v) })),
               high52w: meta.fiftyTwoWeekHigh,
               low52w: meta.fiftyTwoWeekLow,
-              ticker: company.stockTicker.replace('.KS', ''),
+              ticker: company.stockTicker.split('.')[0],
             };
           } catch (e) {
             console.warn(`[Stock] ${company.stockTicker}:`, e.message);
@@ -308,7 +308,7 @@ export default function Dashboard() {
         setDartStatus('SUCCESS');
         setDartStatusText(
           failedCfsCount > 0
-            ? `[DART] ${selectedYear}년 ${selectedQuarter} 동기화 완료 — ${fetchedCount}/${activeCompanies.length}개 기업 성공, ${failedCfsCount}개 연결재무 없음(CFS 미제출)`
+            ? `[DART] ${selectedYear}년 ${selectedQuarter} 동기화 완료 — ${fetchedCount}/${activeCompanies.length}개 기업 성공, ${failedCfsCount}개사 연결재무 미작성(별도로 대체)`
             : `[DART 일괄 조회] ${selectedYear}년 ${selectedQuarter} 전체 기업 동기화 완료!`
         );
         setDartError(null);
@@ -437,9 +437,20 @@ export default function Dashboard() {
   // ---------------------------------------------------------
   // 당분기 vs 누계액(누적값) 수학적 역산 연산기 구현
   // ---------------------------------------------------------
+  // 종속회사가 없어 연결재무를 작성하지 않는 회사는 연결 모드에서 별도 수치로 대체 (연결=별도)
+  const getStatement = (companyId, quarterStr, fsDiv) => {
+    const entry = financialData[quarterStr]?.[companyId];
+    const hasCfs = Object.keys(entry?.cfs || {}).length > 0;
+    if (fsDiv === 'cfs' && !hasCfs) return entry?.ofs || {};
+    return entry?.[fsDiv] || {};
+  };
+  const isOfsFallback = (companyId, quarterStr) => {
+    const entry = financialData[quarterStr]?.[companyId];
+    return Object.keys(entry?.cfs || {}).length === 0 && Object.keys(entry?.ofs || {}).length > 0;
+  };
+
   const getComputedValue = (companyId, quarterStr, metric, fsDiv) => {
-    const qData = financialData[quarterStr];
-    const currentVal = qData?.[companyId]?.[fsDiv]?.[metric] ?? 0;
+    const currentVal = getStatement(companyId, quarterStr, fsDiv)[metric] ?? 0;
 
     if (metric === 'debtRatio' || metric === 'equity' || metric === 'currentAssets' || metric === 'currentLiabilities') return currentVal;
     if (isCumulative) return currentVal;
@@ -454,8 +465,7 @@ export default function Dashboard() {
     else if (q === '3Q') prevQKey = `${year} 2Q`;
     else if (q === '4Q') prevQKey = `${year} 3Q`;
 
-    const prevQData = financialData[prevQKey];
-    const prevVal = prevQData?.[companyId]?.[fsDiv]?.[metric] ?? 0;
+    const prevVal = getStatement(companyId, prevQKey, fsDiv)[metric] ?? 0;
 
     // 음수 역산값도 공시 원본(환입·재분류)을 반영한 결과이므로 보정하지 않음
     return currentVal - prevVal;
@@ -622,7 +632,7 @@ export default function Dashboard() {
           <div className="flex items-center gap-2 mb-5">
             <div className="p-2 bg-amber-500/10 rounded-lg text-amber-400"><BarChart2 className="w-5 h-5" /></div>
             <div>
-              <h2 className="text-lg font-bold text-slate-100">KOSPI 주가 현황</h2>
+              <h2 className="text-lg font-bold text-slate-100">주가 현황 (KOSPI · KOSDAQ)</h2>
               <p className="text-slate-400 text-xs">Yahoo Finance 시세 (약 15~20분 지연) · 전일 종가 대비 등락</p>
             </div>
           </div>
@@ -634,7 +644,7 @@ export default function Dashboard() {
                   <div className="absolute top-0 left-0 w-1 h-full rounded-l-xl" style={{ backgroundColor: company.color }}></div>
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs font-bold text-slate-200 truncate">{company.name}</span>
-                    <span className="text-[9px] font-mono text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded">{company.stockTicker.replace('.KS','')}</span>
+                    <span className="text-[9px] font-mono text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded">{company.stockTicker.split('.')[0]} · {company.stockTicker.endsWith('.KQ') ? '코스닥' : '코스피'}</span>
                   </div>
                   {isStockLoading ? (
                     <div className="animate-pulse">
@@ -711,7 +721,7 @@ export default function Dashboard() {
                   </div>
                   {isConsolidated && cfsUnavailableSet.size > 0 && (
                     <span className="text-[9px] text-amber-400 flex items-center gap-1 px-1">
-                      ⚠ 연결재무 없음: {companies.filter(c => cfsUnavailableSet.has(c.id)).map(c => c.name).join(', ')}
+                      ⚠ 연결재무 미작성 → 별도 수치로 표시: {companies.filter(c => cfsUnavailableSet.has(c.id)).map(c => c.name).join(', ')}
                     </span>
                   )}
                 </div>
@@ -938,8 +948,8 @@ export default function Dashboard() {
         {(() => {
           const fsDiv = isConsolidated ? 'cfs' : 'ofs';
           // 연도 간 동일 기간 비교이므로 당분기 토글과 무관하게 누계값 사용 (과거 연도는 직전 분기 미조회)
-          const raw = (cid, qKey, metric) => financialData[qKey]?.[cid]?.[fsDiv]?.[metric] ?? 0;
-          const hasData = (cid, qKey) => Object.keys(financialData[qKey]?.[cid]?.[fsDiv] || {}).length > 0;
+          const raw = (cid, qKey, metric) => getStatement(cid, qKey, fsDiv)[metric] ?? 0;
+          const hasData = (cid, qKey) => Object.keys(getStatement(cid, qKey, fsDiv)).length > 0;
           const trendChartData = Array.from({ length: trendYears }, (_, i) => {
             const year = String(parseInt(activeYear) - (trendYears - 1 - i));
             const qKey = `${year} ${activeQuarter}`;
@@ -1139,7 +1149,12 @@ export default function Dashboard() {
                       <div className="flex items-center gap-2">
                         <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: company.color }}></span>
                         <div className="flex flex-col">
-                          <span className="text-slate-200">{company.name}</span>
+                          <span className="text-slate-200">
+                            {company.name}
+                            {isConsolidated && isOfsFallback(company.id, targetQuarterStr) && (
+                              <span className="ml-1 text-[9px] font-semibold text-amber-400" title="연결재무제표 미작성 회사 — 별도재무제표 수치">(별도)</span>
+                            )}
+                          </span>
                           <span className="text-[9px] text-slate-500 font-mono">DART: {company.corpCode}</span>
                         </div>
                       </div>
@@ -1214,7 +1229,7 @@ export default function Dashboard() {
           <div className="flex bg-slate-950 p-1 rounded-lg border border-slate-800 self-start sm:self-auto">
             {[
               { id: 'daelimBath', label: '대림바스' },
-              { id: 'isDongseo', label: '아이에스동서' },
+              { id: 'watos', label: '와토스코리아' },
               { id: 'lxhausys', label: 'LX하우시스' },
               { id: 'kcc', label: 'KCC' }
             ].map(tab => (

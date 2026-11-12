@@ -6,8 +6,8 @@ export default async function handler(req, res) {
   const { ticker } = req.query;
   if (!ticker) return res.status(400).json({ error: 'ticker required' });
 
-  // 허용된 KS 티커만 통과 (보안)
-  if (!/^[0-9]{6}\.KS$/.test(ticker)) {
+  // 한국 종목 티커만 허용: 유가증권(.KS)·코스닥(.KQ)
+  if (!/^[0-9]{6}\.(KS|KQ)$/.test(ticker)) {
     return res.status(400).json({ error: 'invalid ticker format' });
   }
 
