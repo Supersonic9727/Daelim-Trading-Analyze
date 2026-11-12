@@ -119,7 +119,7 @@ export default function Dashboard() {
   const [trendCards, setTrendCards] = useState([]);
   const [stockData, setStockData] = useState({});
   const [isStockLoading, setIsStockLoading] = useState(true);
-  const [disclosures, setDisclosures] = useState({});
+  const [disclosures, setDisclosures] = useState(null);
   const [activeDisclosureTab, setActiveDisclosureTab] = useState('');
 
   const [isDartLoading, setIsDartLoading] = useState(false);
@@ -192,14 +192,17 @@ export default function Dashboard() {
     if (!apiKey) return;
     const fetchDisclosures = async () => {
       const result = {};
-      for (const co of companies.filter(c => c.corpCode)) {
+      // bgn_de 미지정 시 DART는 당일 접수분만 반환하므로 최근 1년으로 지정
+      const from = new Date();
+      from.setFullYear(from.getFullYear() - 1);
+      const bgnDe = from.toISOString().slice(0, 10).replace(/-/g, '');
+      await Promise.all(companies.filter(c => c.corpCode).map(async (co) => {
         try {
-          const url = `/api-dart/api/list.json?crtfc_key=${apiKey.trim()}&corp_code=${co.corpCode}&page_no=1&page_count=5`;
-          const res = await fetch(url);
-          const data = await res.json();
-          if (data.status === '000' && data.list) result[co.id] = data.list;
-        } catch (e) { /* silent */ }
-      }
+          const url = `/api-dart/api/list.json?crtfc_key=${apiKey.trim()}&corp_code=${co.corpCode}&bgn_de=${bgnDe}&page_no=1&page_count=5`;
+          const data = await fetch(url).then(r => r.json());
+          if (data.status === '000' || data.status === '013') result[co.id] = data.list || [];
+        } catch (e) { /* 조회 실패 시 해당 탭은 오류 안내 */ }
+      }));
       setDisclosures(result);
       setActiveDisclosureTab(prev => prev || companies[0]?.id || '');
     };
@@ -1357,25 +1360,32 @@ export default function Dashboard() {
             <FileText className="w-8 h-8 mx-auto mb-2 opacity-30" />
             <p>상단 DART API Key 입력 후 자동으로 최근 공시가 표시됩니다.</p>
           </div>
-        ) : disclosures[activeDisclosureTab]?.length > 0 ? (
+        ) : disclosures === null ? (
+          <div className="text-center py-8 text-slate-500 text-sm">
+            <RefreshCw className="w-6 h-6 mx-auto mb-2 opacity-30 animate-spin" />
+            <p>공시 목록 조회 중...</p>
+          </div>
+        ) : !disclosures[activeDisclosureTab] ? (
+          <div className="text-center py-8 text-slate-500 text-sm">
+            <p>공시 목록을 불러오지 못했습니다. 잠시 후 새로고침해 주세요.</p>
+          </div>
+        ) : disclosures[activeDisclosureTab].length > 0 ? (
           <div className="space-y-2">
-            {disclosures[activeDisclosureTab].map((item, idx) => (
-              <div key={idx} className="flex items-start gap-3 bg-slate-900/40 border border-slate-800/60 rounded-xl px-4 py-3 hover:border-slate-700 transition-colors">
+            {disclosures[activeDisclosureTab].map((item) => (
+              <a key={item.rcept_no} href={`https://dart.fss.or.kr/dsaf001/main.do?rcpNo=${item.rcept_no}`} target="_blank" rel="noopener noreferrer" className="flex items-start gap-3 bg-slate-900/40 border border-slate-800/60 rounded-xl px-4 py-3 hover:border-slate-700 transition-colors">
                 <div className="shrink-0 mt-0.5">
                   <FileText className="w-4 h-4 text-cyan-500/70" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-slate-200 truncate">{item.report_nm}</p>
+                  <p className="text-xs font-medium text-slate-200 truncate">{item.report_nm?.trim()}</p>
                   <p className="text-[10px] text-slate-500 mt-0.5">{item.rcept_dt?.slice(0,4)}.{item.rcept_dt?.slice(4,6)}.{item.rcept_dt?.slice(6,8)} · {item.flr_nm}</p>
                 </div>
-                <span className="shrink-0 text-[9px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-mono">{item.pblntf_ty}</span>
-              </div>
+              </a>
             ))}
           </div>
         ) : (
           <div className="text-center py-8 text-slate-500 text-sm">
-            <RefreshCw className="w-6 h-6 mx-auto mb-2 opacity-30 animate-spin" />
-            <p>공시 목록 조회 중...</p>
+            <p>최근 1년간 접수된 공시가 없습니다.</p>
           </div>
         )}
       </section>
