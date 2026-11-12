@@ -68,7 +68,7 @@ const parseList = (list, targetFsDiv) => {
     ['매출액', '영업수익'],
     ['IS', 'CIS']
   );
-  const sales = salesItem ? Math.round(flowAmount(salesItem) / 1000000) : 0;
+  const sales = salesItem ? (flowAmount(salesItem) / 1000000) : 0;
 
   // 2. 영업이익 / 영업손실 파싱 (IS / CIS 구분)
   const opProfitItem = findItem(
@@ -79,7 +79,7 @@ const parseList = (list, targetFsDiv) => {
   let operatingProfit = 0;
   if (opProfitItem) {
     const rawVal = flowAmount(opProfitItem);
-    const converted = Math.round(rawVal / 1000000);
+    const converted = (rawVal / 1000000);
     
     const accNm = opProfitItem.account_nm || '';
     const isLoss = (accNm.includes('손실') && !accNm.includes('손익') && !accNm.includes('이익')) || accNm.includes('적자') || rawVal < 0;
@@ -120,7 +120,7 @@ const parseList = (list, targetFsDiv) => {
   let netIncome = 0;
   if (comprehensiveIncomeItem) {
     const rawVal = flowAmount(comprehensiveIncomeItem);
-    const converted = Math.round(rawVal / 1000000);
+    const converted = (rawVal / 1000000);
 
     const accNm = comprehensiveIncomeItem.account_nm || '';
     const isLoss = (accNm.includes('손실') && !accNm.includes('손익') && !accNm.includes('이익')) || accNm.includes('적자') || rawVal < 0;
@@ -133,7 +133,7 @@ const parseList = (list, targetFsDiv) => {
     ['당기순이익', '당기순손실', '당기순이익(손실)', '분기순이익', '분기순손실', '분기순이익(손실)', '반기순이익', '반기순이익(손실)'],
     ['IS', 'CIS']
   );
-  const profitLoss = profitLossItem ? Math.round(flowAmount(profitLossItem) / 1000000) : 0;
+  const profitLoss = profitLossItem ? (flowAmount(profitLossItem) / 1000000) : 0;
 
   // 3-2. 경상손익(법인세차감전순이익) 파싱 (IS / CIS 구분)
   const ordinaryIncomeItem = findItem(
@@ -144,7 +144,7 @@ const parseList = (list, targetFsDiv) => {
   let ordinaryIncome = 0;
   if (ordinaryIncomeItem) {
     const rawVal = flowAmount(ordinaryIncomeItem);
-    const converted = Math.round(rawVal / 1000000);
+    const converted = (rawVal / 1000000);
     const accNm = ordinaryIncomeItem.account_nm || '';
     const isLoss = (accNm.includes('손실') && !accNm.includes('손익') && !accNm.includes('이익')) || rawVal < 0;
     ordinaryIncome = isLoss ? -Math.abs(converted) : converted;
@@ -157,7 +157,7 @@ const parseList = (list, targetFsDiv) => {
     ['판매비와관리비', '판매비와관리비총계', '판매비및관리비', '판관비'],
     ['IS', 'CIS']
   );
-  const sgaExpenses = sgaItem ? Math.round(flowAmount(sgaItem) / 1000000) : 0;
+  const sgaExpenses = sgaItem ? (flowAmount(sgaItem) / 1000000) : 0;
   
   // 5. 부채총계 파싱 (BS 구분)
   const debtItem = findItem(
@@ -182,7 +182,7 @@ const parseList = (list, targetFsDiv) => {
       debtRatio = Math.round((debt / equity) * 100);
     }
   }
-  const equityMillion = equity !== 0 ? Math.round(equity / 1000000) : 0;
+  const equityMillion = equity !== 0 ? (equity / 1000000) : 0;
 
   // 7. 유동자산 파싱 (BS 구분)
   const curAssetItem = findItem(
@@ -190,7 +190,7 @@ const parseList = (list, targetFsDiv) => {
     ['유동자산', '유동자산합계'],
     ['BS']
   );
-  const currentAssets = curAssetItem ? Math.round(parseAmount(curAssetItem.thstrm_amount) / 1000000) : 0;
+  const currentAssets = curAssetItem ? (parseAmount(curAssetItem.thstrm_amount) / 1000000) : 0;
 
   // 8. 유동부채 파싱 (BS 구분)
   const curLiabItem = findItem(
@@ -198,7 +198,7 @@ const parseList = (list, targetFsDiv) => {
     ['유동부채', '유동부채합계'],
     ['BS']
   );
-  const currentLiabilities = curLiabItem ? Math.round(parseAmount(curLiabItem.thstrm_amount) / 1000000) : 0;
+  const currentLiabilities = curLiabItem ? (parseAmount(curLiabItem.thstrm_amount) / 1000000) : 0;
 
   return { sales, operatingProfit, netIncome, profitLoss, sgaExpenses, debtRatio, ordinaryIncome, equity: equityMillion, currentAssets, currentLiabilities };
 };

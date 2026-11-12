@@ -95,6 +95,10 @@ const getLatestFiledPeriod = (now = new Date()) => {
 };
 const LATEST_PERIOD = getLatestFiledPeriod();
 
+// 금액은 원 단위 정밀도(백만원 소수)로 보관하고 표시 시점에만 반올림 — 당분기 역산 시 반올림 오차 방지
+const roundM = (v) => Math.round(v) || 0;
+const fmtM = (v) => roundM(v).toLocaleString('ko-KR');
+
 export default function Dashboard() {
   // 1. 기업 리스트 상태 - corpCode: DART 고유번호(company.json 검증), stockTicker: KOSPI 종목코드
   const [companies, setCompanies] = useState([
@@ -423,7 +427,7 @@ export default function Dashboard() {
         const netMargin = sales > 0 ? ((pl / sales) * 100).toFixed(2) : '';
         const roeCsv = eq > 0 ? ((pl / eq) * 100).toFixed(2) : '';
         const currentRatioCsv = curL > 0 ? ((curA / curL) * 100).toFixed(2) : '';
-        rows.push([company.name, q, isConsolidated ? '연결(CFS)' : '별도(OFS)', isCumulative ? '누계액' : '당분기', sales, op, opMargin, oi, oiMarginCsv, sga, sgaR, pl, netMargin, net, debt < 0 ? '자본잠식' : debt, roeCsv, currentRatioCsv].join(','));
+        rows.push([company.name, q, isConsolidated ? '연결(CFS)' : '별도(OFS)', isCumulative ? '누계액' : '당분기', roundM(sales), roundM(op), opMargin, roundM(oi), oiMarginCsv, roundM(sga), sgaR, roundM(pl), netMargin, roundM(net), debt < 0 ? '자본잠식' : debt, roeCsv, currentRatioCsv].join(','));
       });
     });
 
@@ -482,7 +486,7 @@ export default function Dashboard() {
         const sga = getComputedValue(company.id, qKey, 'sgaExpenses', fsDiv);
         row[company.name] = sales > 0 ? parseFloat(((sga / sales) * 100).toFixed(2)) : 0;
       } else {
-        row[company.name] = getComputedValue(company.id, qKey, activeMetric, fsDiv);
+        row[company.name] = roundM(getComputedValue(company.id, qKey, activeMetric, fsDiv));
       }
     });
     
@@ -964,7 +968,7 @@ export default function Dashboard() {
               } else if (trendMetric === 'sgaRatio') {
                 row[company.name] = sales > 0 ? parseFloat(((raw(company.id, qKey, 'sgaExpenses') / sales) * 100).toFixed(2)) : null;
               } else {
-                row[company.name] = raw(company.id, qKey, trendMetric);
+                row[company.name] = roundM(raw(company.id, qKey, trendMetric));
               }
             });
             return row;
@@ -1156,20 +1160,20 @@ export default function Dashboard() {
                         </div>
                       </div>
                     </td>
-                    <td className="p-4 text-right font-medium text-slate-100">{sales.toLocaleString('ko-KR')}</td>
+                    <td className="p-4 text-right font-medium text-slate-100">{fmtM(sales)}</td>
                     <td className={`p-4 text-right font-semibold ${op < 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
-                      {op >= 0 ? '+' : ''}{op.toLocaleString('ko-KR')}
+                      {op >= 0 ? '+' : ''}{fmtM(op)}
                     </td>
                     <td className={`p-4 text-right font-semibold ${opMargin === null ? 'text-slate-500' : parseFloat(opMargin) < 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
                       {opMargin === null ? '-' : `${parseFloat(opMargin) >= 0 ? '+' : ''}${opMargin}%`}
                     </td>
                     <td className={`p-4 text-right font-semibold ${oi < 0 ? 'text-rose-400' : 'text-cyan-400'}`}>
-                      {oi >= 0 ? '+' : ''}{oi.toLocaleString('ko-KR')}
+                      {oi >= 0 ? '+' : ''}{fmtM(oi)}
                     </td>
                     <td className={`p-4 text-right font-semibold ${oiMargin === null ? 'text-slate-500' : parseFloat(oiMargin) < 0 ? 'text-rose-400' : 'text-cyan-400'}`}>
                       {oiMargin === null ? '-' : `${parseFloat(oiMargin) >= 0 ? '+' : ''}${oiMargin}%`}
                     </td>
-                    <td className="p-4 text-right text-slate-300">{sga.toLocaleString('ko-KR')}</td>
+                    <td className="p-4 text-right text-slate-300">{fmtM(sga)}</td>
                     <td className={`p-4 text-right font-semibold ${sgaRatio === null ? 'text-slate-500' : 'text-slate-300'}`}>
                       {sgaRatio === null ? '-' : `${sgaRatio}%`}
                     </td>
@@ -1179,14 +1183,14 @@ export default function Dashboard() {
                           ? 'bg-rose-500/10 text-rose-400 border-rose-500/20'
                           : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                       }`}>
-                        {pl >= 0 ? '+' : ''}{pl.toLocaleString('ko-KR')}
+                        {pl >= 0 ? '+' : ''}{fmtM(pl)}
                       </span>
                     </td>
                     <td className={`p-4 text-right font-semibold ${netMargin === null ? 'text-slate-500' : parseFloat(netMargin) < 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
                       {netMargin === null ? '-' : `${parseFloat(netMargin) >= 0 ? '+' : ''}${netMargin}%`}
                     </td>
                     <td className={`p-4 text-right font-semibold ${net < 0 ? 'text-rose-400' : 'text-slate-300'}`}>
-                      {net >= 0 ? '+' : ''}{net.toLocaleString('ko-KR')}
+                      {net >= 0 ? '+' : ''}{fmtM(net)}
                     </td>
                     <td className="p-4 text-right text-slate-300 font-semibold">
                       {debt < 0 ? (
