@@ -152,24 +152,42 @@ const parseList = (list, targetFsDiv) => {
     ['부채총계', '부채의합계', '부채총합'],
     ['BS']
   );
-  
+
   // 6. 자본총계 파싱 (BS 구분)
   const equityItem = findItem(
     ['ifrs-full_Equity', 'ifrs_Equity'],
     ['자본총계', '자본의합계', '자본총합'],
     ['BS']
   );
-  
+
   let debtRatio = 0;
+  let equity = 0;
   if (debtItem && equityItem) {
     const debt = parseAmount(debtItem.thstrm_amount);
-    const equity = parseAmount(equityItem.thstrm_amount);
+    equity = parseAmount(equityItem.thstrm_amount);
     if (equity !== 0) {
       debtRatio = Math.round((debt / equity) * 100);
     }
   }
-  
-  return { sales, operatingProfit, netIncome, sgaExpenses, debtRatio, ordinaryIncome };
+  const equityMillion = equity !== 0 ? Math.round(equity / 1000000) : 0;
+
+  // 7. 유동자산 파싱 (BS 구분)
+  const curAssetItem = findItem(
+    ['ifrs-full_CurrentAssets', 'ifrs_CurrentAssets'],
+    ['유동자산', '유동자산합계'],
+    ['BS']
+  );
+  const currentAssets = curAssetItem ? Math.round(parseAmount(curAssetItem.thstrm_amount) / 1000000) : 0;
+
+  // 8. 유동부채 파싱 (BS 구분)
+  const curLiabItem = findItem(
+    ['ifrs-full_CurrentLiabilities', 'ifrs_CurrentLiabilities'],
+    ['유동부채', '유동부채합계'],
+    ['BS']
+  );
+  const currentLiabilities = curLiabItem ? Math.round(parseAmount(curLiabItem.thstrm_amount) / 1000000) : 0;
+
+  return { sales, operatingProfit, netIncome, sgaExpenses, debtRatio, ordinaryIncome, equity: equityMillion, currentAssets, currentLiabilities };
 };
 
 export const fetchDartData = async (apiKey, corpCode, year, reprtCode, fsDiv) => {

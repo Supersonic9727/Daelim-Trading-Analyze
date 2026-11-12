@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
+import {
   TrendingUp,
   TrendingDown,
   DollarSign,
@@ -14,7 +14,11 @@ import {
   Grid,
   Info,
   Layers3,
-  Download
+  Download,
+  BarChart2,
+  Newspaper,
+  Building2,
+  RefreshCw
 } from 'lucide-react';
 import { 
   ResponsiveContainer, 
@@ -43,6 +47,22 @@ const sortQuarters = (qList) => {
 
 // SWOT 분석 및 자사 주체 비교 포인트 데이터 (대림통상 주체 180도 전면 전환)
 const swotData = {
+  lxhausys: {
+    name: "LX하우시스",
+    s: ["국내 최대 PVC 창호·바닥재 생산 설비 및 LG그룹 계열 브랜드 신뢰도", "건자재 토탈 솔루션(창호·단열·바닥재·벽재) 풀 패키지 경쟁력"],
+    w: ["수전·위생도기 직접 생산 라인 부재로 욕실 금구류 OEM 의존도 높음", "공동주택 의존도 높아 분양 감소기에 직접적인 수주 타격 체감"],
+    o: ["제로에너지 건물(ZEB) 의무화 확대에 따른 단열창호 정책 수혜", "리모델링 시장 성장과 함께 B2C 창호·욕실 패키지 판매 채널 확대"],
+    t: ["중국산 저가 PVC 창호 국내 유입 증가로 중저가 라인 마진 압박", "원자재(PVC수지, 철강) 국제 가격 변동 직격탄 구조"],
+    compare: "LX하우시스는 창호·바닥재 중심의 대형 건자재 메이커로 욕실 수전/도기 분야에서 직접 경쟁보다는 토탈 패키지 발주처로서의 성격이 강합니다. 대림통상은 LX하우시스의 주택 패키지 납품 채널에 수전 금구 하이엔드 스펙인을 통해 욕실 부문 협력 관계를 강화하는 방향이 유리합니다."
+  },
+  kcc: {
+    name: "KCC",
+    s: ["도료·유리·실리콘 등 소재 원천 기술 보유로 건자재 전 분야 수직계열화", "반도체용 실리콘 등 고부가가치 신사업 포트폴리오로 경기 방어력 우수"],
+    w: ["욕실 수전·위생도기 부문 직접 사업 없어 욕실 시장 접근성 낮음", "대형 사업구조 특성상 중소형 리모델링 시장 대응 속도 열세"],
+    o: ["내화·단열 도료 환경규제 강화로 KCC 고성능 도료 의무 적용 수요 증가", "조선·해양·산업 도료 사업 고성장으로 전체 수익성 보완 가능"],
+    t: ["글로벌 도료 메이커(PPG, AkzoNobel) 국내 직접 공략 강화로 프리미엄 시장 압박", "탄소중립 규제에 따른 도료·실리콘 생산 공정 비용 급등"],
+    compare: "KCC는 도료·유리·실리콘 원소재 기반의 종합 건자재 그룹으로 욕실 수전 분야와 직접 경쟁 관계에 있지 않습니다. 대림통상은 KCC의 고급 욕실 마감재(실리콘 실란트 등)와 자사 도비도스 수전을 패키지로 묶어 고급 주거 인테리어 채널을 공동 공략하는 협력 전략이 효과적입니다."
+  },
   daelimBath: {
     name: "대림바스",
     s: ["수전금구 B2B 특판 시장 및 비데 OEM 생산 정밀성 및 독보적 제조원가 강점", "도비도스 브랜드 욕실 패키지 포트폴리오를 통한 시장 침투 능력"],
@@ -66,9 +86,11 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 export default function Dashboard() {
   // 1. 기업 리스트 상태 - DART 실제 공식 고유번호(corpCode)와 시각적 지정코드(displayCode) 이원화 세팅 (3사 체제 압축)
   const [companies, setCompanies] = useState([
-    { id: 'daelimTrading', name: '대림통상', displayCode: '00114731', corpCode: '00109824', color: '#6366f1' },
-    { id: 'daelimBath', name: '대림바스', displayCode: '00157082', corpCode: '00109754', color: '#06b6d4' },
-    { id: 'isDongseo', name: '아이에스동서', displayCode: '00105344', corpCode: '00115977', color: '#10b981' },
+    { id: 'daelimTrading', name: '대림통상', displayCode: '00114731', corpCode: '00109824', color: '#6366f1', stockTicker: '006570.KS' },
+    { id: 'daelimBath', name: '대림B&Co', displayCode: '00157082', corpCode: '00109754', color: '#06b6d4', stockTicker: '005750.KS' },
+    { id: 'isDongseo', name: '아이에스동서', displayCode: '00105344', corpCode: '00115977', color: '#10b981', stockTicker: '010780.KS' },
+    { id: 'lxhausys', name: 'LX하우시스', displayCode: '00759513', corpCode: '00759513', color: '#f59e0b', stockTicker: '072130.KS' },
+    { id: 'kcc', name: 'KCC', displayCode: '00105271', corpCode: '00105271', color: '#ec4899', stockTicker: '002380.KS' },
   ]);
 
 
@@ -79,59 +101,73 @@ export default function Dashboard() {
   const [financialData, setFinancialData] = useState({
     "2024 1Q": {
       daelimTrading: {
-        cfs: { sales: 62000, operatingProfit: 2800, netIncome: -1200, debtRatio: 95, ordinaryIncome: 800, sgaExpenses: 9300 },
-        ofs: { sales: 58000, operatingProfit: 2200, netIncome: -900, debtRatio: 90, ordinaryIncome: 600, sgaExpenses: 8700 }
+        cfs: { sales: 62000, operatingProfit: 2800, netIncome: -1200, debtRatio: 95, ordinaryIncome: 800, sgaExpenses: 9300, equity: 48500, currentAssets: 68000, currentLiabilities: 55000 },
+        ofs: { sales: 58000, operatingProfit: 2200, netIncome: -900, debtRatio: 90, ordinaryIncome: 600, sgaExpenses: 8700, equity: 46000, currentAssets: 63000, currentLiabilities: 51000 }
       },
       daelimBath: {
-        cfs: { sales: 58000, operatingProfit: 1800, netIncome: 1300, debtRatio: 110, ordinaryIncome: 1680, sgaExpenses: 8700 },
-        ofs: { sales: 58000, operatingProfit: 1800, netIncome: 1300, debtRatio: 110, ordinaryIncome: 1680, sgaExpenses: 8700 }
+        cfs: { sales: 58000, operatingProfit: 1800, netIncome: 1300, debtRatio: 110, ordinaryIncome: 1680, sgaExpenses: 8700, equity: 62000, currentAssets: 86000, currentLiabilities: 66000 },
+        ofs: { sales: 58000, operatingProfit: 1800, netIncome: 1300, debtRatio: 110, ordinaryIncome: 1680, sgaExpenses: 8700, equity: 62000, currentAssets: 86000, currentLiabilities: 66000 }
       },
       isDongseo: {
-        cfs: { sales: 420000, operatingProfit: 65000, netIncome: -18000, debtRatio: 130, ordinaryIncome: 20000, sgaExpenses: 42000 },
-        ofs: { sales: 310000, operatingProfit: 48000, netIncome: -11000, debtRatio: 115, ordinaryIncome: 14500, sgaExpenses: 31000 }
+        cfs: { sales: 420000, operatingProfit: 65000, netIncome: -18000, debtRatio: 130, ordinaryIncome: 20000, sgaExpenses: 42000, equity: 640000, currentAssets: 850000, currentLiabilities: 680000 },
+        ofs: { sales: 310000, operatingProfit: 48000, netIncome: -11000, debtRatio: 115, ordinaryIncome: 14500, sgaExpenses: 31000, equity: 580000, currentAssets: 720000, currentLiabilities: 580000 }
+      },
+      lxhausys: {
+        cfs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 },
+        ofs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 }
+      },
+      kcc: {
+        cfs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 },
+        ofs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 }
       }
     },
     "2024 2Q": {
       daelimTrading: {
-        cfs: { sales: 127000, operatingProfit: 6000, netIncome: -2300, debtRatio: 92, ordinaryIncome: 1800, sgaExpenses: 19050 },
-        ofs: { sales: 118000, operatingProfit: 4800, netIncome: -1500, debtRatio: 88, ordinaryIncome: 1400, sgaExpenses: 17700 }
+        cfs: { sales: 127000, operatingProfit: 6000, netIncome: -2300, debtRatio: 92, ordinaryIncome: 1800, sgaExpenses: 19050, equity: 48200, currentAssets: 70000, currentLiabilities: 56000 },
+        ofs: { sales: 118000, operatingProfit: 4800, netIncome: -1500, debtRatio: 88, ordinaryIncome: 1400, sgaExpenses: 17700, equity: 45800, currentAssets: 65000, currentLiabilities: 52000 }
       },
       daelimBath: {
-        cfs: { sales: 118000, operatingProfit: 4000, netIncome: 2950, debtRatio: 108, ordinaryIncome: 3800, sgaExpenses: 17700 },
-        ofs: { sales: 118000, operatingProfit: 4000, netIncome: 2950, debtRatio: 108, ordinaryIncome: 3800, sgaExpenses: 17700 }
+        cfs: { sales: 118000, operatingProfit: 4000, netIncome: 2950, debtRatio: 108, ordinaryIncome: 3800, sgaExpenses: 17700, equity: 63000, currentAssets: 88000, currentLiabilities: 67500 },
+        ofs: { sales: 118000, operatingProfit: 4000, netIncome: 2950, debtRatio: 108, ordinaryIncome: 3800, sgaExpenses: 17700, equity: 63000, currentAssets: 88000, currentLiabilities: 67500 }
       },
       isDongseo: {
-        cfs: { sales: 870000, operatingProfit: 137000, netIncome: -34000, debtRatio: 125, ordinaryIncome: 43000, sgaExpenses: 87000 },
-        ofs: { sales: 630000, operatingProfit: 101000, netIncome: -24000, debtRatio: 112, ordinaryIncome: 32000, sgaExpenses: 63000 }
-      }
+        cfs: { sales: 870000, operatingProfit: 137000, netIncome: -34000, debtRatio: 125, ordinaryIncome: 43000, sgaExpenses: 87000, equity: 645000, currentAssets: 870000, currentLiabilities: 695000 },
+        ofs: { sales: 630000, operatingProfit: 101000, netIncome: -24000, debtRatio: 112, ordinaryIncome: 32000, sgaExpenses: 63000, equity: 585000, currentAssets: 735000, currentLiabilities: 590000 }
+      },
+      lxhausys: { cfs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 }, ofs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 } },
+      kcc: { cfs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 }, ofs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 } }
     },
     "2024 3Q": {
       daelimTrading: {
-        cfs: { sales: 188000, operatingProfit: 8500, netIncome: -3500, debtRatio: 98, ordinaryIncome: 2600, sgaExpenses: 28200 },
-        ofs: { sales: 175500, operatingProfit: 6800, netIncome: -2700, debtRatio: 94, ordinaryIncome: 2000, sgaExpenses: 26325 }
+        cfs: { sales: 188000, operatingProfit: 8500, netIncome: -3500, debtRatio: 98, ordinaryIncome: 2600, sgaExpenses: 28200, equity: 47800, currentAssets: 69500, currentLiabilities: 55500 },
+        ofs: { sales: 175500, operatingProfit: 6800, netIncome: -2700, debtRatio: 94, ordinaryIncome: 2000, sgaExpenses: 26325, equity: 45500, currentAssets: 64000, currentLiabilities: 51500 }
       },
       daelimBath: {
-        cfs: { sales: 175000, operatingProfit: 5500, netIncome: 3950, debtRatio: 112, ordinaryIncome: 5100, sgaExpenses: 26250 },
-        ofs: { sales: 175000, operatingProfit: 5500, netIncome: 3950, debtRatio: 112, ordinaryIncome: 5100, sgaExpenses: 26250 }
+        cfs: { sales: 175000, operatingProfit: 5500, netIncome: 3950, debtRatio: 112, ordinaryIncome: 5100, sgaExpenses: 26250, equity: 63500, currentAssets: 87000, currentLiabilities: 66500 },
+        ofs: { sales: 175000, operatingProfit: 5500, netIncome: 3950, debtRatio: 112, ordinaryIncome: 5100, sgaExpenses: 26250, equity: 63500, currentAssets: 87000, currentLiabilities: 66500 }
       },
       isDongseo: {
-        cfs: { sales: 1280000, operatingProfit: 197000, netIncome: -52000, debtRatio: 132, ordinaryIncome: 62000, sgaExpenses: 128000 },
-        ofs: { sales: 935000, operatingProfit: 145000, netIncome: -38000, debtRatio: 118, ordinaryIncome: 46000, sgaExpenses: 93500 }
-      }
+        cfs: { sales: 1280000, operatingProfit: 197000, netIncome: -52000, debtRatio: 132, ordinaryIncome: 62000, sgaExpenses: 128000, equity: 642000, currentAssets: 860000, currentLiabilities: 688000 },
+        ofs: { sales: 935000, operatingProfit: 145000, netIncome: -38000, debtRatio: 118, ordinaryIncome: 46000, sgaExpenses: 93500, equity: 580000, currentAssets: 725000, currentLiabilities: 585000 }
+      },
+      lxhausys: { cfs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 }, ofs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 } },
+      kcc: { cfs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 }, ofs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 } }
     },
     "2024 4Q": {
       daelimTrading: {
-        cfs: { sales: 256000, operatingProfit: 12500, netIncome: -5400, debtRatio: 89, ordinaryIncome: 3800, sgaExpenses: 38400 },
-        ofs: { sales: 238000, operatingProfit: 10000, netIncome: -4200, debtRatio: 86, ordinaryIncome: 3000, sgaExpenses: 35700 }
+        cfs: { sales: 256000, operatingProfit: 12500, netIncome: -5400, debtRatio: 89, ordinaryIncome: 3800, sgaExpenses: 38400, equity: 48000, currentAssets: 68500, currentLiabilities: 53500 },
+        ofs: { sales: 238000, operatingProfit: 10000, netIncome: -4200, debtRatio: 86, ordinaryIncome: 3000, sgaExpenses: 35700, equity: 46000, currentAssets: 63500, currentLiabilities: 49500 }
       },
       daelimBath: {
-        cfs: { sales: 237000, operatingProfit: 8000, netIncome: 5800, debtRatio: 105, ordinaryIncome: 7500, sgaExpenses: 35550 },
-        ofs: { sales: 237000, operatingProfit: 8000, netIncome: 5800, debtRatio: 105, ordinaryIncome: 7500, sgaExpenses: 35550 }
+        cfs: { sales: 237000, operatingProfit: 8000, netIncome: 5800, debtRatio: 105, ordinaryIncome: 7500, sgaExpenses: 35550, equity: 64000, currentAssets: 86000, currentLiabilities: 65000 },
+        ofs: { sales: 237000, operatingProfit: 8000, netIncome: 5800, debtRatio: 105, ordinaryIncome: 7500, sgaExpenses: 35550, equity: 64000, currentAssets: 86000, currentLiabilities: 65000 }
       },
       isDongseo: {
-        cfs: { sales: 1760000, operatingProfit: 278000, netIncome: -73000, debtRatio: 120, ordinaryIncome: 87000, sgaExpenses: 176000 },
-        ofs: { sales: 1285000, operatingProfit: 205000, netIncome: -49000, debtRatio: 107, ordinaryIncome: 64000, sgaExpenses: 128500 }
-      }
+        cfs: { sales: 1760000, operatingProfit: 278000, netIncome: -73000, debtRatio: 120, ordinaryIncome: 87000, sgaExpenses: 176000, equity: 650000, currentAssets: 850000, currentLiabilities: 665000 },
+        ofs: { sales: 1285000, operatingProfit: 205000, netIncome: -49000, debtRatio: 107, ordinaryIncome: 64000, sgaExpenses: 128500, equity: 590000, currentAssets: 720000, currentLiabilities: 575000 }
+      },
+      lxhausys: { cfs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 }, ofs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 } },
+      kcc: { cfs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 }, ofs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 } }
     }
   });
 
@@ -152,6 +188,10 @@ export default function Dashboard() {
 
   const [marketSummary, setMarketSummary] = useState('');
   const [trendCards, setTrendCards] = useState([]);
+  const [stockData, setStockData] = useState({});
+  const [isStockLoading, setIsStockLoading] = useState(true);
+  const [disclosures, setDisclosures] = useState({});
+  const [activeDisclosureTab, setActiveDisclosureTab] = useState('');
 
   const [isDartLoading, setIsDartLoading] = useState(false);
   const [dartStatusText, setDartStatusText] = useState('');
@@ -170,6 +210,63 @@ export default function Dashboard() {
     setMarketSummary(summary);
     setTrendCards(list);
   }, [selectedYear, selectedQuarter]);
+
+  // 주가 실시간 조회 (Yahoo Finance 프록시 → /api/stock)
+  useEffect(() => {
+    const fetchAllStocks = async () => {
+      setIsStockLoading(true);
+      const results = {};
+      await Promise.all(
+        companies.filter(c => c.stockTicker).map(async (company) => {
+          try {
+            const res = await fetch(`/api/stock?ticker=${company.stockTicker}`);
+            const data = await res.json();
+            const chart = data?.chart?.result?.[0];
+            if (!chart) return;
+            const meta = chart.meta;
+            const closes = (chart.indicators?.quote?.[0]?.close || []).filter(v => v !== null);
+            const prevClose = meta.chartPreviousClose || meta.previousClose || meta.regularMarketPrice;
+            const price = meta.regularMarketPrice;
+            const change = price - prevClose;
+            const changePct = prevClose ? (change / prevClose * 100) : 0;
+            results[company.id] = {
+              price,
+              change,
+              changePct,
+              sparkline: closes.map(v => ({ v: Math.round(v) })),
+              high52w: meta.fiftyTwoWeekHigh,
+              low52w: meta.fiftyTwoWeekLow,
+              ticker: company.stockTicker.replace('.KS', ''),
+            };
+          } catch (e) {
+            console.warn(`[Stock] ${company.stockTicker}:`, e.message);
+          }
+        })
+      );
+      setStockData(results);
+      setIsStockLoading(false);
+    };
+    fetchAllStocks();
+  }, []);
+
+  // DART 최근 공시 목록 자동 조회 (apiKey 바인딩 시 자동 실행)
+  useEffect(() => {
+    if (!apiKey) return;
+    const fetchDisclosures = async () => {
+      const result = {};
+      for (const co of companies.filter(c => c.corpCode)) {
+        try {
+          const url = `/api-dart/api/list.json?crtfc_key=${apiKey.trim()}&corp_code=${co.corpCode}&page_no=1&page_count=5`;
+          const res = await fetch(url);
+          const data = await res.json();
+          if (data.status === '000' && data.list) result[co.id] = data.list;
+        } catch (e) { /* silent */ }
+      }
+      setDisclosures(result);
+      setActiveDisclosureTab(prev => prev || companies[0]?.id || '');
+    };
+    fetchDisclosures();
+  }, [apiKey]);
 
   // ---------------------------------------------------------
   // DART 실시간 API 일괄 다중 호출 (자동 Looper) 시스템
@@ -380,7 +477,7 @@ export default function Dashboard() {
   // ---------------------------------------------------------
   const handleExportCSV = () => {
     const fsDiv = isConsolidated ? 'cfs' : 'ofs';
-    const header = ['기업명', '기간', '공시구분', '집계모드', '매출액(백만)', '영업이익(백만)', '영업이익률(%)', '경상손익(백만)', '경상손익률(%)', '판관비(백만)', '판관비율(%)', '총포괄손익(백만)', '순이익률(%)', '부채비율(%)'];
+    const header = ['기업명', '기간', '공시구분', '집계모드', '매출액(백만)', '영업이익(백만)', '영업이익률(%)', '경상손익(백만)', '경상손익률(%)', '판관비(백만)', '판관비율(%)', '총포괄손익(백만)', '순이익률(%)', '부채비율(%)', 'ROE(%)', '유동비율(%)'];
     const rows = [header.join(',')];
 
     sortQuarters(quarters).forEach(q => {
@@ -391,11 +488,16 @@ export default function Dashboard() {
         const net = getComputedValue(company.id, q, 'netIncome', fsDiv);
         const sga = getComputedValue(company.id, q, 'sgaExpenses', fsDiv);
         const debt = getComputedValue(company.id, q, 'debtRatio', fsDiv);
+        const eq = getComputedValue(company.id, q, 'equity', fsDiv);
+        const curA = getComputedValue(company.id, q, 'currentAssets', fsDiv);
+        const curL = getComputedValue(company.id, q, 'currentLiabilities', fsDiv);
         const opMargin = sales > 0 ? ((op / sales) * 100).toFixed(2) : '0.00';
         const oiMarginCsv = sales > 0 ? ((oi / sales) * 100).toFixed(2) : '0.00';
         const sgaR = sales > 0 ? ((sga / sales) * 100).toFixed(2) : '0.00';
         const netMargin = sales > 0 ? ((net / sales) * 100).toFixed(2) : '0.00';
-        rows.push([company.name, q, isConsolidated ? '연결(CFS)' : '별도(OFS)', isCumulative ? '누계액' : '당분기', sales, op, opMargin, oi, oiMarginCsv, sga, sgaR, net, netMargin, debt < 0 ? '자본잠식' : debt].join(','));
+        const roeCsv = eq > 0 ? ((net / eq) * 100).toFixed(2) : '0.00';
+        const currentRatioCsv = curL > 0 ? ((curA / curL) * 100).toFixed(2) : '0.00';
+        rows.push([company.name, q, isConsolidated ? '연결(CFS)' : '별도(OFS)', isCumulative ? '누계액' : '당분기', sales, op, opMargin, oi, oiMarginCsv, sga, sgaR, net, netMargin, debt < 0 ? '자본잠식' : debt, roeCsv, currentRatioCsv].join(','));
       });
     });
 
@@ -417,7 +519,7 @@ export default function Dashboard() {
     const qData = financialData[quarterStr];
     const currentVal = qData?.[companyId]?.[fsDiv]?.[metric] ?? 0;
 
-    if (metric === 'debtRatio') return currentVal;
+    if (metric === 'debtRatio' || metric === 'equity' || metric === 'currentAssets' || metric === 'currentLiabilities') return currentVal;
     if (isCumulative) return currentVal;
 
     const [year, q] = quarterStr.split(' ');
@@ -606,6 +708,64 @@ export default function Dashboard() {
       {/* 📊 분석 및 실시간 제어판 영역 */}
       <div className="grid grid-cols-1 gap-8 mb-8">
         
+        {/* 📈 KOSPI 실시간 주가 패널 */}
+        <section className="glass-panel rounded-2xl p-6 mb-8 shadow-md">
+          <div className="flex items-center gap-2 mb-5">
+            <div className="p-2 bg-amber-500/10 rounded-lg text-amber-400"><BarChart2 className="w-5 h-5" /></div>
+            <div>
+              <h2 className="text-lg font-bold text-slate-100">KOSPI 주가 현황</h2>
+              <p className="text-slate-400 text-xs">Yahoo Finance 실시간 연동 · 전일비 등락 기준</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+            {companies.filter(c => c.stockTicker).map(company => {
+              const s = stockData[company.id];
+              return (
+                <div key={company.id} className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-4 relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-1 h-full rounded-l-xl" style={{ backgroundColor: company.color }}></div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-bold text-slate-200 truncate">{company.name}</span>
+                    <span className="text-[9px] font-mono text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded">{company.stockTicker.replace('.KS','')}</span>
+                  </div>
+                  {isStockLoading ? (
+                    <div className="animate-pulse">
+                      <div className="h-6 bg-slate-700 rounded w-3/4 mb-1"></div>
+                      <div className="h-3 bg-slate-800 rounded w-1/2"></div>
+                    </div>
+                  ) : s ? (
+                    <>
+                      <div className="text-xl font-extrabold text-slate-100 mb-0.5">
+                        ₩{s.price.toLocaleString('ko-KR')}
+                      </div>
+                      <div className={`text-xs font-bold flex items-center gap-1 ${s.change >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                        {s.change >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                        {s.change >= 0 ? '+' : ''}{s.change.toLocaleString('ko-KR')} ({s.changePct >= 0 ? '+' : ''}{s.changePct.toFixed(2)}%)
+                      </div>
+                      {s.sparkline?.length > 0 && (
+                        <div className="mt-2 h-10 w-full">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={s.sparkline} margin={{ top: 2, right: 2, bottom: 2, left: 2 }}>
+                              <Line type="monotone" dataKey="v" stroke={company.color} strokeWidth={1.5} dot={false} />
+                            </LineChart>
+                          </ResponsiveContainer>
+                        </div>
+                      )}
+                      {(s.high52w || s.low52w) && (
+                        <div className="mt-1.5 text-[9px] text-slate-500 flex justify-between">
+                          <span>52W 저: ₩{s.low52w?.toLocaleString('ko-KR') ?? '-'}</span>
+                          <span>고: ₩{s.high52w?.toLocaleString('ko-KR') ?? '-'}</span>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="text-xs text-slate-500 mt-2">조회 불가</div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
         {/* 대시보드 차트 메인 영역 (수동 에디터 폼 삭제에 따라 Full-Width 전체 폭으로 가독성 확장) */}
         <section className="glass-panel rounded-2xl p-6 flex flex-col justify-between shadow-lg relative">
           <div>
@@ -1034,6 +1194,8 @@ export default function Dashboard() {
                 <th className="p-4 text-right">총포괄손익</th>
                 <th className="p-4 text-right">순이익률</th>
                 <th className="p-4 text-right">부채비율</th>
+                <th className="p-4 text-right">ROE</th>
+                <th className="p-4 text-right">유동비율</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/50 text-slate-300 text-xs">
@@ -1046,11 +1208,16 @@ export default function Dashboard() {
                 const sga = getComputedValue(company.id, targetQuarterStr, 'sgaExpenses', fsDiv);
                 const net = getComputedValue(company.id, targetQuarterStr, 'netIncome', fsDiv);
                 const debt = getComputedValue(company.id, targetQuarterStr, 'debtRatio', fsDiv);
+                const eq = getComputedValue(company.id, targetQuarterStr, 'equity', fsDiv);
+                const curA = getComputedValue(company.id, targetQuarterStr, 'currentAssets', fsDiv);
+                const curL = getComputedValue(company.id, targetQuarterStr, 'currentLiabilities', fsDiv);
 
                 const opMargin = sales > 0 ? ((op / sales) * 100).toFixed(2) : null;
                 const oiMargin = sales > 0 ? ((oi / sales) * 100).toFixed(2) : null;
                 const sgaRatio = sales > 0 ? ((sga / sales) * 100).toFixed(2) : null;
                 const netMargin = sales > 0 ? ((net / sales) * 100).toFixed(2) : null;
+                const roe = eq > 0 ? ((net / eq) * 100).toFixed(2) : null;
+                const currentRatio = curL > 0 ? ((curA / curL) * 100).toFixed(1) : null;
 
                 return (
                   <tr key={company.id} className="hover:bg-slate-900/40 transition-colors border-b border-slate-800/45">
@@ -1098,6 +1265,12 @@ export default function Dashboard() {
                       ) : debt === 0 ? (
                         <span className="text-slate-500">-</span>
                       ) : `${debt}%`}
+                    </td>
+                    <td className={`p-4 text-right font-semibold ${roe === null ? 'text-slate-500' : parseFloat(roe) < 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
+                      {roe === null ? '-' : `${parseFloat(roe) >= 0 ? '+' : ''}${roe}%`}
+                    </td>
+                    <td className={`p-4 text-right font-semibold ${currentRatio === null ? 'text-slate-500' : parseFloat(currentRatio) < 100 ? 'text-amber-400' : 'text-slate-300'}`}>
+                      {currentRatio === null ? '-' : `${currentRatio}%`}
                     </td>
                   </tr>
                 );
@@ -1228,6 +1401,64 @@ export default function Dashboard() {
             </p>
           </div>
         </div>
+      </section>
+
+      {/* 📰 DART 최근 공시 목록 */}
+      <section className="glass-panel rounded-2xl p-6 mb-8 shadow-md">
+        <div className="flex items-center gap-2 mb-5">
+          <div className="p-2 bg-cyan-500/10 rounded-lg text-cyan-400"><Newspaper className="w-5 h-5" /></div>
+          <div>
+            <h2 className="text-lg font-bold text-slate-100">DART 최근 공시 목록</h2>
+            <p className="text-slate-400 text-xs">금감원 전자공시 · API 키 입력 시 자동 조회</p>
+          </div>
+        </div>
+
+        {/* 기업 탭 */}
+        <div className="flex flex-wrap gap-2 mb-4">
+          {companies.filter(c => c.corpCode).map(company => (
+            <button
+              key={company.id}
+              onClick={() => setActiveDisclosureTab(company.id)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${
+                activeDisclosureTab === company.id
+                  ? 'text-white border-transparent'
+                  : 'text-slate-400 border-slate-700 hover:border-slate-500'
+              }`}
+              style={activeDisclosureTab === company.id ? { backgroundColor: company.color + '33', borderColor: company.color } : {}}
+            >
+              <Building2 className="w-3 h-3" />
+              {company.name}
+            </button>
+          ))}
+        </div>
+
+        {/* 공시 목록 */}
+        {!apiKey ? (
+          <div className="text-center py-8 text-slate-500 text-sm">
+            <FileText className="w-8 h-8 mx-auto mb-2 opacity-30" />
+            <p>상단 DART API Key 입력 후 자동으로 최근 공시가 표시됩니다.</p>
+          </div>
+        ) : disclosures[activeDisclosureTab]?.length > 0 ? (
+          <div className="space-y-2">
+            {disclosures[activeDisclosureTab].map((item, idx) => (
+              <div key={idx} className="flex items-start gap-3 bg-slate-900/40 border border-slate-800/60 rounded-xl px-4 py-3 hover:border-slate-700 transition-colors">
+                <div className="shrink-0 mt-0.5">
+                  <FileText className="w-4 h-4 text-cyan-500/70" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium text-slate-200 truncate">{item.report_nm}</p>
+                  <p className="text-[10px] text-slate-500 mt-0.5">{item.rcept_dt?.slice(0,4)}.{item.rcept_dt?.slice(4,6)}.{item.rcept_dt?.slice(6,8)} · {item.flr_nm}</p>
+                </div>
+                <span className="shrink-0 text-[9px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-mono">{item.pblntf_ty}</span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8 text-slate-500 text-sm">
+            <RefreshCw className="w-6 h-6 mx-auto mb-2 opacity-30 animate-spin" />
+            <p>공시 목록 조회 중...</p>
+          </div>
+        )}
       </section>
     </div>
   );
