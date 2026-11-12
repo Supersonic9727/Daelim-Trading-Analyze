@@ -1,13 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   TrendingUp,
   TrendingDown,
-  DollarSign,
-  Percent,
-  Layers,
   FileText,
   Activity,
-  Award,
   Zap,
   Key,
   Calendar,
@@ -94,6 +90,9 @@ const getLatestFiledPeriod = (now = new Date()) => {
   return { year: String(y - 1), quarter: '3Q' };
 };
 const LATEST_PERIOD = getLatestFiledPeriod();
+const previousPeriod = ({ year, quarter }) => quarter === '1Q'
+  ? { year: String(Number(year) - 1), quarter: '4Q' }
+  : { year, quarter: `${Number(quarter[0]) - 1}Q` };
 
 // 금액은 원 단위 정밀도(백만원 소수)로 보관하고 표시 시점에만 반올림 — 당분기 역산 시 반올림 오차 방지
 const roundM = (v) => Math.round(v) || 0;
@@ -102,15 +101,16 @@ const roundM = (v) => Math.round(v) || 0;
 const isNoDataError = (e) => /미공시|데이터가 없습니다|조회된 데이터가 없습니다/.test(e?.message || '');
 const fmtM = (v) => roundM(v).toLocaleString('ko-KR');
 
+// 비교 기업 - corpCode: DART 고유번호(company.json 검증), stockTicker: Yahoo 티커(.KS 코스피 / .KQ 코스닥)
+const companies = [
+  { id: 'daelimTrading', name: '대림통상', corpCode: '00109824', color: '#6366f1', stockTicker: '006570.KS' },
+  { id: 'daelimBath', name: '대림바스', corpCode: '00109754', color: '#06b6d4', stockTicker: '005750.KS' },
+  { id: 'watos', name: '와토스코리아', corpCode: '00455875', color: '#10b981', stockTicker: '079000.KQ' },
+  { id: 'lxhausys', name: 'LX하우시스', corpCode: '00759513', color: '#f59e0b', stockTicker: '108670.KS' },
+  { id: 'kcc', name: 'KCC', corpCode: '00105271', color: '#ec4899', stockTicker: '002380.KS' },
+];
+
 export default function Dashboard() {
-  // 1. 기업 리스트 상태 - corpCode: DART 고유번호(company.json 검증), stockTicker: KOSPI 종목코드
-  const [companies, setCompanies] = useState([
-    { id: 'daelimTrading', name: '대림통상', corpCode: '00109824', color: '#6366f1', stockTicker: '006570.KS' },
-    { id: 'daelimBath', name: '대림바스', corpCode: '00109754', color: '#06b6d4', stockTicker: '005750.KS' },
-    { id: 'watos', name: '와토스코리아', corpCode: '00455875', color: '#10b981', stockTicker: '079000.KQ' },
-    { id: 'lxhausys', name: 'LX하우시스', corpCode: '00759513', color: '#f59e0b', stockTicker: '108670.KS' },
-    { id: 'kcc', name: 'KCC', corpCode: '00105271', color: '#ec4899', stockTicker: '002380.KS' },
-  ]);
 
 
   // 2. 분기 범위 상태 - DART 조회 완료 시 해당 연도 1Q~선택 분기로 설정
@@ -241,7 +241,7 @@ export default function Dashboard() {
           const url = `/api-dart/api/list.json?corp_code=${co.corpCode}&bgn_de=${bgnDe}&page_no=1&page_count=5`;
           const data = await fetch(url).then(r => r.json());
           if (data.status === '000' || data.status === '013') result[co.id] = data.list || [];
-        } catch (e) { /* 조회 실패 시 해당 탭은 오류 안내 */ }
+        } catch { /* 조회 실패 시 해당 탭은 오류 안내 */ }
       }));
       setDisclosures(result);
       setActiveDisclosureTab(prev => prev || companies[0]?.id || '');
@@ -252,7 +252,8 @@ export default function Dashboard() {
   // ---------------------------------------------------------
   // DART 실시간 API 일괄 다중 호출 (자동 Looper) 시스템
   // ---------------------------------------------------------
-  const handleFetchDartApi = async () => {
+  // year/quarter: 조회할 기간 (기본값은 드롭다운 선택값). 대상 분기 데이터가 있는 기업 수를 반환
+  const handleFetchDartApi = async (year = selectedYear, quarter = selectedQuarter) => {
     setIsDartLoading(true);
     setDartStatus('LOADING');
     setDartError(null);
@@ -265,13 +266,13 @@ export default function Dashboard() {
       '4Q': '11011'  // 사업보고서
     };
 
-    const targetQuarterStr = `${selectedYear} ${selectedQuarter}`;
+    const targetQuarterStr = `${year} ${quarter}`;
     // 차트·당분기 역산이 실데이터만 쓰도록 해당 연도 1Q ~ 선택 분기를 모두 조회
-    const qList = ['1Q', '2Q', '3Q', '4Q'].slice(0, ['1Q', '2Q', '3Q', '4Q'].indexOf(selectedQuarter) + 1);
+    const qList = ['1Q', '2Q', '3Q', '4Q'].slice(0, ['1Q', '2Q', '3Q', '4Q'].indexOf(quarter) + 1);
 
     // 연도/분기 확정 (시장 지표 동시 연동용)
-    setActiveYear(selectedYear);
-    setActiveQuarter(selectedQuarter);
+    setActiveYear(year);
+    setActiveQuarter(quarter);
 
     const activeCompanies = companies.filter(c => c.corpCode);
     const totalCalls = activeCompanies.length * qList.length * 2;
@@ -282,15 +283,15 @@ export default function Dashboard() {
 
     const fetchCached = async (company, q, fsDiv) => {
       const reprtCode = rCodeMap[q];
-      const cacheKey = `${company.corpCode}-${selectedYear}-${reprtCode}-${fsDiv}`;
+      const cacheKey = `${company.corpCode}-${year}-${reprtCode}-${fsDiv}`;
       if (apiCacheRef.current.has(cacheKey)) return apiCacheRef.current.get(cacheKey);
       try {
-        const data = await fetchDartData(company.corpCode, selectedYear, reprtCode, fsDiv);
+        const data = await fetchDartData(company.corpCode, year, reprtCode, fsDiv);
         apiCacheRef.current.set(cacheKey, data);
         await delay(200); // DART 초당 트래픽 제한 대응
         return data;
       } catch (e) {
-        console.warn(`[DART API WARNING] ${company.name} ${selectedYear} ${q} ${fsDiv} 호출 실패:`, e.message);
+        console.warn(`[DART API WARNING] ${company.name} ${year} ${q} ${fsDiv} 호출 실패:`, e.message);
         if (isNoDataError(e)) apiCacheRef.current.set(cacheKey, null); // 일시 오류는 캐시하지 않아 재조회 가능
         return null;
       }
@@ -300,7 +301,7 @@ export default function Dashboard() {
       // 기업별로 병렬 실행 (기업 내부 분기 호출은 순차) - 순차 40회 호출 시 수 분 소요
       await Promise.all(activeCompanies.map(async (company) => {
         for (const q of qList) {
-          const qStr = `${selectedYear} ${q}`;
+          const qStr = `${year} ${q}`;
           const cfsData = await fetchCached(company, q, 'CFS');
           currentCallCount++;
           setDartStatusText(`DART 재무제표 동기화 중... (${currentCallCount}/${totalCalls})`);
@@ -308,7 +309,8 @@ export default function Dashboard() {
           currentCallCount++;
           setDartStatusText(`DART 재무제표 동기화 중... (${currentCallCount}/${totalCalls})`);
 
-          if (q === selectedQuarter && !cfsData) localCfsUnavail.add(company.id);
+          // 별도만 있고 연결이 없을 때만 '연결 미작성' (둘 다 없으면 미공시)
+          if (q === quarter && !cfsData && ofsData) localCfsUnavail.add(company.id);
           if (cfsData || ofsData) {
             newFinancialData[qStr] = newFinancialData[qStr] || {};
             newFinancialData[qStr][company.id] = { cfs: cfsData || {}, ofs: ofsData || {} };
@@ -318,37 +320,52 @@ export default function Dashboard() {
 
       // 다년도 추이 데이터는 유지하고 이번 조회 분기만 갱신
       setFinancialData(prev => ({ ...prev, ...newFinancialData }));
-      setQuarters(qList.map(q => `${selectedYear} ${q}`));
+      setQuarters(qList.map(q => `${year} ${q}`));
 
       setCfsUnavailableSet(localCfsUnavail);
       const fetchedCount = Object.keys(newFinancialData[targetQuarterStr] || {}).length;
       if (fetchedCount === 0) {
         setDartStatus('ERROR');
         setDartStatusText(`일괄 조회 실패: 모든 기업 데이터 없음 (서버 API 키 미설정 또는 해당 연도/분기 미공시)`);
-        setDartError(`DART OpenAPI 일괄 조회 실패:\n- 요청 연도/분기: ${selectedYear}년 ${selectedQuarter}\n- 사유: 조회된 기업 데이터 없음 (전체 ${activeCompanies.length}개 기업 응답 없음)`);
+        setDartError(`DART OpenAPI 일괄 조회 실패:\n- 요청 연도/분기: ${year}년 ${quarter}\n- 사유: 조회된 기업 데이터 없음 (전체 ${activeCompanies.length}개 기업 응답 없음)`);
       } else {
         const failedCfsCount = localCfsUnavail.size;
+        const missing = activeCompanies.filter(c => !newFinancialData[targetQuarterStr]?.[c.id]).map(c => c.name);
         setDartStatus('SUCCESS');
         setDartStatusText(
-          failedCfsCount > 0
-            ? `[DART] ${selectedYear}년 ${selectedQuarter} 동기화 완료 — ${fetchedCount}/${activeCompanies.length}개 기업 성공, ${failedCfsCount}개사 연결재무 미작성(별도로 대체)`
-            : `[DART 일괄 조회] ${selectedYear}년 ${selectedQuarter} 전체 기업 동기화 완료!`
+          `[DART] ${year}년 ${quarter} 동기화 완료 — ${fetchedCount}/${activeCompanies.length}개 기업`
+          + (missing.length ? `, 미공시: ${missing.join('·')}` : '')
+          + (failedCfsCount ? `, ${failedCfsCount}개사 연결재무 미작성(별도로 대체)` : '')
         );
         setDartError(null);
       }
+      return fetchedCount;
     } catch (err) {
       setDartStatus('ERROR');
       const errMsg = err.message || '일괄 조회 중 서버 이상';
       setDartStatusText(`일괄 동기화 실패: ${errMsg}`);
-      setDartError(`DART OpenAPI 일괄 조회 실패:\n- 요청 연도/분기: ${selectedYear}년 ${selectedQuarter}\n- 사유: ${errMsg}`);
+      setDartError(`DART OpenAPI 일괄 조회 실패:\n- 요청 연도/분기: ${year}년 ${quarter}\n- 사유: ${errMsg}`);
+      return 0;
     } finally {
       setIsDartLoading(false);
     }
   };
 
-  // 접속 시 기본 연도/분기 실데이터 자동 조회
+  // 접속 시 최신 기간 자동 조회. 제출기한 직후라 DART에 아직 반영되지 않았으면 직전 분기로 한 단계 대체
   useEffect(() => {
-    handleFetchDartApi();
+    (async () => {
+      const count = await handleFetchDartApi(LATEST_PERIOD.year, LATEST_PERIOD.quarter);
+      if (count > 0) return;
+      const prev = previousPeriod(LATEST_PERIOD);
+      setSelectedYear(prev.year);
+      setSelectedQuarter(prev.quarter);
+      const prevCount = await handleFetchDartApi(prev.year, prev.quarter);
+      if (prevCount > 0) {
+        setDartStatusText(prevText => `${LATEST_PERIOD.year}년 ${LATEST_PERIOD.quarter} 보고서 DART 미반영 → ${prev.year}년 ${prev.quarter} 표시 | ${prevText}`);
+      }
+    })();
+    // 최초 1회만 실행
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ---------------------------------------------------------
@@ -426,6 +443,11 @@ export default function Dashboard() {
 
     sortQuarters(quarters).forEach(q => {
       companies.forEach(company => {
+        const fsLabel = isConsolidated ? (isOfsFallback(company.id, q) ? '별도(연결 미작성)' : '연결(CFS)') : '별도(OFS)';
+        if (!isComputable(company.id, q, fsDiv)) {
+          rows.push([company.name, q, fsLabel, isCumulative ? '누계액' : '당분기', '미공시'].join(','));
+          return;
+        }
         const sales = getComputedValue(company.id, q, 'sales', fsDiv);
         const op = getComputedValue(company.id, q, 'operatingProfit', fsDiv);
         const oi = getComputedValue(company.id, q, 'ordinaryIncome', fsDiv);
@@ -442,7 +464,7 @@ export default function Dashboard() {
         const netMargin = sales > 0 ? ((pl / sales) * 100).toFixed(2) : '';
         const roeCsv = eq > 0 ? ((pl / eq) * 100).toFixed(2) : '';
         const currentRatioCsv = curL > 0 ? ((curA / curL) * 100).toFixed(2) : '';
-        rows.push([company.name, q, isConsolidated ? '연결(CFS)' : '별도(OFS)', isCumulative ? '누계액' : '당분기', roundM(sales), roundM(op), opMargin, roundM(oi), oiMarginCsv, roundM(sga), sgaR, roundM(pl), netMargin, roundM(net), debt < 0 ? '자본잠식' : debt, roeCsv, currentRatioCsv].join(','));
+        rows.push([company.name, q, fsLabel, isCumulative ? '누계액' : '당분기', roundM(sales), roundM(op), opMargin, roundM(oi), oiMarginCsv, roundM(sga), sgaR, roundM(pl), netMargin, roundM(net), debt < 0 ? '자본잠식' : debt, roeCsv, currentRatioCsv].join(','));
       });
     });
 
@@ -470,6 +492,14 @@ export default function Dashboard() {
   const isOfsFallback = (companyId, quarterStr) => {
     const entry = financialData[quarterStr]?.[companyId];
     return Object.keys(entry?.cfs || {}).length === 0 && Object.keys(entry?.ofs || {}).length > 0;
+  };
+  // 해당 분기 공시가 있고, 당분기 모드면 역산에 필요한 직전 분기 공시도 있어야 값을 표시 (없으면 0이 아니라 '미공시')
+  const isComputable = (companyId, quarterStr, fsDiv) => {
+    const has = (qs) => Object.keys(getStatement(companyId, qs, fsDiv)).length > 0;
+    if (!has(quarterStr)) return false;
+    const [year, q] = quarterStr.split(' ');
+    if (isCumulative || q === '1Q') return true;
+    return has(`${year} ${Number(q[0]) - 1}Q`);
   };
 
   const getComputedValue = (companyId, quarterStr, metric, fsDiv) => {
@@ -502,14 +532,16 @@ export default function Dashboard() {
     const row = { quarter: qKey };
     
     companies.forEach(company => {
-      if (activeMetric === 'operatingProfitMargin') {
+      if (!isComputable(company.id, qKey, fsDiv)) {
+        row[company.name] = null;
+      } else if (activeMetric === 'operatingProfitMargin') {
         const sales = getComputedValue(company.id, qKey, 'sales', fsDiv);
         const op = getComputedValue(company.id, qKey, 'operatingProfit', fsDiv);
-        row[company.name] = sales > 0 ? parseFloat(((op / sales) * 100).toFixed(2)) : 0;
+        row[company.name] = sales > 0 ? parseFloat(((op / sales) * 100).toFixed(2)) : null;
       } else if (activeMetric === 'sgaRatio') {
         const sales = getComputedValue(company.id, qKey, 'sales', fsDiv);
         const sga = getComputedValue(company.id, qKey, 'sgaExpenses', fsDiv);
-        row[company.name] = sales > 0 ? parseFloat(((sga / sales) * 100).toFixed(2)) : 0;
+        row[company.name] = sales > 0 ? parseFloat(((sga / sales) * 100).toFixed(2)) : null;
       } else {
         row[company.name] = roundM(getComputedValue(company.id, qKey, activeMetric, fsDiv));
       }
@@ -592,7 +624,7 @@ export default function Dashboard() {
           </div>
 
           <button 
-            onClick={handleFetchDartApi}
+            onClick={() => handleFetchDartApi()}
             disabled={isDartLoading}
             className={`w-full text-xs font-bold py-2 rounded-lg flex items-center justify-center gap-2 transition-all ${
               isDartLoading 
@@ -854,7 +886,7 @@ export default function Dashboard() {
                     formatter={(value, name) => {
                       const isPercent = ['operatingProfitMargin', 'debtRatio', 'sgaRatio'].includes(activeMetric);
                       const unit = isPercent ? '%' : ' 백만원';
-                      return [`${value.toLocaleString('ko-KR')}${unit}`, name];
+                      return [value == null ? '미공시' : `${value.toLocaleString('ko-KR')}${unit}`, name];
                     }}
                   />
                   <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} iconType="circle" />
@@ -1178,22 +1210,37 @@ export default function Dashboard() {
                 const roe = eq > 0 ? ((pl / eq) * 100).toFixed(2) : null;
                 const currentRatio = curL > 0 ? ((curA / curL) * 100).toFixed(1) : null;
 
+                const nameCell = (
+                  <td className="p-4 font-bold">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: company.color }}></span>
+                      <div className="flex flex-col">
+                        <span className="text-slate-200">
+                          {company.name}
+                          {isConsolidated && isOfsFallback(company.id, targetQuarterStr) && (
+                            <span className="ml-1 text-[9px] font-semibold text-amber-400" title="연결재무제표 미작성 회사 — 별도재무제표 수치">(별도)</span>
+                          )}
+                        </span>
+                        <span className="text-[9px] text-slate-500 font-mono">DART: {company.corpCode}</span>
+                      </div>
+                    </div>
+                  </td>
+                );
+
+                if (!isComputable(company.id, targetQuarterStr, fsDiv)) {
+                  return (
+                    <tr key={company.id} className="border-b border-slate-800/45">
+                      {nameCell}
+                      <td colSpan={13} className="p-4 text-center text-slate-500 font-semibold">
+                        미공시 — {activeYear}년 {activeQuarter} 보고서가 아직 DART에 없습니다{!isCumulative && activeQuarter !== '1Q' ? ' (당분기 역산에는 직전 분기 보고서도 필요)' : ''}
+                      </td>
+                    </tr>
+                  );
+                }
+
                 return (
                   <tr key={company.id} className="hover:bg-slate-900/40 transition-colors border-b border-slate-800/45">
-                    <td className="p-4 font-bold">
-                      <div className="flex items-center gap-2">
-                        <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: company.color }}></span>
-                        <div className="flex flex-col">
-                          <span className="text-slate-200">
-                            {company.name}
-                            {isConsolidated && isOfsFallback(company.id, targetQuarterStr) && (
-                              <span className="ml-1 text-[9px] font-semibold text-amber-400" title="연결재무제표 미작성 회사 — 별도재무제표 수치">(별도)</span>
-                            )}
-                          </span>
-                          <span className="text-[9px] text-slate-500 font-mono">DART: {company.corpCode}</span>
-                        </div>
-                      </div>
-                    </td>
+                    {nameCell}
                     <td className="p-4 text-right font-medium text-slate-100">{fmtM(sales)}</td>
                     <td className={`p-4 text-right font-semibold ${op < 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
                       {op >= 0 ? '+' : ''}{fmtM(op)}
@@ -1261,7 +1308,7 @@ export default function Dashboard() {
           </div>
 
           {/* 경쟁사 선택 탭 */}
-          <div className="flex bg-slate-950 p-1 rounded-lg border border-slate-800 self-start sm:self-auto">
+          <div className="flex flex-wrap bg-slate-950 p-1 rounded-lg border border-slate-800 self-start sm:self-auto">
             {[
               { id: 'daelimBath', label: '대림바스' },
               { id: 'watos', label: '와토스코리아' },
@@ -1271,7 +1318,7 @@ export default function Dashboard() {
               <button
                 key={tab.id}
                 onClick={() => setActiveSwot(tab.id)}
-                className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${
+                className={`px-2.5 sm:px-4 py-1.5 rounded-md text-xs font-bold whitespace-nowrap transition-all ${
                   activeSwot === tab.id
                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/10'
                     : 'text-slate-400 hover:text-slate-200'

@@ -35,4 +35,9 @@ export default [
       ],
     },
   },
+  {
+    // Vercel 서버 함수와 Vite 설정은 Node 환경에서 실행
+    files: ['api/**/*.js', 'vite.config.js'],
+    languageOptions: { globals: globals.node },
+  },
 ]
