@@ -1,14 +1,35 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 
+// 로컬 개발에서 Vercel 함수(api/stock.js, api/kosis.js)를 그대로 실행하는 최소 어댑터
+const localApiFunctions = (names) => ({
+  name: 'local-api-functions',
+  configureServer(server) {
+    for (const name of names) {
+      server.middlewares.use(`/api/${name}`, async (req, res) => {
+        const url = new URL(req.originalUrl || req.url, 'http://local')
+        const { default: handler } = await server.ssrLoadModule(`/api/${name}.js`)
+        const shim = {
+          setHeader: (k, v) => res.setHeader(k, v),
+          status(code) { res.statusCode = code; return shim },
+          json(body) { res.setHeader('Content-Type', 'application/json; charset=utf-8'); res.end(JSON.stringify(body)) },
+          end: (body) => res.end(body),
+        }
+        await handler({ method: req.method, query: Object.fromEntries(url.searchParams) }, shim)
+      })
+    }
+  },
+})
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
-  // 접두사 없이 로드: DART 키는 개발 프록시에서만 쓰고 클라이언트 번들에는 넣지 않음
+  // 접두사 없이 로드: API 키는 개발 서버(Node)에서만 쓰고 클라이언트 번들에는 넣지 않음
   const env = loadEnv(mode, process.cwd(), '')
-  const dartKey = env.DART_API_KEY || env.VITE_DART_API_KEY || ''
+  const dartKey = env.DART_API_KEY || ''
+  process.env.KOSIS_API_KEY = env.KOSIS_API_KEY || ''
 
   return {
-    plugins: [react()],
+    plugins: [react(), localApiFunctions(['stock', 'kosis'])],
     server: {
       proxy: {
         '/api-dart': {

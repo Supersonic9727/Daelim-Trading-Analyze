@@ -32,7 +32,7 @@ import {
   Legend,
   LineChart
 } from 'recharts';
-import { getMarketTrendsData } from '../data/marketTrends';
+import { buildMarketCards, buildMarketSummary, quarterEndPrd } from '../utils/marketIndicators';
 import { fetchDartData } from '../utils/dartApi';
 
 // 분기 정렬 헬퍼
@@ -135,6 +135,8 @@ export default function Dashboard() {
 
   const [marketSummary, setMarketSummary] = useState('');
   const [trendCards, setTrendCards] = useState([]);
+  const [marketStatus, setMarketStatus] = useState('loading'); // loading | ready | error
+  const [marketError, setMarketError] = useState('');
   const [stockData, setStockData] = useState({});
   const [isStockLoading, setIsStockLoading] = useState(true);
   const [disclosures, setDisclosures] = useState(null);
@@ -151,11 +153,32 @@ export default function Dashboard() {
   const [isTrendLoading, setIsTrendLoading] = useState(false);
   const [trendStatusText, setTrendStatusText] = useState('');
 
-  // 시장 지표 패널은 조회 확정 기간(activeYear/activeQuarter)에 맞춰 갱신
+  // 시장 지표: 조회 확정 기간의 분기 말월 기준 KOSIS 공식 통계 (/api/kosis)
   useEffect(() => {
-    const { summary, list } = getMarketTrendsData(activeYear, activeQuarter);
-    setMarketSummary(summary);
-    setTrendCards(list);
+    let cancelled = false;
+    const endPrd = quarterEndPrd(activeYear, activeQuarter);
+    setMarketStatus('loading');
+    fetch(`/api/kosis?end=${endPrd}`)
+      .then(async (r) => {
+        const body = await r.json();
+        if (!r.ok) throw new Error(body.error || `HTTP ${r.status}`);
+        return body;
+      })
+      .then((body) => {
+        if (cancelled) return;
+        const cards = buildMarketCards(body, endPrd);
+        setTrendCards(cards);
+        setMarketSummary(buildMarketSummary(cards));
+        setMarketStatus('ready');
+      })
+      .catch((e) => {
+        if (cancelled) return;
+        setTrendCards([]);
+        setMarketSummary('');
+        setMarketError(e.message);
+        setMarketStatus('error');
+      });
+    return () => { cancelled = true; };
   }, [activeYear, activeQuarter]);
 
   // 주가 실시간 조회 (Yahoo Finance 프록시 → /api/stock)
@@ -1001,7 +1024,7 @@ export default function Dashboard() {
         })()}
       </section>
 
-      {/* 🏡 시장 트렌드 분석 패널 (useEffect를 통해 activeYear, activeQuarter에 100% 동기화됨) */}
+      {/* 🏡 시장 지표 패널 - KOSIS 공식 통계, 조회 확정 기간(분기 말월) 기준 */}
       <section className="mb-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-2">
@@ -1009,43 +1032,55 @@ export default function Dashboard() {
               <Layers3 className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-100">시장 트렌드 참고 패널 (8대 지표)</h2>
-              <p className="text-amber-400/90 text-xs font-semibold">⚠ 실제 통계가 아닌 연도별 경기 국면 가정에 따른 추정 시뮬레이션 값입니다. 의사결정에 인용하지 마세요.</p>
+              <h2 className="text-lg font-bold text-slate-100">주택·건설 시장 지표 (8대 공식 통계)</h2>
+              <p className="text-slate-400 text-xs">출처: KOSIS 국가통계포털 · 배지 색상은 대림통상 관점 (초록: 긍정, 빨강: 부정, 회색: 중립)</p>
             </div>
           </div>
 
           <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-xl px-3 py-1 text-xs text-indigo-400 font-bold self-start md:self-auto">
-            기준 기간: {activeYear}년 {activeQuarter}
+            기준 기간: {activeYear}년 {activeQuarter} (분기 말월 기준)
           </div>
         </div>
 
-        {/* 시장 동향 브리핑 요약 */}
+        {/* 시장 동향 요약 (수치 기반) */}
         <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 mb-6 flex items-start gap-3 shadow-md">
           <div className="p-2 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-lg shrink-0">
             <Info className="w-4 h-4" />
           </div>
           <div>
-            <div className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">시장 동향 브리핑 요약</div>
+            <div className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">시장 동향 요약</div>
             <p className="text-xs text-slate-300 mt-0.5 leading-relaxed font-semibold">
-              {marketSummary}
+              {marketStatus === 'loading' ? 'KOSIS 공식 통계 조회 중...'
+                : marketStatus === 'error' ? `시장 지표 조회 실패: ${marketError}`
+                : marketSummary || '해당 기간에 공표된 지표가 없습니다.'}
             </p>
           </div>
         </div>
 
         {/* 8대 지표 카드 그리드 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {trendCards.map(card => (
-            <div 
-              key={card.id} 
+          {marketStatus === 'loading' && Array.from({ length: 8 }, (_, i) => (
+            <div key={i} className="glass-panel rounded-2xl p-5 h-[150px] animate-pulse">
+              <div className="h-3 bg-slate-800 rounded w-1/2 mb-4"></div>
+              <div className="h-6 bg-slate-700 rounded w-2/3 mb-3"></div>
+              <div className="h-3 bg-slate-800 rounded w-full"></div>
+            </div>
+          ))}
+          {marketStatus === 'ready' && trendCards.map(card => (
+            <div
+              key={card.id}
+              title={card.table}
               className="glass-panel glass-panel-hover rounded-2xl p-5 flex flex-col justify-between shadow-md relative overflow-hidden"
             >
               <div>
-                <div className="flex justify-between items-start mb-2">
+                <div className="flex justify-between items-start mb-2 gap-2">
                   <span className="text-slate-400 text-[11px] font-semibold tracking-tight">{card.title}</span>
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                    card.isUp 
-                      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
-                      : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border shrink-0 ${
+                    card.tone === 'good'
+                      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                      : card.tone === 'bad'
+                      ? 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                      : 'bg-slate-500/10 text-slate-400 border-slate-500/20'
                   }`}>
                     {card.change}
                   </span>
