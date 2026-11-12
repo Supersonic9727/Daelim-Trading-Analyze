@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   TrendingUp,
   TrendingDown,
@@ -84,92 +84,21 @@ const swotData = {
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 export default function Dashboard() {
-  // 1. 기업 리스트 상태 - DART 실제 공식 고유번호(corpCode)와 시각적 지정코드(displayCode) 이원화 세팅 (3사 체제 압축)
+  // 1. 기업 리스트 상태 - corpCode: DART 고유번호(company.json 검증), stockTicker: KOSPI 종목코드
   const [companies, setCompanies] = useState([
-    { id: 'daelimTrading', name: '대림통상', displayCode: '00114731', corpCode: '00109824', color: '#6366f1', stockTicker: '006570.KS' },
-    { id: 'daelimBath', name: '대림B&Co', displayCode: '00157082', corpCode: '00109754', color: '#06b6d4', stockTicker: '005750.KS' },
-    { id: 'isDongseo', name: '아이에스동서', displayCode: '00105344', corpCode: '00115977', color: '#10b981', stockTicker: '010780.KS' },
-    { id: 'lxhausys', name: 'LX하우시스', displayCode: '00759513', corpCode: '00759513', color: '#f59e0b', stockTicker: '108670.KS' },
-    { id: 'kcc', name: 'KCC', displayCode: '00105271', corpCode: '00105271', color: '#ec4899', stockTicker: '002380.KS' },
+    { id: 'daelimTrading', name: '대림통상', corpCode: '00109824', color: '#6366f1', stockTicker: '006570.KS' },
+    { id: 'daelimBath', name: '대림바스', corpCode: '00109754', color: '#06b6d4', stockTicker: '005750.KS' },
+    { id: 'isDongseo', name: '아이에스동서', corpCode: '00115977', color: '#10b981', stockTicker: '010780.KS' },
+    { id: 'lxhausys', name: 'LX하우시스', corpCode: '00759513', color: '#f59e0b', stockTicker: '108670.KS' },
+    { id: 'kcc', name: 'KCC', corpCode: '00105271', color: '#ec4899', stockTicker: '002380.KS' },
   ]);
 
 
   // 2. 분기 범위 상태 - 기본 2024년 설정
   const [quarters, setQuarters] = useState(["2024 1Q", "2024 2Q", "2024 3Q", "2024 4Q"]);
 
-  // 3. 재무 데이터 상태 (연결/별도 이원화) - 기본 2024년 백만원 단위, 판관비 및 총포괄손익 반영
-  const [financialData, setFinancialData] = useState({
-    "2024 1Q": {
-      daelimTrading: {
-        cfs: { sales: 62000, operatingProfit: 2800, netIncome: -1200, debtRatio: 95, ordinaryIncome: 800, sgaExpenses: 9300, equity: 48500, currentAssets: 68000, currentLiabilities: 55000 },
-        ofs: { sales: 58000, operatingProfit: 2200, netIncome: -900, debtRatio: 90, ordinaryIncome: 600, sgaExpenses: 8700, equity: 46000, currentAssets: 63000, currentLiabilities: 51000 }
-      },
-      daelimBath: {
-        cfs: { sales: 58000, operatingProfit: 1800, netIncome: 1300, debtRatio: 110, ordinaryIncome: 1680, sgaExpenses: 8700, equity: 62000, currentAssets: 86000, currentLiabilities: 66000 },
-        ofs: { sales: 58000, operatingProfit: 1800, netIncome: 1300, debtRatio: 110, ordinaryIncome: 1680, sgaExpenses: 8700, equity: 62000, currentAssets: 86000, currentLiabilities: 66000 }
-      },
-      isDongseo: {
-        cfs: { sales: 420000, operatingProfit: 65000, netIncome: -18000, debtRatio: 130, ordinaryIncome: 20000, sgaExpenses: 42000, equity: 640000, currentAssets: 850000, currentLiabilities: 680000 },
-        ofs: { sales: 310000, operatingProfit: 48000, netIncome: -11000, debtRatio: 115, ordinaryIncome: 14500, sgaExpenses: 31000, equity: 580000, currentAssets: 720000, currentLiabilities: 580000 }
-      },
-      lxhausys: {
-        cfs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 },
-        ofs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 }
-      },
-      kcc: {
-        cfs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 },
-        ofs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 }
-      }
-    },
-    "2024 2Q": {
-      daelimTrading: {
-        cfs: { sales: 127000, operatingProfit: 6000, netIncome: -2300, debtRatio: 92, ordinaryIncome: 1800, sgaExpenses: 19050, equity: 48200, currentAssets: 70000, currentLiabilities: 56000 },
-        ofs: { sales: 118000, operatingProfit: 4800, netIncome: -1500, debtRatio: 88, ordinaryIncome: 1400, sgaExpenses: 17700, equity: 45800, currentAssets: 65000, currentLiabilities: 52000 }
-      },
-      daelimBath: {
-        cfs: { sales: 118000, operatingProfit: 4000, netIncome: 2950, debtRatio: 108, ordinaryIncome: 3800, sgaExpenses: 17700, equity: 63000, currentAssets: 88000, currentLiabilities: 67500 },
-        ofs: { sales: 118000, operatingProfit: 4000, netIncome: 2950, debtRatio: 108, ordinaryIncome: 3800, sgaExpenses: 17700, equity: 63000, currentAssets: 88000, currentLiabilities: 67500 }
-      },
-      isDongseo: {
-        cfs: { sales: 870000, operatingProfit: 137000, netIncome: -34000, debtRatio: 125, ordinaryIncome: 43000, sgaExpenses: 87000, equity: 645000, currentAssets: 870000, currentLiabilities: 695000 },
-        ofs: { sales: 630000, operatingProfit: 101000, netIncome: -24000, debtRatio: 112, ordinaryIncome: 32000, sgaExpenses: 63000, equity: 585000, currentAssets: 735000, currentLiabilities: 590000 }
-      },
-      lxhausys: { cfs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 }, ofs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 } },
-      kcc: { cfs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 }, ofs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 } }
-    },
-    "2024 3Q": {
-      daelimTrading: {
-        cfs: { sales: 188000, operatingProfit: 8500, netIncome: -3500, debtRatio: 98, ordinaryIncome: 2600, sgaExpenses: 28200, equity: 47800, currentAssets: 69500, currentLiabilities: 55500 },
-        ofs: { sales: 175500, operatingProfit: 6800, netIncome: -2700, debtRatio: 94, ordinaryIncome: 2000, sgaExpenses: 26325, equity: 45500, currentAssets: 64000, currentLiabilities: 51500 }
-      },
-      daelimBath: {
-        cfs: { sales: 175000, operatingProfit: 5500, netIncome: 3950, debtRatio: 112, ordinaryIncome: 5100, sgaExpenses: 26250, equity: 63500, currentAssets: 87000, currentLiabilities: 66500 },
-        ofs: { sales: 175000, operatingProfit: 5500, netIncome: 3950, debtRatio: 112, ordinaryIncome: 5100, sgaExpenses: 26250, equity: 63500, currentAssets: 87000, currentLiabilities: 66500 }
-      },
-      isDongseo: {
-        cfs: { sales: 1280000, operatingProfit: 197000, netIncome: -52000, debtRatio: 132, ordinaryIncome: 62000, sgaExpenses: 128000, equity: 642000, currentAssets: 860000, currentLiabilities: 688000 },
-        ofs: { sales: 935000, operatingProfit: 145000, netIncome: -38000, debtRatio: 118, ordinaryIncome: 46000, sgaExpenses: 93500, equity: 580000, currentAssets: 725000, currentLiabilities: 585000 }
-      },
-      lxhausys: { cfs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 }, ofs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 } },
-      kcc: { cfs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 }, ofs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 } }
-    },
-    "2024 4Q": {
-      daelimTrading: {
-        cfs: { sales: 256000, operatingProfit: 12500, netIncome: -5400, debtRatio: 89, ordinaryIncome: 3800, sgaExpenses: 38400, equity: 48000, currentAssets: 68500, currentLiabilities: 53500 },
-        ofs: { sales: 238000, operatingProfit: 10000, netIncome: -4200, debtRatio: 86, ordinaryIncome: 3000, sgaExpenses: 35700, equity: 46000, currentAssets: 63500, currentLiabilities: 49500 }
-      },
-      daelimBath: {
-        cfs: { sales: 237000, operatingProfit: 8000, netIncome: 5800, debtRatio: 105, ordinaryIncome: 7500, sgaExpenses: 35550, equity: 64000, currentAssets: 86000, currentLiabilities: 65000 },
-        ofs: { sales: 237000, operatingProfit: 8000, netIncome: 5800, debtRatio: 105, ordinaryIncome: 7500, sgaExpenses: 35550, equity: 64000, currentAssets: 86000, currentLiabilities: 65000 }
-      },
-      isDongseo: {
-        cfs: { sales: 1760000, operatingProfit: 278000, netIncome: -73000, debtRatio: 120, ordinaryIncome: 87000, sgaExpenses: 176000, equity: 650000, currentAssets: 850000, currentLiabilities: 665000 },
-        ofs: { sales: 1285000, operatingProfit: 205000, netIncome: -49000, debtRatio: 107, ordinaryIncome: 64000, sgaExpenses: 128500, equity: 590000, currentAssets: 720000, currentLiabilities: 575000 }
-      },
-      lxhausys: { cfs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 }, ofs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 } },
-      kcc: { cfs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 }, ofs: { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0, equity: 0, currentAssets: 0, currentLiabilities: 0 } }
-    }
-  });
+  // 3. 재무 데이터 상태 (연결/별도 이원화, 백만원 단위) - DART 실조회 값만 저장 (샘플 수치 미사용)
+  const [financialData, setFinancialData] = useState({});
 
   // UI 토글 / 선택 상태 변수들
   const [activeMetric, setActiveMetric] = useState('sales'); // sales, operatingProfitMargin, sgaExpenses, sgaRatio, debtRatio, netIncome (총포괄손익)
@@ -298,91 +227,62 @@ export default function Dashboard() {
       '4Q': '11011'  // 사업보고서
     };
 
-    const reprtCode = rCodeMap[selectedQuarter];
     const targetQuarterStr = `${selectedYear} ${selectedQuarter}`;
+    // 차트·당분기 역산이 실데이터만 쓰도록 해당 연도 1Q ~ 선택 분기를 모두 조회
+    const qList = ['1Q', '2Q', '3Q', '4Q'].slice(0, ['1Q', '2Q', '3Q', '4Q'].indexOf(selectedQuarter) + 1);
 
     // 연도/분기 확정 (시장 지표 동시 연동용)
     setActiveYear(selectedYear);
     setActiveQuarter(selectedQuarter);
 
-    // 루프 실행을 위해 호출할 기업 목록 필터링
     const activeCompanies = companies.filter(c => c.corpCode);
-    const totalCalls = activeCompanies.length * 2; // 각 기업별 연결(CFS) + 별도(OFS) 총 호출 횟수
+    const totalCalls = activeCompanies.length * qList.length * 2;
     let currentCallCount = 0;
-    
-    // 호출 데이터 임시 누적 객체
-    let newFinancialData = {};
+
+    const newFinancialData = {};
     const localCfsUnavail = new Set();
+    const trimmedKey = apiKey.trim();
+
+    const fetchCached = async (company, q, fsDiv) => {
+      const reprtCode = rCodeMap[q];
+      const cacheKey = `${trimmedKey}-${company.corpCode.trim()}-${selectedYear}-${reprtCode}-${fsDiv}`;
+      if (apiCacheRef.current.has(cacheKey)) return apiCacheRef.current.get(cacheKey);
+      try {
+        const data = await fetchDartData(trimmedKey, company.corpCode.trim(), selectedYear, reprtCode, fsDiv);
+        apiCacheRef.current.set(cacheKey, data);
+        await delay(200); // DART 초당 트래픽 제한 대응
+        return data;
+      } catch (e) {
+        console.warn(`[DART API WARNING] ${company.name} ${selectedYear} ${q} ${fsDiv} 호출 실패:`, e.message);
+        apiCacheRef.current.set(cacheKey, null);
+        return null;
+      }
+    };
 
     try {
       for (const company of activeCompanies) {
-        // 1. 연결재무제표 (CFS) 호출
-        currentCallCount++;
-        setDartStatusText(`[${company.name}] 연결재무제표(CFS) 동기화 중... (${currentCallCount}/${totalCalls})`);
-        
-        let cfsData = null;
-        try {
-          const trimmedKey = apiKey.trim();
-          const cfsCacheKey = `${trimmedKey}-${company.corpCode.trim()}-${selectedYear}-${reprtCode}-CFS`;
-          if (apiCacheRef.current.has(cfsCacheKey)) {
-            cfsData = apiCacheRef.current.get(cfsCacheKey);
-            if (cfsData === null) localCfsUnavail.add(company.id);
-          } else {
-            cfsData = await fetchDartData(trimmedKey, company.corpCode.trim(), selectedYear, reprtCode, 'CFS');
-            apiCacheRef.current.set(cfsCacheKey, cfsData);
+        for (const q of qList) {
+          const qStr = `${selectedYear} ${q}`;
+          currentCallCount++;
+          setDartStatusText(`[${company.name}] ${q} 연결(CFS) 동기화 중... (${currentCallCount}/${totalCalls})`);
+          const cfsData = await fetchCached(company, q, 'CFS');
+          currentCallCount++;
+          setDartStatusText(`[${company.name}] ${q} 별도(OFS) 동기화 중... (${currentCallCount}/${totalCalls})`);
+          const ofsData = await fetchCached(company, q, 'OFS');
+
+          if (q === selectedQuarter && !cfsData) localCfsUnavail.add(company.id);
+          if (cfsData || ofsData) {
+            newFinancialData[qStr] = newFinancialData[qStr] || {};
+            newFinancialData[qStr][company.id] = { cfs: cfsData || {}, ofs: ofsData || {} };
           }
-        } catch (e) {
-          console.warn(`[DART API WARNING] ${company.name} 연결재무제표 호출 실패:`, e.message);
-          localCfsUnavail.add(company.id);
         }
-
-        await delay(300); // DART 초당 트래픽 제한 우회를 위한 0.3초의 지연 시간(Delay) 강제 적용
-
-        // 2. 별도재무제표 (OFS) 호출
-        currentCallCount++;
-        setDartStatusText(`[${company.name}] 별도재무제표(OFS) 동기화 중... (${currentCallCount}/${totalCalls})`);
-
-        let ofsData = null;
-        try {
-          const trimmedKey = apiKey.trim();
-          const ofsCacheKey = `${trimmedKey}-${company.corpCode.trim()}-${selectedYear}-${reprtCode}-OFS`;
-          if (apiCacheRef.current.has(ofsCacheKey)) {
-            ofsData = apiCacheRef.current.get(ofsCacheKey);
-          } else {
-            ofsData = await fetchDartData(trimmedKey, company.corpCode.trim(), selectedYear, reprtCode, 'OFS');
-            apiCacheRef.current.set(ofsCacheKey, ofsData);
-          }
-        } catch (e) {
-          console.warn(`[DART API WARNING] ${company.name} 별도재무제표 호출 실패:`, e.message);
-        }
-
-        // 받아온 데이터를 임시 객체에 정립
-        if (cfsData || ofsData) {
-          newFinancialData[company.id] = {
-            cfs: cfsData || { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0 },
-            ofs: ofsData || { sales: 0, operatingProfit: 0, netIncome: 0, debtRatio: 0, ordinaryIncome: 0, sgaExpenses: 0 }
-          };
-        }
-
-        await delay(300); // 딜레이 안전장치
       }
 
-      // 최종 데이터 바인딩 - 조회한 분기의 데이터만 실데이터로 교체 (다른 분기 목 데이터 유지)
-      setFinancialData(prev => {
-        const updatedQData = { ...(prev[targetQuarterStr] || {}) };
-        Object.keys(newFinancialData).forEach(compId => {
-          updatedQData[compId] = newFinancialData[compId];
-        });
-        return { ...prev, [targetQuarterStr]: updatedQData };
-      });
-
-      // 새로운 분기 범위 등록
-      if (!quarters.includes(targetQuarterStr)) {
-        setQuarters(prev => sortQuarters([...prev, targetQuarterStr]));
-      }
+      setFinancialData(newFinancialData);
+      setQuarters(qList.map(q => `${selectedYear} ${q}`));
 
       setCfsUnavailableSet(localCfsUnavail);
-      const fetchedCount = Object.keys(newFinancialData).length;
+      const fetchedCount = Object.keys(newFinancialData[targetQuarterStr] || {}).length;
       if (fetchedCount === 0) {
         setDartStatus('ERROR');
         setDartStatusText(`일괄 조회 실패: 모든 기업 데이터 없음 (API 키 오류 또는 해당 연도/분기 미공시)`);
@@ -406,6 +306,11 @@ export default function Dashboard() {
       setIsDartLoading(false);
     }
   };
+
+  // 접속 시 API 키가 있으면 기본 연도/분기 실데이터 자동 조회
+  useEffect(() => {
+    if (apiKey) handleFetchDartApi();
+  }, []);
 
   // ---------------------------------------------------------
   // 다년도 추이 일괄 조회
@@ -504,8 +409,9 @@ export default function Dashboard() {
         const oiMarginCsv = sales > 0 ? ((oi / sales) * 100).toFixed(2) : '0.00';
         const sgaR = sales > 0 ? ((sga / sales) * 100).toFixed(2) : '0.00';
         const netMargin = sales > 0 ? ((net / sales) * 100).toFixed(2) : '0.00';
-        const roeCsv = eq > 0 ? ((net / eq) * 100).toFixed(2) : '0.00';
-        const currentRatioCsv = curL > 0 ? ((curA / curL) * 100).toFixed(2) : '0.00';
+        const pl = getComputedValue(company.id, q, 'profitLoss', fsDiv);
+        const roeCsv = eq > 0 ? ((pl / eq) * 100).toFixed(2) : '';
+        const currentRatioCsv = curL > 0 ? ((curA / curL) * 100).toFixed(2) : '';
         rows.push([company.name, q, isConsolidated ? '연결(CFS)' : '별도(OFS)', isCumulative ? '누계액' : '당분기', sales, op, opMargin, oi, oiMarginCsv, sga, sgaR, net, netMargin, debt < 0 ? '자본잠식' : debt, roeCsv, currentRatioCsv].join(','));
       });
     });
@@ -707,7 +613,7 @@ export default function Dashboard() {
             >
               <div>
                 <div className="text-xs font-bold text-slate-200">{c.name}</div>
-                <div className="text-[10px] text-indigo-400 font-mono font-semibold">DART 고유코드: {c.displayCode}</div>
+                <div className="text-[10px] text-indigo-400 font-mono font-semibold">DART 고유코드: {c.corpCode}</div>
               </div>
             </div>
           ))}
@@ -1225,7 +1131,8 @@ export default function Dashboard() {
                 const oiMargin = sales > 0 ? ((oi / sales) * 100).toFixed(2) : null;
                 const sgaRatio = sales > 0 ? ((sga / sales) * 100).toFixed(2) : null;
                 const netMargin = sales > 0 ? ((net / sales) * 100).toFixed(2) : null;
-                const roe = eq > 0 ? ((net / eq) * 100).toFixed(2) : null;
+                const pl = getComputedValue(company.id, targetQuarterStr, 'profitLoss', fsDiv);
+                const roe = eq > 0 ? ((pl / eq) * 100).toFixed(2) : null;
                 const currentRatio = curL > 0 ? ((curA / curL) * 100).toFixed(1) : null;
 
                 return (
@@ -1235,7 +1142,7 @@ export default function Dashboard() {
                         <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: company.color }}></span>
                         <div className="flex flex-col">
                           <span className="text-slate-200">{company.name}</span>
-                          <span className="text-[9px] text-slate-500 font-mono">DART: {company.displayCode}</span>
+                          <span className="text-[9px] text-slate-500 font-mono">DART: {company.corpCode}</span>
                         </div>
                       </div>
                     </td>
@@ -1306,7 +1213,9 @@ export default function Dashboard() {
           <div className="flex bg-slate-950 p-1 rounded-lg border border-slate-800 self-start sm:self-auto">
             {[
               { id: 'daelimBath', label: '대림바스' },
-              { id: 'isDongseo', label: '아이에스동서' }
+              { id: 'isDongseo', label: '아이에스동서' },
+              { id: 'lxhausys', label: 'LX하우시스' },
+              { id: 'kcc', label: 'KCC' }
             ].map(tab => (
               <button
                 key={tab.id}

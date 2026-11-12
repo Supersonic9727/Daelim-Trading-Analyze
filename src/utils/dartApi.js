@@ -26,34 +26,38 @@ const parseList = (list, targetFsDiv) => {
     return isNegative ? -Math.abs(num) : num;
   };
 
+  // 손익 계정: 반기·분기 보고서의 thstrm_amount는 3개월치이므로 누계(thstrm_add_amount)를 우선 사용
+  const flowAmount = (item) => {
+    const add = (item.thstrm_add_amount || '').replace(/,/g, '').trim();
+    return add && add !== '-' ? parseAmount(item.thstrm_add_amount) : parseAmount(item.thstrm_amount);
+  };
+
   // 계정과목명 및 표준 IFRS ID를 유연하게 탐색하는 헬퍼
+  // 우선순위: IFRS 계정 ID → 한글명 완전 일치 → 한글명 부분 일치
+  // (DART 목록 순서상 '자본과부채총계'가 '부채총계'보다 먼저 나오므로 단일 패스 부분 일치는 오매칭됨)
   const findItem = (accountIds, KoreanKeywords, sjDivs = []) => {
-    return group.find(item => {
+    const candidates = group.filter(item => sjDivs.length === 0 || sjDivs.includes((item.sj_div || '').trim()));
+    const nameOf = (item) => (item.account_nm || '').replace(/\s/g, '');
+    const isRevenueSearch = accountIds.some(id => ['ifrs-full_Revenue', 'ifrs-full_RevenueFromContractsWithCustomers', 'ifrs_Revenue', 'dart_OperatingRevenue'].includes(id));
+
+    const byId = candidates.find(item => {
       const accId = (item.account_id || '').trim();
-      const accNm = (item.account_nm || '').replace(/\s/g, ''); // 공백 제거
-      const sjDiv = (item.sj_div || '').trim();
-      
-      // 특정 재무제표 구분(sj_div) 조건 필터링 (BS: 재무상태표, IS: 손익계산서, CIS: 포괄손익계산서)
-      if (sjDivs.length > 0 && !sjDivs.includes(sjDiv)) {
-        return false;
-      }
-      
-      // 1. IFRS 표준 계정 ID 일치 여부 확인
-      if (accId && accountIds.includes(accId)) {
-        // 매출액 탐색 시 매출원가(Cost of Sales) 혼입 방지 필터
-        const isRevenueSearch = accountIds.includes('ifrs-full_Revenue') || accountIds.includes('ifrs-full_RevenueFromContractsWithCustomers') || accountIds.includes('ifrs_Revenue') || accountIds.includes('dart_OperatingRevenue');
-        if (isRevenueSearch && (accNm.includes('원가') || accNm.includes('Cost') || accNm.includes('Expenses'))) {
-          return false;
-        }
-        return true;
-      }
-      // 2. 한글 계정과목명 키워드 매칭
+      if (!accId || !accountIds.includes(accId)) return false;
+      const accNm = nameOf(item);
+      return !(isRevenueSearch && (accNm.includes('원가') || accNm.includes('Cost') || accNm.includes('Expenses')));
+    });
+    if (byId) return byId;
+
+    const byExact = candidates.find(item => KoreanKeywords.includes(nameOf(item)));
+    if (byExact) return byExact;
+
+    return candidates.find(item => {
+      const accNm = nameOf(item);
+      if (/자본과부채|부채와자본|부채및자본|자본및부채/.test(accNm)) return false;
       return KoreanKeywords.some(keyword => {
-        // 매출액, 영업수익 탐색 시 정확히 일치할 때만 매핑 (매출원가 혼입 차단)
-        if (keyword === '매출액' || keyword === '영업수익') {
-          return accNm === keyword;
-        }
-        return accNm === keyword || accNm.includes(keyword);
+        if (keyword === '매출액' || keyword === '영업수익') return false;
+        if (accNm.includes('비유동') && !keyword.includes('비유동')) return false;
+        return accNm.includes(keyword);
       });
     });
   };
@@ -64,7 +68,7 @@ const parseList = (list, targetFsDiv) => {
     ['매출액', '영업수익'],
     ['IS', 'CIS']
   );
-  const sales = salesItem ? Math.round(parseAmount(salesItem.thstrm_amount) / 1000000) : 0;
+  const sales = salesItem ? Math.round(flowAmount(salesItem) / 1000000) : 0;
 
   // 2. 영업이익 / 영업손실 파싱 (IS / CIS 구분)
   const opProfitItem = findItem(
@@ -74,7 +78,7 @@ const parseList = (list, targetFsDiv) => {
   );
   let operatingProfit = 0;
   if (opProfitItem) {
-    const rawVal = parseAmount(opProfitItem.thstrm_amount);
+    const rawVal = flowAmount(opProfitItem);
     const converted = Math.round(rawVal / 1000000);
     
     const accNm = opProfitItem.account_nm || '';
@@ -115,13 +119,21 @@ const parseList = (list, targetFsDiv) => {
 
   let netIncome = 0;
   if (comprehensiveIncomeItem) {
-    const rawVal = parseAmount(comprehensiveIncomeItem.thstrm_amount);
+    const rawVal = flowAmount(comprehensiveIncomeItem);
     const converted = Math.round(rawVal / 1000000);
 
     const accNm = comprehensiveIncomeItem.account_nm || '';
     const isLoss = (accNm.includes('손실') && !accNm.includes('손익') && !accNm.includes('이익')) || accNm.includes('적자') || rawVal < 0;
     netIncome = isLoss ? -Math.abs(converted) : converted;
   }
+
+  // 3-1. 당기순이익(손실) 파싱 - ROE 분자용 (총포괄손익과 별개)
+  const profitLossItem = findItem(
+    ['ifrs-full_ProfitLoss', 'ifrs_ProfitLoss'],
+    ['당기순이익', '당기순손실', '당기순이익(손실)', '분기순이익', '분기순손실', '분기순이익(손실)', '반기순이익', '반기순이익(손실)'],
+    ['IS', 'CIS']
+  );
+  const profitLoss = profitLossItem ? Math.round(flowAmount(profitLossItem) / 1000000) : 0;
 
   // 3-2. 경상손익(법인세차감전순이익) 파싱 (IS / CIS 구분)
   const ordinaryIncomeItem = findItem(
@@ -131,7 +143,7 @@ const parseList = (list, targetFsDiv) => {
   );
   let ordinaryIncome = 0;
   if (ordinaryIncomeItem) {
-    const rawVal = parseAmount(ordinaryIncomeItem.thstrm_amount);
+    const rawVal = flowAmount(ordinaryIncomeItem);
     const converted = Math.round(rawVal / 1000000);
     const accNm = ordinaryIncomeItem.account_nm || '';
     const isLoss = (accNm.includes('손실') && !accNm.includes('손익') && !accNm.includes('이익')) || rawVal < 0;
@@ -144,7 +156,7 @@ const parseList = (list, targetFsDiv) => {
     ['판매비와관리비', '판매비와관리비총계', '판관비', '판매비', '관리비', '임차료및판관비총계'],
     ['IS', 'CIS']
   );
-  const sgaExpenses = sgaItem ? Math.round(parseAmount(sgaItem.thstrm_amount) / 1000000) : 0;
+  const sgaExpenses = sgaItem ? Math.round(flowAmount(sgaItem) / 1000000) : 0;
   
   // 5. 부채총계 파싱 (BS 구분)
   const debtItem = findItem(
@@ -187,7 +199,7 @@ const parseList = (list, targetFsDiv) => {
   );
   const currentLiabilities = curLiabItem ? Math.round(parseAmount(curLiabItem.thstrm_amount) / 1000000) : 0;
 
-  return { sales, operatingProfit, netIncome, sgaExpenses, debtRatio, ordinaryIncome, equity: equityMillion, currentAssets, currentLiabilities };
+  return { sales, operatingProfit, netIncome, profitLoss, sgaExpenses, debtRatio, ordinaryIncome, equity: equityMillion, currentAssets, currentLiabilities };
 };
 
 export const fetchDartData = async (apiKey, corpCode, year, reprtCode, fsDiv) => {
