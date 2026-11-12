@@ -260,15 +260,16 @@ export default function Dashboard() {
     };
 
     try {
-      for (const company of activeCompanies) {
+      // 기업별로 병렬 실행 (기업 내부 분기 호출은 순차) - 순차 40회 호출 시 수 분 소요
+      await Promise.all(activeCompanies.map(async (company) => {
         for (const q of qList) {
           const qStr = `${selectedYear} ${q}`;
-          currentCallCount++;
-          setDartStatusText(`[${company.name}] ${q} 연결(CFS) 동기화 중... (${currentCallCount}/${totalCalls})`);
           const cfsData = await fetchCached(company, q, 'CFS');
           currentCallCount++;
-          setDartStatusText(`[${company.name}] ${q} 별도(OFS) 동기화 중... (${currentCallCount}/${totalCalls})`);
+          setDartStatusText(`DART 재무제표 동기화 중... (${currentCallCount}/${totalCalls})`);
           const ofsData = await fetchCached(company, q, 'OFS');
+          currentCallCount++;
+          setDartStatusText(`DART 재무제표 동기화 중... (${currentCallCount}/${totalCalls})`);
 
           if (q === selectedQuarter && !cfsData) localCfsUnavail.add(company.id);
           if (cfsData || ofsData) {
@@ -276,7 +277,7 @@ export default function Dashboard() {
             newFinancialData[qStr][company.id] = { cfs: cfsData || {}, ofs: ofsData || {} };
           }
         }
-      }
+      }));
 
       setFinancialData(newFinancialData);
       setQuarters(qList.map(q => `${selectedYear} ${q}`));
