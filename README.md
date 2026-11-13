@@ -1,8 +1,116 @@
-# React + Vite
+# 대림통상 경쟁사 재무 비교 대시보드
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+대림통상(자사)과 욕실·건자재 경쟁사의 공시 재무제표, 주가, 주택·건설 시장 지표를 한 화면에서 비교하는 대시보드입니다.
 
-Currently, two official plugins are available:
+- 배포 주소: https://daelim-trading-analyze.vercel.app
+- 스택: React 18 + Vite, Tailwind CSS, Recharts, Vercel Serverless Functions
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 화면 구성
+
+| 영역 | 내용 | 데이터 |
+|---|---|---|
+| 주가 현황 | 현재가, 전일 종가 대비 등락, 1개월 추이, 52주 고저 | Yahoo Finance (약 15~20분 지연) |
+| 재무 비교 차트 | 매출, 영업이익률, 판관비, 경상손익, 총포괄손익, 부채비율 (분기별) | Open DART |
+| 연간 다년도 추이 | 최근 3·5년 같은 분기의 누계 비교 | Open DART |
+| 주택·건설 시장 지표 | 8대 공식 통계 (아래 표) | KOSIS 국가통계포털 |
+| 재무 수치 테이블 | 13개 항목, CSV 내보내기 | Open DART |
+| SWOT 분석 | 경쟁사별 대림통상 관점 SWOT | 직접 작성한 정성 자료 |
+| DART 최근 공시 | 회사별 최근 1년 공시, 클릭 시 DART 원문 | Open DART |
+
+## 비교 기업
+
+| 회사 | DART 고유번호 | 종목코드 | 비고 |
+|---|---|---|---|
+| 대림통상 | 00109824 | 006570 (코스피) | 자사 |
+| 대림바스 | 00109754 | 005750 (코스피) | 옛 대림비앤코, 2025년 4월 사명 변경 |
+| 와토스코리아 | 00455875 | 079000 (코스닥) | 연결재무 미작성 → 연결 모드에서도 별도 수치 표시 |
+| LX하우시스 | 00759513 | 108670 (코스피) | |
+| KCC | 00105271 | 002380 (코스피) | |
+
+기업 목록은 [src/components/Dashboard.jsx](src/components/Dashboard.jsx)의 `companies` 상수에 있습니다. 기업을 추가하려면 아래를 확인하세요.
+
+- DART 고유번호는 `/api-dart/api/company.json?corp_code=...`로 회사명과 종목코드가 맞는지 검증합니다.
+- Yahoo 티커는 코스피면 `.KS`, 코스닥이면 `.KQ`를 붙입니다.
+- 비상장 기타법인은 DART 재무제표 API를 지원하지 않습니다.
+
+## 환경 변수
+
+| 이름 | 용도 | 발급처 |
+|---|---|---|
+| `DART_API_KEY` | Open DART 재무제표·공시 조회 | https://opendart.fss.or.kr |
+| `KOSIS_API_KEY` | 시장 지표 통계 조회 | https://kosis.kr/openapi/ |
+
+- 두 키는 **서버에서만** 사용합니다. 서버 함수가 요청에 키를 붙이므로 브라우저 코드에는 키가 들어가지 않습니다.
+- **`VITE_` 접두사를 붙이면 안 됩니다.** Vite가 브라우저 번들에 값을 넣어 공개됩니다.
+- 키 값을 채팅, 이슈, 커밋에 붙여 넣지 마세요. `.env`는 `.gitignore`에 포함되어 있습니다.
+- Open DART는 키 재발급 기능이 없습니다. 키를 바꾸려면 탈퇴 후 재가입해야 합니다.
+
+## 로컬 실행
+
+Node 18 이상이 필요합니다.
+
+```bash
+npm ci
+cp .env.example .env   # 두 키 값을 채웁니다
+npm run dev
+```
+
+- 개발 서버는 `/api-dart`(DART), `/api/kosis`, `/api/stock`을 로컬에서 그대로 처리합니다([vite.config.js](vite.config.js)).
+- 검사와 빌드는 `npm run lint`, `npm run build`로 실행합니다.
+
+## 배포
+
+- `main` 브랜치에 푸시하면 Vercel이 자동으로 배포합니다.
+- Vercel 프로젝트의 Environment Variables에 `DART_API_KEY`, `KOSIS_API_KEY`를 등록해야 합니다. 환경 변수를 바꾼 뒤에는 Redeploy해야 반영됩니다.
+- 서버 함수는 DART·KOSIS 서버와 가까운 서울 리전(`icn1`)에서 실행됩니다([vercel.json](vercel.json)).
+
+## 서버 함수
+
+| 경로 | 파일 | 역할 |
+|---|---|---|
+| `/api-dart/*` | [api/proxy.js](api/proxy.js) | DART 프록시. 재무제표 전체·주요계정, 공시목록, 기업개황 4종만 허용하고 파라미터를 검증. 정상 응답은 1시간 엣지 캐시 |
+| `/api/kosis?end=YYYYMM` | [api/kosis.js](api/kosis.js) | KOSIS 프록시. 고정된 8개 통계 시계열만 조회(전년 1월~기준월). 6시간 엣지 캐시 |
+| `/api/stock?ticker=...` | [api/stock.js](api/stock.js) | Yahoo Finance 프록시. `######.KS` / `######.KQ` 형식만 허용 |
+
+## 재무 데이터 계산 규칙
+
+파싱은 [src/utils/dartApi.js](src/utils/dartApi.js), 계산은 `Dashboard.jsx`의 `getComputedValue`에서 합니다.
+
+- **단위**: 백만원. 원 단위 정밀도로 보관하고 화면에 표시할 때만 반올림합니다.
+- **계정 매칭**: IFRS 계정 ID → 한글 계정명 완전 일치 → 부분 일치 순서로 찾습니다. 부분 일치에서는 '자본과부채총계', '비유동○○' 계정을 제외합니다.
+- **누계**: 반기·3분기 보고서의 손익 항목은 `thstrm_add_amount`(누계)를 씁니다. `thstrm_amount`는 3개월치입니다.
+- **당분기**: 누계에서 직전 분기 누계를 빼서 구합니다. 음수가 나와도 공시 원본(환입·재분류)이므로 그대로 표시합니다.
+- **비율 정의**
+  - 부채비율 = 부채총계 ÷ 자본총계
+  - 유동비율 = 유동자산 ÷ 유동부채
+  - ROE = 당기순이익 ÷ 기말 자본총계 (연환산하지 않음)
+  - 순이익률 = 당기순이익 ÷ 매출액
+  - 경상손익 = 법인세비용차감전순이익
+- **연결재무 미작성 회사**: 연결 모드에서도 별도재무제표 수치를 쓰고 "(별도)"로 표시합니다.
+- **미공시**: 해당 분기 보고서가 없으면 0이 아니라 "미공시"로 표시합니다. 당분기 모드에서는 직전 분기 보고서도 있어야 값을 계산합니다.
+- **기본 조회 기간**: 법정 제출기한(사업보고서 3/31, 1분기 5/15, 반기 8/14, 3분기 11/14)이 지난 가장 최근 보고서입니다. 접속 시 DART에 아직 반영되지 않았으면 직전 분기를 표시합니다.
+
+## 시장 지표 (KOSIS)
+
+정의는 [src/utils/marketIndicators.js](src/utils/marketIndicators.js)와 [api/kosis.js](api/kosis.js)에 있습니다.
+
+| 지표 | 통계표 | 작성기관 | 표시 방식 |
+|---|---|---|---|
+| 주택 인허가 실적 | DT_MLTM_1946 | 국토교통부 | 연초~기준월 누계, 전년 동기 대비 |
+| 주택 착공 실적 | DT_MLTM_5386 | 국토교통부 | 누계, 전년 동기 대비 |
+| 신규 분양세대수 | DT_41401N_007 | 주택도시보증공사 | 누계, 전년 동기 대비 |
+| 주택 건설수주액 | DT_1G1B002 | 국가데이터처 | 누계(조원), 전년 동기 대비 |
+| 전국 미분양 주택 | DT_MLTM_2080 | 국토교통부 | 기준월 값, 전년 동월 대비 |
+| 건설업 업황실적 BSI | DT_512Y007 | 한국은행 | 기준월 값, 전년 동월 대비(p) |
+| 주거용건물 공사비지수 | DT_39701_A003 | 한국건설기술연구원 | 기준월 값, 전년 동월 대비 |
+| 서울 주택매매가격 변동률 | DT_1YL1701 | 국가데이터처 | 기준월 전월비, 연초 대비 누적 |
+
+- 기준월은 선택한 분기의 마지막 달입니다. 아직 공표되지 않았으면 가장 최근 공표 월을 쓰고 카드에 표시합니다.
+- 배지 색은 대림통상 관점입니다. 예를 들어 미분양 증가와 공사비 상승은 빨강입니다.
+- 건설경기실사지수(CBSI, 한국건설산업연구원)와 대형 건설사 수주 비중은 API로 제공되지 않아, 각각 한국은행 건설업 BSI와 주택 착공 실적으로 대체했습니다.
+
+## 유의 사항
+
+- SWOT은 공시 수치와 공개 보도를 근거로 직접 작성한 정성 자료라 자동으로 갱신되지 않습니다. 회사별 문구 끝에 근거 수치의 기준 연도를 적어 두었습니다.
+- 주가는 Yahoo Finance 지연 시세라 투자 판단용 실시간 시세가 아닙니다.
+- Open DART는 개인 키 기준 하루 20,000건, KOSIS는 분당 호출 수가 제한됩니다. 엣지 캐시로 호출 수를 줄이고 있습니다.
