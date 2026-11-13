@@ -14,7 +14,11 @@ import {
   BarChart2,
   Newspaper,
   Building2,
-  RefreshCw
+  RefreshCw,
+  CheckCircle2,
+  AlertCircle,
+  Factory,
+  ArrowRight
 } from 'lucide-react';
 import { 
   ResponsiveContainer, 
@@ -28,7 +32,7 @@ import {
   Legend,
   LineChart
 } from 'recharts';
-import { buildMarketCards, buildMarketSummary, quarterEndPrd } from '../utils/marketIndicators';
+import { buildMarketCards, buildMarketSummary, buildMarketImpact, quarterEndPrd } from '../utils/marketIndicators';
 import { fetchDartData } from '../utils/dartApi';
 
 // 분기 정렬 헬퍼
@@ -134,6 +138,8 @@ export default function Dashboard() {
   const [activeQuarter, setActiveQuarter] = useState(LATEST_PERIOD.quarter);
 
   const [marketSummary, setMarketSummary] = useState('');
+  const [marketImpact, setMarketImpact] = useState(null);
+  const [toast, setToast] = useState(null); // { type: 'success' | 'error', title, detail }
   const [trendCards, setTrendCards] = useState([]);
   const [marketStatus, setMarketStatus] = useState('loading'); // loading | ready | error
   const [marketError, setMarketError] = useState('');
@@ -169,17 +175,26 @@ export default function Dashboard() {
         const cards = buildMarketCards(body, endPrd);
         setTrendCards(cards);
         setMarketSummary(buildMarketSummary(cards));
+        setMarketImpact(buildMarketImpact(cards));
         setMarketStatus('ready');
       })
       .catch((e) => {
         if (cancelled) return;
         setTrendCards([]);
         setMarketSummary('');
+        setMarketImpact(null);
         setMarketError(e.message);
         setMarketStatus('error');
       });
     return () => { cancelled = true; };
   }, [activeYear, activeQuarter]);
+
+  // 조회 완료 안내 팝업: 2초 뒤 자동으로 닫힘
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 2000);
+    return () => clearTimeout(timer);
+  }, [toast]);
 
   // 주가 실시간 조회 (Yahoo Finance 프록시 → /api/stock)
   useEffect(() => {
@@ -253,7 +268,8 @@ export default function Dashboard() {
   // DART 실시간 API 일괄 다중 호출 (자동 Looper) 시스템
   // ---------------------------------------------------------
   // year/quarter: 조회할 기간 (기본값은 드롭다운 선택값). 대상 분기 데이터가 있는 기업 수를 반환
-  const handleFetchDartApi = async (year = selectedYear, quarter = selectedQuarter) => {
+  // notify: 버튼으로 직접 조회했을 때만 완료 팝업 표시 (접속 시 자동 조회는 표시하지 않음)
+  const handleFetchDartApi = async (year = selectedYear, quarter = selectedQuarter, { notify = false } = {}) => {
     setIsDartLoading(true);
     setDartStatus('LOADING');
     setDartError(null);
@@ -328,6 +344,7 @@ export default function Dashboard() {
         setDartStatus('ERROR');
         setDartStatusText(`일괄 조회 실패: 모든 기업 데이터 없음 (서버 API 키 미설정 또는 해당 연도/분기 미공시)`);
         setDartError(`DART OpenAPI 일괄 조회 실패:\n- 요청 연도/분기: ${year}년 ${quarter}\n- 사유: 조회된 기업 데이터 없음 (전체 ${activeCompanies.length}개 기업 응답 없음)`);
+        if (notify) setToast({ type: 'error', title: '조회된 데이터가 없습니다', detail: `${year}년 ${quarter} · 아직 공시되지 않았을 수 있습니다` });
       } else {
         const failedCfsCount = localCfsUnavail.size;
         const missing = activeCompanies.filter(c => !newFinancialData[targetQuarterStr]?.[c.id]).map(c => c.name);
@@ -338,6 +355,11 @@ export default function Dashboard() {
           + (failedCfsCount ? `, ${failedCfsCount}개사 연결재무 미작성(별도로 대체)` : '')
         );
         setDartError(null);
+        if (notify) setToast({
+          type: 'success',
+          title: '조회가 완료되었습니다',
+          detail: `${year}년 ${quarter} · ${fetchedCount}/${activeCompanies.length}개 기업${missing.length ? ` (미공시: ${missing.join('·')})` : ''}`,
+        });
       }
       return fetchedCount;
     } catch (err) {
@@ -345,6 +367,7 @@ export default function Dashboard() {
       const errMsg = err.message || '일괄 조회 중 서버 이상';
       setDartStatusText(`일괄 동기화 실패: ${errMsg}`);
       setDartError(`DART OpenAPI 일괄 조회 실패:\n- 요청 연도/분기: ${year}년 ${quarter}\n- 사유: ${errMsg}`);
+      if (notify) setToast({ type: 'error', title: '조회에 실패했습니다', detail: errMsg });
       return 0;
     } finally {
       setIsDartLoading(false);
@@ -569,6 +592,29 @@ export default function Dashboard() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
+      {/* 조회 완료 안내 팝업 (2초 후 자동 닫힘) */}
+      {toast && (
+        <div
+          key={`${toast.title}-${toast.detail}`}
+          role="status"
+          aria-live="polite"
+          className={`toast-in fixed top-6 z-50 w-[calc(100%-32px)] max-w-sm flex items-start gap-3 rounded-xl border px-4 py-3 shadow-2xl backdrop-blur ${
+            toast.type === 'success'
+              ? 'bg-emerald-950/95 border-emerald-500/40 text-emerald-100'
+              : 'bg-rose-950/95 border-rose-500/40 text-rose-100'
+          }`}
+          style={{ left: '50%', transform: 'translateX(-50%)' }}
+        >
+          {toast.type === 'success'
+            ? <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+            : <AlertCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />}
+          <div className="min-w-0">
+            <div className="text-sm font-bold">{toast.title}</div>
+            {toast.detail && <div className="text-xs opacity-80 mt-0.5 break-keep">{toast.detail}</div>}
+          </div>
+        </div>
+      )}
+
       {/* 🚀 상단 고급 헤더 */}
       <header className="glass-panel rounded-2xl p-6 mb-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative overflow-hidden shadow-2xl">
         <div className="absolute top-0 left-0 w-2.5 h-full bg-gradient-to-b from-indigo-500 via-cyan-500 to-rose-500"></div>
@@ -624,7 +670,7 @@ export default function Dashboard() {
           </div>
 
           <button 
-            onClick={() => handleFetchDartApi()}
+            onClick={() => handleFetchDartApi(selectedYear, selectedQuarter, { notify: true })}
             disabled={isDartLoading}
             className={`w-full text-xs font-bold py-2 rounded-lg flex items-center justify-center gap-2 transition-all ${
               isDartLoading 
@@ -682,64 +728,6 @@ export default function Dashboard() {
       {/* 📊 분석 및 실시간 제어판 영역 */}
       <div className="grid grid-cols-1 gap-8 mb-8">
         
-        {/* 📈 KOSPI 실시간 주가 패널 */}
-        <section className="glass-panel rounded-2xl p-6 mb-8 shadow-md">
-          <div className="flex items-center gap-2 mb-5">
-            <div className="p-2 bg-amber-500/10 rounded-lg text-amber-400"><BarChart2 className="w-5 h-5" /></div>
-            <div>
-              <h2 className="text-lg font-bold text-slate-100">주가 현황 (KOSPI · KOSDAQ)</h2>
-              <p className="text-slate-400 text-xs">Yahoo Finance 시세 (약 15~20분 지연) · 전일 종가 대비 등락</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-            {companies.filter(c => c.stockTicker).map(company => {
-              const s = stockData[company.id];
-              return (
-                <div key={company.id} className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-4 relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-1 h-full rounded-l-xl" style={{ backgroundColor: company.color }}></div>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-bold text-slate-200 truncate">{company.name}</span>
-                    <span className="text-[9px] font-mono text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded">{company.stockTicker.split('.')[0]} · {company.stockTicker.endsWith('.KQ') ? '코스닥' : '코스피'}</span>
-                  </div>
-                  {isStockLoading ? (
-                    <div className="animate-pulse">
-                      <div className="h-6 bg-slate-700 rounded w-3/4 mb-1"></div>
-                      <div className="h-3 bg-slate-800 rounded w-1/2"></div>
-                    </div>
-                  ) : s ? (
-                    <>
-                      <div className="text-xl font-extrabold text-slate-100 mb-0.5">
-                        ₩{s.price.toLocaleString('ko-KR')}
-                      </div>
-                      <div className={`text-xs font-bold flex items-center gap-1 ${s.change > 0 ? 'text-red-400' : s.change < 0 ? 'text-blue-400' : 'text-slate-400'}`}>
-                        {s.change > 0 ? <TrendingUp className="w-3 h-3" /> : s.change < 0 ? <TrendingDown className="w-3 h-3" /> : null}
-                        {s.change > 0 ? '▲' : s.change < 0 ? '▼' : ''}{Math.abs(s.change).toLocaleString('ko-KR')} ({s.changePct > 0 ? '+' : ''}{s.changePct.toFixed(2)}%)
-                      </div>
-                      {s.sparkline?.length > 0 && (
-                        <div className="mt-2 h-10 w-full">
-                          <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={s.sparkline} margin={{ top: 2, right: 2, bottom: 2, left: 2 }}>
-                              <Line type="monotone" dataKey="v" stroke={company.color} strokeWidth={1.5} dot={false} />
-                            </LineChart>
-                          </ResponsiveContainer>
-                        </div>
-                      )}
-                      {(s.high52w || s.low52w) && (
-                        <div className="mt-1.5 text-[9px] text-slate-500 flex justify-between">
-                          <span>52W 저: ₩{s.low52w?.toLocaleString('ko-KR') ?? '-'}</span>
-                          <span>고: ₩{s.high52w?.toLocaleString('ko-KR') ?? '-'}</span>
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <div className="text-xs text-slate-500 mt-2">조회 불가</div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
         {/* 대시보드 차트 메인 영역 (수동 에디터 폼 삭제에 따라 Full-Width 전체 폭으로 가독성 확장) */}
         <section className="glass-panel rounded-2xl p-6 flex flex-col justify-between shadow-lg relative">
           <div>
@@ -1056,6 +1044,64 @@ export default function Dashboard() {
         })()}
       </section>
 
+      {/* 📈 주가 현황 (연간 다년도 추이 아래) */}
+      <section className="glass-panel rounded-2xl p-6 mb-8 shadow-md">
+        <div className="flex items-center gap-2 mb-5">
+          <div className="p-2 bg-amber-500/10 rounded-lg text-amber-400"><BarChart2 className="w-5 h-5" /></div>
+          <div>
+            <h2 className="text-lg font-bold text-slate-100">주가 현황 (KOSPI · KOSDAQ)</h2>
+            <p className="text-slate-400 text-xs">Yahoo Finance 시세 (약 15~20분 지연) · 전일 종가 대비 등락</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+          {companies.filter(c => c.stockTicker).map(company => {
+            const s = stockData[company.id];
+            return (
+              <div key={company.id} className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-4 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-1 h-full rounded-l-xl" style={{ backgroundColor: company.color }}></div>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-bold text-slate-200 truncate">{company.name}</span>
+                  <span className="text-[9px] font-mono text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded">{company.stockTicker.split('.')[0]} · {company.stockTicker.endsWith('.KQ') ? '코스닥' : '코스피'}</span>
+                </div>
+                {isStockLoading ? (
+                  <div className="animate-pulse">
+                    <div className="h-6 bg-slate-700 rounded w-3/4 mb-1"></div>
+                    <div className="h-3 bg-slate-800 rounded w-1/2"></div>
+                  </div>
+                ) : s ? (
+                  <>
+                    <div className="text-xl font-extrabold text-slate-100 mb-0.5">
+                      ₩{s.price.toLocaleString('ko-KR')}
+                    </div>
+                    <div className={`text-xs font-bold flex items-center gap-1 ${s.change > 0 ? 'text-red-400' : s.change < 0 ? 'text-blue-400' : 'text-slate-400'}`}>
+                      {s.change > 0 ? <TrendingUp className="w-3 h-3" /> : s.change < 0 ? <TrendingDown className="w-3 h-3" /> : null}
+                      {s.change > 0 ? '▲' : s.change < 0 ? '▼' : ''}{Math.abs(s.change).toLocaleString('ko-KR')} ({s.changePct > 0 ? '+' : ''}{s.changePct.toFixed(2)}%)
+                    </div>
+                    {s.sparkline?.length > 0 && (
+                      <div className="mt-2 h-10 w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart data={s.sparkline} margin={{ top: 2, right: 2, bottom: 2, left: 2 }}>
+                            <Line type="monotone" dataKey="v" stroke={company.color} strokeWidth={1.5} dot={false} />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                    )}
+                    {(s.high52w || s.low52w) && (
+                      <div className="mt-1.5 text-[9px] text-slate-500 flex justify-between">
+                        <span>52W 저: ₩{s.low52w?.toLocaleString('ko-KR') ?? '-'}</span>
+                        <span>고: ₩{s.high52w?.toLocaleString('ko-KR') ?? '-'}</span>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-xs text-slate-500 mt-2">조회 불가</div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
       {/* 🏡 시장 지표 패널 - KOSIS 공식 통계, 조회 확정 기간(분기 말월) 기준 */}
       <section className="mb-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
@@ -1088,6 +1134,65 @@ export default function Dashboard() {
             </p>
           </div>
         </div>
+
+        {/* 건자재 기업 영향 분석 (지표 방향을 규칙에 따라 해석) */}
+        {marketStatus === 'ready' && marketImpact?.items.length > 0 && (
+          <div className="glass-panel rounded-2xl p-5 mb-6 shadow-md">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-4">
+              <div className="flex items-start gap-2">
+                <div className="p-2 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-lg shrink-0">
+                  <Factory className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-100">건자재 기업에 미치는 영향</h3>
+                  <p className="text-[11px] text-slate-400 mt-0.5">위 지표의 전년 대비 방향으로 욕실·건자재 기업의 매출과 수익성 영향을 풀어 쓴 해석입니다.</p>
+                </div>
+              </div>
+              <div className="flex gap-1.5 text-[10px] font-bold shrink-0">
+                <span className="px-2 py-0.5 rounded-full border bg-emerald-500/10 text-emerald-400 border-emerald-500/20">긍정 {marketImpact.counts.good}</span>
+                <span className="px-2 py-0.5 rounded-full border bg-slate-500/10 text-slate-400 border-slate-500/20">중립 {marketImpact.counts.neutral}</span>
+                <span className="px-2 py-0.5 rounded-full border bg-rose-500/10 text-rose-400 border-rose-500/20">부정 {marketImpact.counts.bad}</span>
+              </div>
+            </div>
+
+            {/* 지표가 매출로 이어지는 흐름 */}
+            <div className="flex flex-wrap items-center gap-1.5 text-[10px] text-slate-400 bg-slate-950/60 border border-slate-800 rounded-lg px-3 py-2 mb-4">
+              <span className="font-bold text-slate-300 mr-1">수요 흐름</span>
+              {['인허가', '착공·분양', '약 2년 뒤 마감 공정 (위생도기·수전 납품)', '입주 후 리모델링·교체'].map((step, i, arr) => (
+                <span key={step} className="flex items-center gap-1.5">
+                  <span className="px-2 py-0.5 rounded bg-slate-800/80 text-slate-300 break-keep">{step}</span>
+                  {i < arr.length - 1 && <ArrowRight className="w-3 h-3 text-slate-600 shrink-0" />}
+                </span>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {marketImpact.items.map(item => {
+                const toneStyle = item.tone === 'good'
+                  ? { bar: 'bg-emerald-400', badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20', label: '긍정 영향' }
+                  : item.tone === 'bad'
+                  ? { bar: 'bg-rose-400', badge: 'bg-rose-500/10 text-rose-400 border-rose-500/20', label: '부정 영향' }
+                  : { bar: 'bg-slate-500', badge: 'bg-slate-500/10 text-slate-400 border-slate-500/20', label: '중립' };
+                return (
+                  <div key={item.id} className="relative bg-slate-900/60 border border-slate-800 rounded-xl p-4 pl-5 overflow-hidden">
+                    <div className={`absolute top-0 left-0 w-1 h-full ${toneStyle.bar}`}></div>
+                    <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                      <span className="text-xs font-bold text-slate-100">{item.title}</span>
+                      <span className="text-[9px] font-semibold text-slate-400 bg-slate-800 px-1.5 py-0.5 rounded">{item.horizon}</span>
+                      <span className={`ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full border ${toneStyle.badge}`}>{toneStyle.label}</span>
+                    </div>
+                    <p className="text-xs text-slate-300 leading-relaxed break-keep">{item.text}</p>
+                    <p className="text-[10px] text-slate-500 mt-2">근거: {item.basis}</p>
+                  </div>
+                );
+              })}
+            </div>
+
+            <p className="text-[10px] text-slate-500 mt-3 leading-relaxed">
+              * 지표 방향을 정해진 규칙(전년 대비 ±5% 등)으로 해석한 참고 자료이며 실적 전망치가 아닙니다. 개별 기업의 특판·소매 비중에 따라 영향의 크기는 다릅니다.
+            </p>
+          </div>
+        )}
 
         {/* 8대 지표 카드 그리드 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

@@ -124,3 +124,140 @@ export const buildMarketSummary = (cards) => {
   const basis = permits?.latest || cards.find((c) => c.latest)?.latest;
   return `${basis ? `${prdLabel(basis)} 기준 ` : ''}${parts.join(', ')}.`;
 };
+
+// ---------------------------------------------------------
+// 건자재 기업 영향 분석: 카드의 전년 대비 방향을 규칙에 따라 해석 (전망치가 아닌 참고용)
+// 신축 아파트 욕실 제품(위생도기·수전·욕실장)은 착공 후 약 2년 뒤 마감 공정에서 납품되므로
+// 인허가·착공·분양·수주는 1~3년 뒤 특판 수요의 선행지표로 본다.
+// ---------------------------------------------------------
+const pct = (v, digits = 1) => `${signed(v, digits)}%`;
+const direction = (delta, threshold) => (delta == null ? null : delta > threshold ? 'up' : delta < -threshold ? 'down' : 'flat');
+const toneOf = (score) => (score > 0 ? 'good' : score < 0 ? 'bad' : 'neutral');
+// 받침 유무로 조사 선택 (예: 착공이 / 수주가)
+const josa = (word, withFinal, withoutFinal) => {
+  const code = word.charCodeAt(word.length - 1) - 0xac00;
+  return code >= 0 && code <= 11171 && code % 28 !== 0 ? withFinal : withoutFinal;
+};
+
+export const buildMarketImpact = (cards) => {
+  const pick = (id) => cards.find((c) => c.id === id && !c.empty && c.rawDelta != null);
+  const items = [];
+
+  // 1. 신축 특판 수요 (선행지표 4종)
+  const pipeline = [
+    { card: pick('starts'), label: '착공' },
+    { card: pick('newSupply'), label: '분양' },
+    { card: pick('housingOrders'), label: '주택 수주' },
+  ].filter((s) => s.card);
+  const permits = pick('permits');
+  if (pipeline.length || permits) {
+    const dirs = pipeline.map((s) => ({ ...s, dir: direction(s.card.rawDelta, 5) }));
+    const ups = dirs.filter((s) => s.dir === 'up');
+    const downs = dirs.filter((s) => s.dir === 'down');
+    const flats = dirs.filter((s) => s.dir === 'flat');
+    // 예: name(ups, '이', '가') → "분양(+18.9%)·주택 수주(+7.2%)가"
+    const name = (list, a = '', b = '') => list.map((s) => `${s.label}(${pct(s.card.rawDelta)})`).join('·') + (a ? josa(list[list.length - 1].label, a, b) : '');
+    const sentences = [];
+    if (ups.length && !downs.length) {
+      sentences.push(`${name(ups, '이', '가')} 전년보다 늘었습니다. 착공 후 약 2년 뒤 마감 공정에서 들어가는 위생도기·수전·욕실장의 건설사 납품(특판) 물량이 늘어날 여건입니다.`);
+    } else if (downs.length && !ups.length) {
+      sentences.push(`${name(downs, '이', '가')} 전년보다 줄었습니다. 1~2년 뒤 건설사 납품(특판) 물량이 감소할 가능성이 큽니다.`);
+    } else if (ups.length && downs.length) {
+      sentences.push(`${name(ups, '은', '는')} 늘었지만 ${name(downs, '은', '는')} 줄어 신축 납품 물량은 뚜렷한 방향 없이 엇갈립니다.`);
+    } else if (dirs.length) {
+      sentences.push(`${name(dirs)} 모두 전년과 비슷해 신축 납품 물량은 보합이 예상됩니다.`);
+    }
+    if (flats.length && (ups.length || downs.length)) sentences.push(`${name(flats, '은', '는')} 전년과 비슷합니다.`);
+    const permitDir = permits ? direction(permits.rawDelta, 5) : null;
+    if (permitDir === 'down') sentences.push(`다만 인허가가 ${pct(permits.rawDelta)} 줄어 2~3년 뒤에는 신축 물량이 다시 줄어들 수 있습니다.`);
+    else if (permitDir === 'up') sentences.push(`인허가도 ${pct(permits.rawDelta)} 늘어 2~3년 뒤까지 수요 기반이 이어질 전망입니다.`);
+    const score = ups.length - downs.length + (permitDir === 'up' ? 1 : permitDir === 'down' ? -1 : 0);
+    items.push({
+      id: 'newBuild',
+      title: '신축 아파트 납품(특판) 수요',
+      horizon: '1~3년 후 매출',
+      tone: toneOf(score),
+      text: sentences.join(' '),
+      basis: [...pipeline, permits && { card: permits, label: '인허가' }].filter(Boolean).map((s) => `${s.label} ${pct(s.card.rawDelta)}`).join(' · '),
+    });
+  }
+
+  // 2. 건설사 자금·수금 리스크 (미분양, 업황BSI)
+  const unsold = pick('unsold');
+  const bsi = pick('bsi');
+  if (unsold || bsi) {
+    const sentences = [];
+    let score = 0;
+    if (unsold) {
+      const d = direction(unsold.rawDelta, 5);
+      const units = unsold.value.replace(' ', '');
+      if (d === 'up') { score -= 1; sentences.push(`미분양(${units})이 전년보다 ${pct(unsold.rawDelta)} 늘었습니다. 건설사 분양대금 회수가 늦어지면 신규 착공 연기와 납품대금 회수 지연(매출채권 증가) 위험이 커집니다.`); }
+      else if (d === 'down') { score += 1; sentences.push(`미분양(${units})이 전년보다 ${pct(unsold.rawDelta)} 줄어 건설사 자금 사정이 나아지는 신호입니다.`); }
+      else sentences.push(`미분양(${units})은 전년과 비슷(${pct(unsold.rawDelta)})해 건설사 자금 부담이 크게 변하지 않았습니다.`);
+    }
+    if (bsi) {
+      const level = parseFloat(bsi.value.replace(/,/g, ''));
+      const d = direction(bsi.rawDelta, 2);
+      const change = d === 'up' ? `전년보다 ${signed(bsi.rawDelta, 0)}p 개선됐지만` : d === 'down' ? `전년보다 ${signed(bsi.rawDelta, 0)}p 악화됐고` : '전년과 비슷하고';
+      if (d === 'up') score += 1;
+      if (d === 'down') score -= 1;
+      // 기준선(100) 미만은 경기를 나쁘게 보는 건설사가 더 많다는 뜻이라 개선 폭과 별개로 감점
+      if (level < 100) {
+        score -= 1;
+        sentences.push(`건설업 업황BSI(${bsi.value})는 ${change} 기준선 100을 ${level < 70 ? '크게 ' : ''}밑돌아, 건설사들은 여전히 경기를 나쁘게 보고 있습니다.`);
+      } else {
+        score += 1;
+        sentences.push(`건설업 업황BSI(${bsi.value})는 기준선 100 이상이라 건설사 체감 경기가 양호합니다.`);
+      }
+    }
+    items.push({
+      id: 'credit',
+      title: '건설사 자금·납품대금 회수',
+      horizon: '수익성·현금흐름',
+      tone: toneOf(score),
+      text: sentences.join(' '),
+      basis: [unsold && `미분양 ${pct(unsold.rawDelta)}`, bsi && `업황BSI ${bsi.value}(${bsi.change})`].filter(Boolean).join(' · '),
+    });
+  }
+
+  // 3. 원가·납품 단가 압박 (공사비지수)
+  const cost = pick('costIndex');
+  if (cost) {
+    const d = direction(cost.rawDelta, 2);
+    const text = d === 'up'
+      ? `주거용건물 공사비가 전년보다 ${pct(cost.rawDelta)} 올랐습니다. 원가 부담이 커진 건설사는 마감재 사양을 낮추거나 납품 단가를 깎으려 하므로, 특판 비중이 높은 기업일수록 마진이 눌릴 수 있습니다.`
+      : d === 'down'
+      ? `주거용건물 공사비가 전년보다 ${pct(cost.rawDelta)} 내려 건설사의 단가 인하 요구가 누그러질 여건입니다.`
+      : `주거용건물 공사비 상승률이 ${pct(cost.rawDelta)}로 안정적이라 납품 단가 협상 부담이 크지 않습니다.`;
+    items.push({
+      id: 'cost',
+      title: '원가·납품 단가 압박',
+      horizon: '마진',
+      tone: d === 'up' ? 'bad' : d === 'down' ? 'good' : 'neutral',
+      text,
+      basis: `공사비지수 ${cost.value.replace(' (2020=100)', '')} (${pct(cost.rawDelta)})`,
+    });
+  }
+
+  // 4. 리모델링·교체 수요 (서울 주택가격, 연초 대비 누적)
+  const price = pick('seoulPrice');
+  if (price) {
+    const d = direction(price.rawDelta, 1);
+    const text = d === 'up'
+      ? `서울 집값이 연초 대비 ${pct(price.rawDelta, 2)} 올랐습니다. 집값이 오를 때는 매매·이사가 늘면서 욕실 리모델링과 수전 교체 수요도 함께 늘어나는 경향이 있어 대리점·인테리어(소매) 채널에 우호적입니다.`
+      : d === 'down'
+      ? `서울 집값이 연초 대비 ${pct(price.rawDelta, 2)} 내렸습니다. 주택 거래가 위축되면 리모델링·교체 수요도 줄어드는 경향이 있어 소매 채널에 부담입니다.`
+      : `서울 집값이 연초 대비 ${pct(price.rawDelta, 2)}로 보합이라 리모델링 수요에 뚜렷한 변화 요인은 없습니다.`;
+    items.push({
+      id: 'remodel',
+      title: '리모델링·교체(소매) 수요',
+      horizon: '단기 매출',
+      tone: d === 'up' ? 'good' : d === 'down' ? 'bad' : 'neutral',
+      text,
+      basis: `서울 매매가격 연초 대비 ${pct(price.rawDelta, 2)} (서울 한정 지표)`,
+    });
+  }
+
+  const count = (t) => items.filter((i) => i.tone === t).length;
+  return { items, counts: { good: count('good'), neutral: count('neutral'), bad: count('bad') } };
+};
