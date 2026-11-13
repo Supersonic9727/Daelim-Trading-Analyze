@@ -34,6 +34,7 @@ import {
 } from 'recharts';
 import { buildMarketCards, buildMarketSummary, buildMarketImpact, quarterEndPrd } from '../utils/marketIndicators';
 import { fetchDartData } from '../utils/dartApi';
+import { getLatestFiledPeriod, previousPeriod } from '../utils/filingPeriod';
 
 // 분기 정렬 헬퍼
 const sortQuarters = (qList) => {
@@ -83,20 +84,8 @@ const swotData = {
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// 법정 제출기한(사업 3/31, 1Q 5/15, 반기 8/14, 3Q 11/14)이 지난 가장 최근 보고서 기간
-const getLatestFiledPeriod = (now = new Date()) => {
-  const y = now.getFullYear();
-  const md = (now.getMonth() + 1) * 100 + now.getDate();
-  if (md > 1114) return { year: String(y), quarter: '3Q' };
-  if (md > 814) return { year: String(y), quarter: '2Q' };
-  if (md > 515) return { year: String(y), quarter: '1Q' };
-  if (md > 331) return { year: String(y - 1), quarter: '4Q' };
-  return { year: String(y - 1), quarter: '3Q' };
-};
+// 법정 제출기한(주말·공휴일이면 다음 영업일)이 지난 가장 최근 보고서 기간 - src/utils/filingPeriod.js
 const LATEST_PERIOD = getLatestFiledPeriod();
-const previousPeriod = ({ year, quarter }) => quarter === '1Q'
-  ? { year: String(Number(year) - 1), quarter: '4Q' }
-  : { year, quarter: `${Number(quarter[0]) - 1}Q` };
 
 // 금액은 원 단위 정밀도(백만원 소수)로 보관하고 표시 시점에만 반올림 — 당분기 역산 시 반올림 오차 방지
 const roundM = (v) => Math.round(v) || 0;
@@ -625,14 +614,14 @@ export default function Dashboard() {
             </span>
             <span className="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 text-xs px-2.5 py-1 rounded-full font-semibold border border-emerald-500/20">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              Auto Looping & Fallback Engine
+              KOSIS 시장 지표 연동
             </span>
           </div>
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
-            Open DART 실시간 재무 & 시장 분석 대시보드
+            Open DART 재무 & 시장 분석 대시보드
           </h1>
           <p className="text-slate-400 text-sm mt-1 max-w-2xl leading-relaxed">
-            금감원 Open DART 공시 데이터를 CORS 프록시 터널을 통해 실시간으로 자동 일괄 동기화(연결/별도 동시 수집)하며, 당분기 역산 연산 및 총포괄손익 지표를 매핑합니다.
+            금감원 Open DART에 공시된 재무제표(연결·별도)를 일괄 조회해 대림통상과 경쟁사를 비교합니다. 당분기 실적은 누계에서 직전 분기 누계를 빼서 계산합니다.
           </p>
         </div>
 
