@@ -59,3 +59,15 @@ export const computeValue = (financialData, companyId, quarterStr, metric, fsDiv
   const prevVal = getStatement(financialData, companyId, prev, fsDiv)[metric] ?? 0;
   return currentVal - prevVal;
 };
+
+// ROE 기간 표시와 연환산 배수
+// 당분기: 3개월치 → ×4 / 누계: n개 분기 누계 → ×4/n / 4Q 누계(연간): 그대로
+const quarterNumber = (quarterStr) => Number(quarterStr.split(' ')[1][0]);
+
+export const roePeriodLabel = (quarterStr, isCumulative) => {
+  if (!isCumulative) return '분기';
+  return ['1분기', '반기 누계', '3분기 누계', '연간'][quarterNumber(quarterStr) - 1];
+};
+
+export const roeAnnualizationFactor = (quarterStr, isCumulative) =>
+  isCumulative ? 4 / quarterNumber(quarterStr) : 4;

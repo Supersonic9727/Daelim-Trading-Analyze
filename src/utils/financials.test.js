@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { parseList } from './dartApi';
-import { getStatement, isComputable, computeValue, isOfsFallback, prevQuarterKey } from './financials';
+import { getStatement, isComputable, computeValue, isOfsFallback, prevQuarterKey, roePeriodLabel, roeAnnualizationFactor } from './financials';
 import q1 from './__fixtures__/daelimTrading_2026_1q_cfs.json';
 import q2 from './__fixtures__/daelimTrading_2026_2q_cfs.json';
 
@@ -92,5 +92,20 @@ describe('공시 3개월치 우선 (대림바스 2026 3Q 연결 총포괄손익 
       '2026 3Q': { x: { cfs: { sales: 900, quarterly: {} }, ofs: {} } },
     };
     expect(computeValue(d2, 'x', '2026 3Q', 'sales', 'cfs', false)).toBe(400);
+  });
+});
+
+describe('ROE 기간 표시와 연환산', () => {
+  it('당분기는 3개월치이므로 ×4', () => {
+    expect(roePeriodLabel('2026 3Q', false)).toBe('분기');
+    expect(roeAnnualizationFactor('2026 3Q', false)).toBe(4);
+  });
+
+  it('누계는 분기 수에 맞춰 환산, 4Q 누계(연간)는 그대로', () => {
+    expect(roePeriodLabel('2026 2Q', true)).toBe('반기 누계');
+    expect(roeAnnualizationFactor('2026 2Q', true)).toBe(2);
+    expect(roeAnnualizationFactor('2026 3Q', true)).toBeCloseTo(4 / 3, 10);
+    expect(roePeriodLabel('2025 4Q', true)).toBe('연간');
+    expect(roeAnnualizationFactor('2025 4Q', true)).toBe(1);
   });
 });

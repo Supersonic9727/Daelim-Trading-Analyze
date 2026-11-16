@@ -1,4 +1,8 @@
 // DART API 실시간 연동 및 데이터 파싱 유틸리티 (정기공시 재무제표 전체조회 & 주요계정 듀얼 연동)
+import { debugLog, debugWarn } from './logger';
+
+// 미공시(DART status 013)로 생긴 오류인지 판별 — 예상된 상황이므로 배포 콘솔에 오류로 남기지 않음
+export const isNoDataError = (error) => /미공시|데이터가 없습니다/.test(error?.message || '');
 
 // 재무제표 데이터 목록에서 지표를 파싱하는 헬퍼 함수 (단위 테스트용으로 export)
 export const parseList = (list, targetFsDiv) => {
@@ -118,7 +122,7 @@ export const parseList = (list, targetFsDiv) => {
   );
 
   if (!comprehensiveIncomeItem) {
-    console.log("[DART API] 총포괄손익 항목 누락 감지, 당기순이익(손실) 대체(Fallback) 파싱 시도");
+    debugLog("[DART API] 총포괄손익 항목 누락 감지, 당기순이익(손실) 대체(Fallback) 파싱 시도");
     comprehensiveIncomeItem = findItem(
       [
         'ifrs-full_ProfitLoss', 
@@ -229,14 +233,14 @@ export const fetchDartData = async (corpCode, year, reprtCode, fsDiv) => {
   const urlAll = `/api-dart/api/fnlttSinglAcntAll.json?corp_code=${corpCode}&bsns_year=${year}&reprt_code=${reprtCode}&fs_div=${fsDiv}`;
 
   try {
-    console.log(`[DART API] 1차 시도 (전체조회 API) 시작: corp_code=${corpCode}, bsns_year=${year}, fs_div=${fsDiv}`);
+    debugLog(`[DART API] 1차 시도 (전체조회 API) 시작: corp_code=${corpCode}, bsns_year=${year}, fs_div=${fsDiv}`);
     const response = await fetch(urlAll);
     const result = await response.json();
 
     if (result.status === '000') {
       const parsedData = parseList(result.list, fsDiv);
       if (parsedData) {
-        console.log("[DART API] 1차 시도 성공 (전체조회 데이터 파싱 완료)");
+        debugLog("[DART API] 1차 시도 성공 (전체조회 데이터 파싱 완료)");
         return parsedData;
       }
     }
@@ -245,25 +249,25 @@ export const fetchDartData = async (corpCode, year, reprtCode, fsDiv) => {
     if (result.status === '013') {
       throw new Error(`해당 ${fsDiv} 공시 데이터가 없습니다. (${year}년 ${reprtCode} 미공시 또는 비대상 기업)`);
     }
-    console.warn(`[DART API] 1차 시도 결과 없음 (status: ${result.status}, message: ${result.message || '없음'}). 2차 시도(주요계정조회)로 대체 시도합니다.`);
+    debugWarn(`[DART API] 1차 시도 결과 없음 (status: ${result.status}, message: ${result.message || '없음'}). 2차 시도(주요계정조회)로 대체 시도합니다.`);
   } catch (error) {
     // 013으로 인한 의도적 throw는 그대로 전파 (2차 시도 없이 종료)
-    if (error.message?.includes('미공시') || error.message?.includes('데이터가 없습니다')) throw error;
-    console.warn("[DART API] 1차 시도 오류 발생. 2차 시도로 대체합니다.", error);
+    if (isNoDataError(error)) throw error;
+    debugWarn("[DART API] 1차 시도 오류 발생. 2차 시도로 대체합니다.", error);
   }
 
   // 2차 시도: 단일회사 주요계정 조회 API (fnlttSinglAcnt.json) - 대기업/금융업종 및 용량초과 우회용
   const urlSingle = `/api-dart/api/fnlttSinglAcnt.json?corp_code=${corpCode}&bsns_year=${year}&reprt_code=${reprtCode}`;
 
   try {
-    console.log(`[DART API] 2차 시도 (주요계정 API) 시작: corp_code=${corpCode}, bsns_year=${year}`);
+    debugLog(`[DART API] 2차 시도 (주요계정 API) 시작: corp_code=${corpCode}, bsns_year=${year}`);
     const response = await fetch(urlSingle);
     const result = await response.json();
 
     if (result.status === '000') {
       const parsedData = parseList(result.list, fsDiv);
       if (parsedData) {
-        console.log("[DART API] 2차 시도 성공! (주요계정 데이터 대체 파싱 완료)");
+        debugLog("[DART API] 2차 시도 성공! (주요계정 데이터 대체 파싱 완료)");
         return parsedData;
       }
     }
@@ -274,7 +278,8 @@ export const fetchDartData = async (corpCode, year, reprtCode, fsDiv) => {
       throw new Error(result.message || `DART API 에러 (코드: ${result.status})`);
     }
   } catch (error) {
-    console.error("[DART API] 1, 2차 시도 모두 실패:", error);
+    if (isNoDataError(error)) debugWarn("[DART API] 미공시:", error.message);
+    else console.error("[DART API] 1, 2차 시도 모두 실패:", error);
     throw error;
   }
 };

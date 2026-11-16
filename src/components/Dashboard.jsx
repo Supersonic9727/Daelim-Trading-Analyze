@@ -33,13 +33,16 @@ import {
   LineChart
 } from 'recharts';
 import { buildMarketCards, buildMarketSummary, buildMarketImpact, quarterEndPrd } from '../utils/marketIndicators';
-import { fetchDartData } from '../utils/dartApi';
+import { fetchDartData, isNoDataError } from '../utils/dartApi';
+import { debugWarn } from '../utils/logger';
 import { getLatestFiledPeriod, previousPeriod } from '../utils/filingPeriod';
 import {
   getStatement as getStatementOf,
   isOfsFallback as isOfsFallbackOf,
   isComputable as isComputableOf,
   computeValue,
+  roePeriodLabel,
+  roeAnnualizationFactor,
 } from '../utils/financials';
 
 // 분기 정렬 헬퍼
@@ -97,7 +100,6 @@ const LATEST_PERIOD = getLatestFiledPeriod();
 const roundM = (v) => Math.round(v) || 0;
 
 // DART 013(해당 보고서 없음) 응답만 '데이터 없음'으로 캐시 — fetchDartData의 013 오류 문구 기준
-const isNoDataError = (e) => /미공시|데이터가 없습니다|조회된 데이터가 없습니다/.test(e?.message || '');
 const fmtM = (v) => roundM(v).toLocaleString('ko-KR');
 // 시세 기준 시각: 한국 시간 "11.13 15:30"
 const quoteTimeFormat = new Intl.DateTimeFormat('ko-KR', {
@@ -313,8 +315,13 @@ export default function Dashboard() {
         await delay(200); // DART 초당 트래픽 제한 대응
         return data;
       } catch (e) {
-        console.warn(`[DART API WARNING] ${company.name} ${year} ${q} ${fsDiv} 호출 실패:`, e.message);
-        if (isNoDataError(e)) apiCacheRef.current.set(cacheKey, null); // 일시 오류는 캐시하지 않아 재조회 가능
+        // 미공시는 예상된 상황이라 개발 서버에서만 로그, 그 밖의 실패는 배포 사이트에도 경고
+        if (isNoDataError(e)) {
+          debugWarn(`[DART API] ${company.name} ${year} ${q} ${fsDiv} 미공시`);
+          apiCacheRef.current.set(cacheKey, null); // 일시 오류는 캐시하지 않아 재조회 가능
+        } else {
+          console.warn(`[DART API WARNING] ${company.name} ${year} ${q} ${fsDiv} 호출 실패:`, e.message);
+        }
         return null;
       }
     };
@@ -428,8 +435,12 @@ export default function Dashboard() {
               apiCacheRef.current.set(cacheKey, data);
               await delay(200);
             } catch (e) {
-              console.warn(`[TREND] ${year}년 ${company.name} ${fsDiv}:`, e.message);
-              if (isNoDataError(e)) apiCacheRef.current.set(cacheKey, null);
+              if (isNoDataError(e)) {
+                debugWarn(`[TREND] ${year}년 ${company.name} ${fsDiv} 미공시`);
+                apiCacheRef.current.set(cacheKey, null);
+              } else {
+                console.warn(`[TREND] ${year}년 ${company.name} ${fsDiv}:`, e.message);
+              }
             }
           }
           currentOp++;
@@ -478,7 +489,7 @@ export default function Dashboard() {
   // ---------------------------------------------------------
   const handleExportCSV = () => {
     const fsDiv = isConsolidated ? 'cfs' : 'ofs';
-    const header = ['기업명', '기간', '공시구분', '집계모드', '매출액(백만)', '영업이익(백만)', '영업이익률(%)', '경상손익(백만)', '경상손익률(%)', '판관비(백만)', '판관비율(%)', '당기순이익(백만)', '순이익률(%)', '총포괄손익(백만)', '부채비율(%)', 'ROE(%)', '유동비율(%)'];
+    const header = ['기업명', '기간', '공시구분', '집계모드', '매출액(백만)', '영업이익(백만)', '영업이익률(%)', '경상손익(백만)', '경상손익률(%)', '판관비(백만)', '판관비율(%)', '당기순이익(백만)', '순이익률(%)', '총포괄손익(백만)', '부채비율(%)', 'ROE 기간', 'ROE(%)', 'ROE 연환산(%)', '유동비율(%)'];
     const rows = [header.join(',')];
 
     sortQuarters(quarters).forEach(q => {
@@ -503,8 +514,9 @@ export default function Dashboard() {
         const pl = getComputedValue(company.id, q, 'profitLoss', fsDiv);
         const netMargin = sales > 0 ? ((pl / sales) * 100).toFixed(2) : '';
         const roeCsv = eq > 0 ? ((pl / eq) * 100).toFixed(2) : '';
+        const roeAnnualCsv = eq > 0 ? ((pl / eq) * 100 * roeAnnualizationFactor(q, isCumulative)).toFixed(2) : '';
         const currentRatioCsv = curL > 0 ? ((curA / curL) * 100).toFixed(2) : '';
-        rows.push([company.name, q, fsLabel, isCumulative ? '누계액' : '당분기', roundM(sales), roundM(op), opMargin, roundM(oi), oiMarginCsv, roundM(sga), sgaR, roundM(pl), netMargin, roundM(net), debt < 0 ? '자본잠식' : debt, roeCsv, currentRatioCsv].join(','));
+        rows.push([company.name, q, fsLabel, isCumulative ? '누계액' : '당분기', roundM(sales), roundM(op), opMargin, roundM(oi), oiMarginCsv, roundM(sga), sgaR, roundM(pl), netMargin, roundM(net), debt < 0 ? '자본잠식' : debt, roePeriodLabel(q, isCumulative), roeCsv, roeAnnualCsv, currentRatioCsv].join(','));
       });
     });
 
@@ -1275,7 +1287,10 @@ export default function Dashboard() {
                 <th className="p-4 text-right" title="당기순이익 ÷ 매출액">순이익률</th>
                 <th className="p-4 text-right">총포괄손익</th>
                 <th className="p-4 text-right" title="부채총계 ÷ 자본총계 (기말)">부채비율</th>
-                <th className="p-4 text-right" title="당기순이익 ÷ 기말 자본총계 (연환산 아님)">ROE</th>
+                <th className="p-4 text-right" title="당기순이익 ÷ 기말 자본총계. 아래 작은 숫자는 1년 기준으로 환산한 값">
+                  ROE
+                  <span className="block text-[9px] font-semibold text-slate-500 normal-case">{roePeriodLabel(`${activeYear} ${activeQuarter}`, isCumulative)} 기준</span>
+                </th>
                 <th className="p-4 text-right" title="유동자산 ÷ 유동부채 (기말)">유동비율</th>
               </tr>
             </thead>
@@ -1299,6 +1314,8 @@ export default function Dashboard() {
                 const pl = getComputedValue(company.id, targetQuarterStr, 'profitLoss', fsDiv);
                 const netMargin = sales > 0 ? ((pl / sales) * 100).toFixed(2) : null;
                 const roe = eq > 0 ? ((pl / eq) * 100).toFixed(2) : null;
+                const roeFactor = roeAnnualizationFactor(targetQuarterStr, isCumulative);
+                const roeAnnual = eq > 0 && roeFactor !== 1 ? ((pl / eq) * 100 * roeFactor).toFixed(1) : null;
                 const currentRatio = curL > 0 ? ((curA / curL) * 100).toFixed(1) : null;
 
                 const nameCell = (
@@ -1373,6 +1390,9 @@ export default function Dashboard() {
                     </td>
                     <td className={`p-4 text-right font-semibold ${roe === null ? 'text-slate-500' : parseFloat(roe) < 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
                       {roe === null ? '-' : `${parseFloat(roe) >= 0 ? '+' : ''}${roe}%`}
+                      {roeAnnual !== null && (
+                        <span className="block text-[9px] font-medium text-slate-500" title="1년 기준으로 환산한 ROE (계절성 미반영)">연환산 {parseFloat(roeAnnual) >= 0 ? '+' : ''}{roeAnnual}%</span>
+                      )}
                     </td>
                     <td className={`p-4 text-right font-semibold ${currentRatio === null ? 'text-slate-500' : parseFloat(currentRatio) < 100 ? 'text-amber-400' : 'text-slate-300'}`}>
                       {currentRatio === null ? '-' : `${currentRatio}%`}
