@@ -44,6 +44,7 @@ import {
   roePeriodLabel,
   roeAnnualizationFactor,
 } from '../utils/financials';
+import { buildSwotFinancials } from '../utils/swotFinancials';
 
 // 분기 정렬 헬퍼
 const sortQuarters = (qList) => {
@@ -55,43 +56,69 @@ const sortQuarters = (qList) => {
   });
 };
 
-// SWOT 분석 및 자사 주체 비교 포인트 데이터 (대림통상 주체 180도 전면 전환)
+// SWOT 정성 항목 (직접 작성). 매출 규모·영업이익률·부채비율·매출 증가율은
+// 조회한 기간의 DART 공시로 자동 계산해 강점/약점에 추가함 (src/utils/swotFinancials.js)
+const SWOT_QUALITATIVE_AS_OF = '2026년 11월';
+// 비교 기준 재무제표: 와토스코리아는 연결 미작성이라 양사 모두 별도로 비교
+const SWOT_FS_DIV = { daelimBath: 'cfs', lxhausys: 'cfs', kcc: 'cfs', watos: 'ofs' };
 const swotData = {
   lxhausys: {
     name: "LX하우시스",
     s: ["수전·비데(도비도스) 등 욕실 기구 단일 카테고리에 집중한 전문 제조사로서 품목별 제품 대응 속도", "LX하우시스 패키지에 없는 수전·비데 전문 품목을 공급할 수 있는 보완적 위치"],
-    w: ["2025년 연결 매출 기준 대림통상 1,262억원 vs LX하우시스 3조 1,787억원 (약 4.0% 수준)으로 마케팅·유통 투자 여력 열세", "창호·바닥재·벽지까지 묶는 LX Z:IN 토탈 리모델링 패키지에 대응할 자체 토탈 패키지 부재"],
+    w: ["창호·바닥재·벽지까지 묶는 LX Z:IN 토탈 리모델링 패키지에 대응할 자체 토탈 패키지 부재"],
     o: ["LX Z:IN 욕실 리모델링 패키지에 수전·비데 공급사로 참여하는 협력 가능성", "노후 주택 욕실 리모델링 수요에서 단품 교체 시장(수전·비데) 공략"],
     t: ["대형 브랜드의 토탈 리모델링 패키지 확대 시 수전이 패키지 내 부품으로 묶여 단가 협상력 약화", "패키지사가 수전을 저가 OEM으로 조달할 경우 가격 경쟁 심화"],
-    compare: "LX하우시스는 2021년 7월 LG그룹에서 계열분리된 LX그룹 계열의 종합 건자재사로, 창호·바닥재·벽지와 LX Z:IN 욕실 리모델링을 함께 운영합니다. 수전·비데 단품에서 직접 맞붙기보다 토탈 패키지 채널에서 경쟁과 협력이 동시에 생기는 관계이므로, 대림통상은 패키지 공급사 진입과 단품 교체 시장 방어를 병행하는 것이 현실적입니다. (규모 수치: DART 2025년 연결 매출)"
+    compare: "LX하우시스는 2021년 7월 LG그룹에서 계열분리된 LX그룹 계열의 종합 건자재사로, 창호·바닥재·벽지와 LX Z:IN 욕실 리모델링을 함께 운영합니다. 수전·비데 단품에서 직접 맞붙기보다 토탈 패키지 채널에서 경쟁과 협력이 동시에 생기는 관계이므로, 대림통상은 패키지 공급사 진입과 단품 교체 시장 방어를 병행하는 것이 현실적입니다."
   },
   kcc: {
     name: "KCC",
     s: ["욕실 수전·비데(도비도스) 전문 브랜드 — KCC는 해당 품목 사업이 없음", "욕실 기구 단일 카테고리 집중에 따른 제품·유통 전문성"],
-    w: ["2025년 연결 매출 기준 대림통상 1,262억원 vs KCC 6조 4,838억원으로 규모·자본력 격차가 매우 큼", "건축자재 B2B 영업망(건설사·시공사) 규모에서 열세"],
+    w: ["건축자재 B2B 영업망(건설사·시공사) 규모에서 열세"],
     o: ["KCC의 실리콘·실란트 등 욕실 시공 부자재와는 경쟁이 아닌 보완 관계로 공동 영업 가능성", "건설사 B2B 납품 시 마감재·부자재사와 연계한 패키지 제안"],
     t: ["욕실 리모델링 B2C 채널은 KCC가 아닌 KCC글라스(홈씨씨)가 운영 — 해당 채널 내 경쟁사 수전 채택 시 진입 장벽", "건설 경기 둔화 시 B2B 건자재 전반의 단가 인하 압박"],
-    compare: "KCC는 2020년 1월 유리·홈씨씨·바닥재 사업을 KCC글라스로 인적분할한 뒤 도료·실리콘·건축자재 중심으로 재편되어, 대림통상의 수전·비데와 직접 경쟁하는 품목은 없습니다. 비교 대상이라기보다 B2B 건자재 시장의 참고 지표이며, 욕실 리모델링 채널 관점에서는 KCC글라스(홈씨씨)를 별도로 보는 것이 정확합니다. (규모 수치: DART 2025년 연결 매출)"
+    compare: "KCC는 2020년 1월 유리·홈씨씨·바닥재 사업을 KCC글라스로 인적분할한 뒤 도료·실리콘·건축자재 중심으로 재편되어, 대림통상의 수전·비데와 직접 경쟁하는 품목은 없습니다. 비교 대상이라기보다 B2B 건자재 시장의 참고 지표이며, 욕실 리모델링 채널 관점에서는 KCC글라스(홈씨씨)를 별도로 보는 것이 정확합니다."
   },
   daelimBath: {
     name: "대림바스",
     s: ["수전·비데 중심의 제품 구성과 자체 브랜드 도비도스(DOBIDOS) 보유", "도비도스 공식 온라인몰을 직접 운영하는 소비자 직판 채널"],
-    w: ["2025년 연결 매출 1,262억원으로 대림바스(3,006억원)의 약 42% 규모", "2025년 연결 영업이익률 -7.6%·부채비율 305%로 대림바스(+6.2%·93%) 대비 수익성과 재무 안정성 모두 열세"],
+    w: [],
     o: ["이누스 2026년 4월 기업회생 신청·5월 회생절차 개시 → 수전·비데·위생도기 대체 공급 수요 (대림바스와 선점 경쟁)", "노후 주택의 수전·비데 단품 교체 수요"],
     t: ["대림바스가 2025년 사명 변경 후 하이엔드 브랜드 휠렌(FÜLEN)·프리미엄 수전금구·리모델링 패키지 고급화를 추진 → 프리미엄 수전 시장에서 정면 경쟁", "'대림' 이름을 공유하는 두 회사가 수전·비데에서 겹쳐 소비자 브랜드 혼동 가능"],
-    compare: "대림바스(옛 대림비앤코, 2025년 4월 사명 변경)는 1966년 요업센터에서 출발한 욕실 전문기업으로, 위생도기뿐 아니라 수전금구·비데·욕실 리모델링까지 운영해 대림통상의 수전·비데와 정면으로 경쟁합니다. 2025년 연결 기준 매출은 대림바스 3,006억원, 대림통상 1,262억원이며, 대림바스는 영업이익률 6.2%·부채비율 93%로 대림통상(-7.6%·305%)보다 수익성과 재무 모두 앞섭니다. 같은 '대림' 이름을 쓰는 만큼, 도비도스 브랜드와 수전 전문성으로 차별점을 분명히 하는 것이 과제입니다. (수치: DART 2025년 사업보고서 연결 기준)"
+    compare: "대림바스(옛 대림비앤코, 2025년 4월 사명 변경)는 1966년 요업센터에서 출발한 욕실 전문기업으로, 위생도기뿐 아니라 수전금구·비데·욕실 리모델링까지 운영해 대림통상의 수전·비데와 정면으로 경쟁합니다. 같은 '대림' 이름을 쓰는 만큼, 도비도스 브랜드와 수전 전문성으로 차별점을 분명히 하는 것이 과제입니다."
   },
   watos: {
     name: "와토스코리아",
-    s: ["2025년 별도 매출 1,022억원으로 와토스코리아(141억원) 대비 약 7배 규모", "수전·비데(도비도스)까지 갖춘 제품 폭 — 와토스코리아는 양변기 부속이 매출의 약 47~48%를 차지하는 부속 중심 구조"],
-    w: ["2025년 별도 부채비율 약 190%로, 부채비율 약 7%인 와토스코리아 대비 재무 안정성 열세", "2025년 별도 영업손실 88억원(와토스코리아 영업손실 43억원) — 양사 모두 수익성 회복 과제"],
+    s: ["수전·비데(도비도스)까지 갖춘 제품 폭 — 와토스코리아는 양변기 부속이 매출의 약 47~48%를 차지하는 부속 중심 구조 (2025년 사업보고서)"],
+    w: [],
     o: ["이누스(2020년 아이에스동서가 E&F PE에 매각)가 2026년 4월 기업회생 신청·5월 회생절차 개시 → 위생도기·욕실 부속 대체 수요", "수전·부속을 묶은 교체용 욕실 세트 제안으로 부속 단품 업체 대비 객단가 확대"],
     t: ["세면기 폽업·샤워기 헤드 등 교체용 욕실 부속 품목이 와토스코리아와 겹쳐 가격 경쟁 발생", "주택 착공 둔화 시 신축 납품 감소 — 양사 공통 리스크"],
-    compare: "와토스코리아(코스닥 079000)는 양변기 탱크 부속을 주력으로 세면기 폽업·양변기 시트·샤워기 헤드까지 만드는 욕실 부속 전문 상장사로, 교체용 욕실 부속 품목에서 대림통상과 직접 겹칩니다. 규모는 대림통상이 약 7배 크지만, 와토스코리아는 부채비율이 약 7%에 불과해 재무구조가 매우 보수적입니다. 대림통상은 수전·비데까지 아우르는 제품 폭을 살린 세트 영업으로 부속 단품 경쟁을 피하면서 재무 안정성 격차를 줄이는 것이 과제입니다. (수치: DART 2025년 사업보고서 별도 기준, 와토스코리아는 연결재무 미작성)"
+    compare: "와토스코리아(코스닥 079000)는 양변기 탱크 부속을 주력으로 세면기 폽업·양변기 시트·샤워기 헤드까지 만드는 욕실 부속 전문 상장사로, 교체용 욕실 부속 품목에서 대림통상과 직접 겹칩니다. 대림통상은 수전·비데까지 아우르는 제품 폭을 살린 세트 영업으로 부속 단품 경쟁을 피하는 것이 과제입니다."
   }
 };
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// SWOT 항목 목록: 공시 자동 항목(배지 표시) → 직접 작성 항목 순
+const renderSwotList = (auto = [], manual = [], bulletClass) => (
+  <ul className="space-y-2 text-xs text-slate-400">
+    {auto.map((item, idx) => (
+      <li key={`auto-${idx}`} className="flex items-start gap-1.5">
+        <span className={`${bulletClass} mt-1`}>•</span>
+        <span>
+          <span className="mr-1.5 px-1 py-px rounded bg-slate-800 border border-slate-700 text-[9px] font-bold text-slate-300 align-middle">공시</span>
+          {item}
+        </span>
+      </li>
+    ))}
+    {manual.map((item, idx) => (
+      <li key={`manual-${idx}`} className="flex items-start gap-1.5">
+        <span className={`${bulletClass} mt-1`}>•</span>
+        <span>{item}</span>
+      </li>
+    ))}
+    {auto.length + manual.length === 0 && <li className="text-slate-600">해당 항목 없음</li>}
+  </ul>
+);
 
 // 법정 제출기한(주말·공휴일이면 다음 영업일)이 지난 가장 최근 보고서 기간 - src/utils/filingPeriod.js
 const LATEST_PERIOD = getLatestFiledPeriod();
@@ -584,6 +611,18 @@ export default function Dashboard() {
 
   // SWOT 분석 바인딩용
   const activeSwotData = swotData[activeSwot] || swotData.daelimBath;
+  // 재무 항목: 화면에 확정된 기간의 누계 공시 (당분기 토글과 무관), 전년 같은 기간은 다년도 추이 조회분 사용
+  const swotFsDiv = SWOT_FS_DIV[activeSwot] || 'cfs';
+  const swotPeriod = `${activeYear} ${activeQuarter}`;
+  const swotPrevPeriod = `${Number(activeYear) - 1} ${activeQuarter}`;
+  const swotFinancials = buildSwotFinancials({
+    self: getStatement('daelimTrading', swotPeriod, swotFsDiv),
+    rival: getStatement(activeSwot, swotPeriod, swotFsDiv),
+    selfPrev: getStatement('daelimTrading', swotPrevPeriod, swotFsDiv),
+    rivalPrev: getStatement(activeSwot, swotPrevPeriod, swotFsDiv),
+    rivalName: activeSwotData.name,
+  });
+  const swotBasisLabel = `${activeYear}년 ${roePeriodLabel(swotPeriod, true)} · ${swotFsDiv === 'cfs' ? '연결' : '별도'}`;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -1414,7 +1453,14 @@ export default function Dashboard() {
             </div>
             <div>
               <h2 className="text-lg font-bold text-slate-100">경쟁사 SWOT 분석 매칭 탭</h2>
-              <p className="text-slate-400 text-xs">경쟁 기업별 강점/약점과 자사(대림통상)와의 비교 포인트 매칭 <span className="text-amber-500/70">※ 내부 작성 정성 데이터 기준 (DART 미연동)</span></p>
+              <p className="text-slate-400 text-xs">경쟁 기업별 강점/약점과 자사(대림통상)와의 비교 포인트 매칭</p>
+              <p className="text-[10px] mt-0.5 text-slate-500">
+                {swotFinancials
+                  ? <><span className="text-indigo-300 font-semibold">공시</span> 항목은 {swotBasisLabel} DART 공시로 조회할 때마다 자동 갱신 · </>
+                  : <span className="text-amber-500/80">{swotBasisLabel} 공시가 없어 재무 비교 항목은 표시하지 않음 · </span>}
+                나머지는 {SWOT_QUALITATIVE_AS_OF} 기준 직접 작성
+                {swotFsDiv === 'ofs' && ' (와토스코리아는 연결재무 미작성이라 양사 별도 기준)'}
+              </p>
             </div>
           </div>
 
@@ -1450,14 +1496,7 @@ export default function Dashboard() {
               <span className="w-6 h-6 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 font-extrabold flex items-center justify-center text-xs">S</span>
               <h3 className="text-sm font-bold text-slate-200">Strength (강점)</h3>
             </div>
-            <ul className="space-y-2 text-xs text-slate-400">
-              {activeSwotData.s.map((item, idx) => (
-                <li key={idx} className="flex items-start gap-1.5">
-                  <span className="text-indigo-400 mt-1">•</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
+            {renderSwotList(swotFinancials?.s, activeSwotData.s, 'text-indigo-400')}
           </div>
 
           {/* Weakness (약점) */}
@@ -1467,14 +1506,7 @@ export default function Dashboard() {
               <span className="w-6 h-6 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 font-extrabold flex items-center justify-center text-xs">W</span>
               <h3 className="text-sm font-bold text-slate-200">Weakness (약점)</h3>
             </div>
-            <ul className="space-y-2 text-xs text-slate-400">
-              {activeSwotData.w.map((item, idx) => (
-                <li key={idx} className="flex items-start gap-1.5">
-                  <span className="text-rose-400 mt-1">•</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
+            {renderSwotList(swotFinancials?.w, activeSwotData.w, 'text-rose-400')}
           </div>
 
           {/* Opportunity (기회) */}
@@ -1484,14 +1516,7 @@ export default function Dashboard() {
               <span className="w-6 h-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-extrabold flex items-center justify-center text-xs">O</span>
               <h3 className="text-sm font-bold text-slate-200">Opportunity (기회)</h3>
             </div>
-            <ul className="space-y-2 text-xs text-slate-400">
-              {activeSwotData.o.map((item, idx) => (
-                <li key={idx} className="flex items-start gap-1.5">
-                  <span className="text-emerald-400 mt-1">•</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
+            {renderSwotList([], activeSwotData.o, 'text-emerald-400')}
           </div>
 
           {/* Threat (위협) */}
@@ -1501,14 +1526,7 @@ export default function Dashboard() {
               <span className="w-6 h-6 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 font-extrabold flex items-center justify-center text-xs">T</span>
               <h3 className="text-sm font-bold text-slate-200">Threat (위협)</h3>
             </div>
-            <ul className="space-y-2 text-xs text-slate-400">
-              {activeSwotData.t.map((item, idx) => (
-                <li key={idx} className="flex items-start gap-1.5">
-                  <span className="text-amber-400 mt-1">•</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
+            {renderSwotList([], activeSwotData.t, 'text-amber-400')}
           </div>
         </div>
 
