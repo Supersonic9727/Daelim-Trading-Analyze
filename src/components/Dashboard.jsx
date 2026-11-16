@@ -1323,7 +1323,7 @@ export default function Dashboard() {
                     <tr key={company.id} className="border-b border-slate-800/45">
                       {nameCell}
                       <td colSpan={13} className="p-4 text-center text-slate-500 font-semibold">
-                        미공시 — {activeYear}년 {activeQuarter} 보고서가 아직 DART에 없습니다{!isCumulative && activeQuarter !== '1Q' ? ' (당분기 역산에는 직전 분기 보고서도 필요)' : ''}
+                        미공시 — {activeYear}년 {activeQuarter} 보고서가 아직 DART에 없습니다{!isCumulative && activeQuarter === '4Q' ? ' (4분기 당분기 계산에는 3분기 보고서도 필요)' : ''}
                       </td>
                     </tr>
                   );

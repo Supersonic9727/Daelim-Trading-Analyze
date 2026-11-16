@@ -15,6 +15,16 @@ describe('parseList - 실제 DART 응답 (대림통상 2026 반기, 연결)', ()
     expect(r.sgaExpenses).toBeCloseTo(15717.586171, 6);
   });
 
+  it('quarterly에는 반기보고서의 3개월치(thstrm_amount)를 보관', () => {
+    expect(r.quarterly.sales).toBeCloseTo(34013.580858, 6);
+    expect(r.quarterly.operatingProfit).toBeCloseTo(-1944.161096, 6);
+    expect(r.quarterly.netIncome).toBeCloseTo(-2700.979103, 6);
+    expect(r.quarterly.sgaExpenses).toBeCloseTo(8246.529415, 6);
+    const rawOf = (id) => Number(q2.list.find(x => x.account_id === id && x.sj_div !== 'BS').thstrm_amount) / 1e6;
+    expect(r.quarterly.profitLoss).toBeCloseTo(rawOf('ifrs-full_ProfitLoss'), 6);
+    expect(r.quarterly.ordinaryIncome).toBeCloseTo(rawOf('ifrs-full_ProfitLossBeforeTax'), 6);
+  });
+
   it('재무상태표는 기말 잔액, 부채비율은 부채총계/자본총계 (자본과부채총계 아님)', () => {
     expect(r.equity).toBeCloseTo(33071.656665, 6);
     expect(r.debtRatio).toBe(Math.round((117285163870 / 33071656665) * 100));
@@ -54,6 +64,25 @@ describe('parseList - 계정 매칭 규칙', () => {
     expect(r.operatingProfit).toBe(-1);
     expect(r.ordinaryIncome).toBe(-2);
     expect(r.sgaExpenses).toBe(7);
+  });
+
+  it('3개월치도 손실 계정명·괄호 표기를 음수로 처리', () => {
+    const r = parseList([
+      row('IS', '영업손실', '1,000,000', { thstrm_add_amount: '3,000,000' }),
+      row('IS', '매출액', '(500,000)', { thstrm_add_amount: '9,000,000' }),
+    ], 'CFS');
+    expect(r.operatingProfit).toBe(-3);
+    expect(r.quarterly.operatingProfit).toBe(-1);
+    expect(r.quarterly.sales).toBe(-0.5);
+  });
+
+  it('누계 칸이 없는 사업보고서는 quarterly가 비어 있음', () => {
+    const r = parseList([
+      row('IS', '매출액', '12,000,000'),
+      row('IS', '영업이익', '1,000,000', { thstrm_add_amount: '-' }),
+    ], 'CFS');
+    expect(r.sales).toBe(12);
+    expect(r.quarterly).toEqual({});
   });
 
   it('요청한 fs_div 행만 사용', () => {

@@ -32,6 +32,30 @@ export const parseList = (list, targetFsDiv) => {
     return add && add !== '-' ? parseAmount(item.thstrm_add_amount) : parseAmount(item.thstrm_amount);
   };
 
+  // 누계 칸이 있는 손익 항목(반기·3분기 보고서)은 thstrm_amount가 회사가 공시한 3개월치
+  const hasCumulativeColumn = (item) => {
+    const add = (item.thstrm_add_amount || '').replace(/,/g, '').trim();
+    return !!add && add !== '-';
+  };
+
+  // 계정명이 '…손실'이거나 값이 음수면 손실로 보고 음수로 맞춤
+  const lossSigned = (item, raw, checkDeficit) => {
+    const accNm = item.account_nm || '';
+    const isLoss = (accNm.includes('손실') && !accNm.includes('손익') && !accNm.includes('이익')) || (checkDeficit && accNm.includes('적자')) || raw < 0;
+    return isLoss ? -Math.abs(raw) : raw;
+  };
+
+  // 손익 항목 읽기: cum = 누계(백만원), q = 공시 3개월치(백만원, 없으면 undefined)
+  // sign: 'none' = 부호 보정 없음, 'loss' = 계정명 손실 판정, 'lossOrDeficit' = 손실·적자 판정
+  const readFlow = (item, sign = 'none') => {
+    if (!item) return { cum: 0, q: undefined };
+    const fix = (raw) => (sign === 'none' ? raw : lossSigned(item, raw, sign === 'lossOrDeficit'));
+    return {
+      cum: fix(flowAmount(item)) / 1000000,
+      q: hasCumulativeColumn(item) ? fix(parseAmount(item.thstrm_amount)) / 1000000 : undefined,
+    };
+  };
+
   // 계정과목명 및 표준 IFRS ID를 유연하게 탐색하는 헬퍼
   // 우선순위: IFRS 계정 ID → 한글명 완전 일치 → 한글명 부분 일치
   // (DART 목록 순서상 '자본과부채총계'가 '부채총계'보다 먼저 나오므로 단일 패스 부분 일치는 오매칭됨)
@@ -68,7 +92,7 @@ export const parseList = (list, targetFsDiv) => {
     ['매출액', '영업수익'],
     ['IS', 'CIS']
   );
-  const sales = salesItem ? (flowAmount(salesItem) / 1000000) : 0;
+  const salesFlow = readFlow(salesItem);
 
   // 2. 영업이익 / 영업손실 파싱 (IS / CIS 구분)
   const opProfitItem = findItem(
@@ -76,15 +100,7 @@ export const parseList = (list, targetFsDiv) => {
     ['영업이익', '영업손실'],
     ['IS', 'CIS']
   );
-  let operatingProfit = 0;
-  if (opProfitItem) {
-    const rawVal = flowAmount(opProfitItem);
-    const converted = (rawVal / 1000000);
-    
-    const accNm = opProfitItem.account_nm || '';
-    const isLoss = (accNm.includes('손실') && !accNm.includes('손익') && !accNm.includes('이익')) || accNm.includes('적자') || rawVal < 0;
-    operatingProfit = isLoss ? -Math.abs(converted) : converted;
-  }
+  const opFlow = readFlow(opProfitItem, 'lossOrDeficit');
   
   // 3. 총포괄손익 / 총포괄손실 파싱 (IS / CIS 구분)
   // 우선적으로 총포괄손익을 파싱하되, 누락 시 기존 당기순손익 값을 대체(Fallback)하여 데이터 유실 방지
@@ -117,15 +133,7 @@ export const parseList = (list, targetFsDiv) => {
     );
   }
 
-  let netIncome = 0;
-  if (comprehensiveIncomeItem) {
-    const rawVal = flowAmount(comprehensiveIncomeItem);
-    const converted = (rawVal / 1000000);
-
-    const accNm = comprehensiveIncomeItem.account_nm || '';
-    const isLoss = (accNm.includes('손실') && !accNm.includes('손익') && !accNm.includes('이익')) || accNm.includes('적자') || rawVal < 0;
-    netIncome = isLoss ? -Math.abs(converted) : converted;
-  }
+  const netFlow = readFlow(comprehensiveIncomeItem, 'lossOrDeficit');
 
   // 3-1. 당기순이익(손실) 파싱 - ROE 분자용 (총포괄손익과 별개)
   const profitLossItem = findItem(
@@ -133,7 +141,7 @@ export const parseList = (list, targetFsDiv) => {
     ['당기순이익', '당기순손실', '당기순이익(손실)', '분기순이익', '분기순손실', '분기순이익(손실)', '반기순이익', '반기순이익(손실)'],
     ['IS', 'CIS']
   );
-  const profitLoss = profitLossItem ? (flowAmount(profitLossItem) / 1000000) : 0;
+  const plFlow = readFlow(profitLossItem);
 
   // 3-2. 경상손익(법인세차감전순이익) 파싱 (IS / CIS 구분)
   const ordinaryIncomeItem = findItem(
@@ -141,14 +149,7 @@ export const parseList = (list, targetFsDiv) => {
     ['법인세차감전순이익', '법인세비용차감전순이익', '경상이익', '세전이익', '법인세차감전순이익(손실)', '세전계속사업이익'],
     ['IS', 'CIS']
   );
-  let ordinaryIncome = 0;
-  if (ordinaryIncomeItem) {
-    const rawVal = flowAmount(ordinaryIncomeItem);
-    const converted = (rawVal / 1000000);
-    const accNm = ordinaryIncomeItem.account_nm || '';
-    const isLoss = (accNm.includes('손실') && !accNm.includes('손익') && !accNm.includes('이익')) || rawVal < 0;
-    ordinaryIncome = isLoss ? -Math.abs(converted) : converted;
-  }
+  const oiFlow = readFlow(ordinaryIncomeItem, 'loss');
 
   // 4. 판관비(판매비와관리비) 파싱 (IS / CIS 구분)
   const sgaItem = findItem(
@@ -157,7 +158,7 @@ export const parseList = (list, targetFsDiv) => {
     ['판매비와관리비', '판매비와관리비총계', '판매비및관리비', '판관비'],
     ['IS', 'CIS']
   );
-  const sgaExpenses = sgaItem ? (flowAmount(sgaItem) / 1000000) : 0;
+  const sgaFlow = readFlow(sgaItem);
   
   // 5. 부채총계 파싱 (BS 구분)
   const debtItem = findItem(
@@ -200,7 +201,26 @@ export const parseList = (list, targetFsDiv) => {
   );
   const currentLiabilities = curLiabItem ? (parseAmount(curLiabItem.thstrm_amount) / 1000000) : 0;
 
-  return { sales, operatingProfit, netIncome, profitLoss, sgaExpenses, debtRatio, ordinaryIncome, equity: equityMillion, currentAssets, currentLiabilities };
+  const flows = { sales: salesFlow, operatingProfit: opFlow, netIncome: netFlow, profitLoss: plFlow, sgaExpenses: sgaFlow, ordinaryIncome: oiFlow };
+  // quarterly: 분기·반기 보고서의 공시 3개월치. 사업보고서는 누계 칸이 없어 비어 있음
+  const quarterly = {};
+  for (const [key, flow] of Object.entries(flows)) {
+    if (flow.q !== undefined) quarterly[key] = flow.q;
+  }
+
+  return {
+    sales: salesFlow.cum,
+    operatingProfit: opFlow.cum,
+    netIncome: netFlow.cum,
+    profitLoss: plFlow.cum,
+    sgaExpenses: sgaFlow.cum,
+    debtRatio,
+    ordinaryIncome: oiFlow.cum,
+    equity: equityMillion,
+    currentAssets,
+    currentLiabilities,
+    quarterly,
+  };
 };
 
 // API 키는 서버 프록시(/api-dart → api/proxy.js)가 붙이므로 클라이언트는 키를 다루지 않음
