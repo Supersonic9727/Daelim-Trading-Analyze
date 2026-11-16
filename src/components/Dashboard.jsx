@@ -520,13 +520,13 @@ export default function Dashboard() {
   };
 
   // ---------------------------------------------------------
-  // 당분기 vs 누계액(누적값) 수학적 역산 연산기 구현
+  // 당분기·누계 값 계산 (financials.js 래퍼)
   // ---------------------------------------------------------
   // 종속회사가 없어 연결재무를 작성하지 않는 회사는 연결 모드에서 별도 수치로 대체 (연결=별도)
   // 계산 로직은 src/utils/financials.js (단위 테스트 대상). 여기서는 현재 상태를 넘겨 호출만 함
   const getStatement = (companyId, quarterStr, fsDiv) => getStatementOf(financialData, companyId, quarterStr, fsDiv);
   const isOfsFallback = (companyId, quarterStr) => isOfsFallbackOf(financialData, companyId, quarterStr);
-  // 계산 불가(해당 분기 또는 역산용 직전 분기 미공시)면 0이 아니라 '미공시'로 표시
+  // 계산 불가(해당 분기 또는 4Q 당분기 계산용 3Q 미공시)면 0이 아니라 '미공시'로 표시
   const isComputable = (companyId, quarterStr, fsDiv) => isComputableOf(financialData, companyId, quarterStr, fsDiv, isCumulative);
   const getComputedValue = (companyId, quarterStr, metric, fsDiv) => computeValue(financialData, companyId, quarterStr, metric, fsDiv, isCumulative);
 
@@ -615,7 +615,7 @@ export default function Dashboard() {
             Open DART 재무 & 시장 분석 대시보드
           </h1>
           <p className="text-slate-400 text-sm mt-1 max-w-2xl leading-relaxed">
-            금감원 Open DART에 공시된 재무제표(연결·별도)를 일괄 조회해 대림통상과 경쟁사를 비교합니다. 당분기 실적은 누계에서 직전 분기 누계를 빼서 계산합니다.
+            금감원 Open DART에 공시된 재무제표(연결·별도)를 일괄 조회해 대림통상과 경쟁사를 비교합니다. 당분기 실적은 1~3분기는 공시된 3개월치, 4분기는 연간에서 3분기 누계를 뺀 값입니다.
           </p>
         </div>
 
@@ -903,7 +903,7 @@ export default function Dashboard() {
           <div className="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-400 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
             <span className="flex items-center gap-1.5">
               <Info className="w-4 h-4 text-indigo-400" />
-              <span>당분기 실적 모드는 DART 누계액에서 전분기값을 빼 역산한 순수 분기 성과입니다.</span>
+              <span>당분기 실적은 해당 분기 3개월치입니다. 1~3분기는 회사가 공시한 값, 4분기는 연간에서 3분기 누계를 뺀 값입니다.</span>
             </span>
             <span className="text-[10px] text-slate-500">
               * 출처: 금융감독원 Open DART 공시 데이터
