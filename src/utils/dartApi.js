@@ -1,7 +1,7 @@
 // DART API 실시간 연동 및 데이터 파싱 유틸리티 (정기공시 재무제표 전체조회 & 주요계정 듀얼 연동)
 
-// 재무제표 데이터 목록에서 지표를 파싱하는 헬퍼 함수
-const parseList = (list, targetFsDiv) => {
+// 재무제표 데이터 목록에서 지표를 파싱하는 헬퍼 함수 (단위 테스트용으로 export)
+export const parseList = (list, targetFsDiv) => {
   if (!list || list.length === 0) return null;
 
   // 응답 객체 리스트 중 요청한 fs_div와 매칭되는 데이터 필터링

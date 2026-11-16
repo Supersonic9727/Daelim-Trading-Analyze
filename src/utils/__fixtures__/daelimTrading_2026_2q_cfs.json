@@ -1,0 +1,1244 @@
+{
+ "source": "Open DART fnlttSinglAcntAll corp_code=00109824 bsns_year=2026 fs_div=CFS reprt_code=11012 (BS/IS/CIS rows, 주요 필드만)",
+ "list": [
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_Assets",
+   "account_nm": "자산총계",
+   "thstrm_amount": "150356820535"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_CurrentAssets",
+   "account_nm": "유동 자산",
+   "thstrm_amount": "75052618198"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_OtherInventoriesGross",
+   "account_nm": "환불자산",
+   "thstrm_amount": "29748401"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_ShortTermTradeReceivable",
+   "account_nm": "매출채권",
+   "thstrm_amount": "24611429152"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_CashAndCashEquivalents",
+   "account_nm": "현금및현금성자산",
+   "thstrm_amount": "2582965700"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_CurrentTaxAssets",
+   "account_nm": "당기 법인세자산",
+   "thstrm_amount": "25008756"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_Inventories",
+   "account_nm": "유동 재고자산",
+   "thstrm_amount": "39317591261"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_AccumulatedImpairmentLossFinishedGoodsGross",
+   "account_nm": "평가충당금, 제품",
+   "thstrm_amount": "1905186067"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_AccumulatedImpairmentLossMerchandiseGross",
+   "account_nm": "평가충당금, 상품",
+   "thstrm_amount": "1838210710"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_AccumulatedImpairmentLossRawMaterialsGross",
+   "account_nm": "평가충당금, 원재료",
+   "thstrm_amount": "1341886203"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_AccumulatedImpairmentLossSuppliesGross",
+   "account_nm": "평가충당금, 저장품",
+   "thstrm_amount": "475016484"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_AccumulatedImpairmentLossWorkInProgressGross",
+   "account_nm": "평가충당금, 재공품",
+   "thstrm_amount": "1556425736"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_FinishedGoodsGross",
+   "account_nm": "제품, 총액",
+   "thstrm_amount": "9221935313"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_GoodsInTransitGross",
+   "account_nm": "미착원재료",
+   "thstrm_amount": "378547704"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_MerchandiseGross",
+   "account_nm": "상품, 총액",
+   "thstrm_amount": "15424800770"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_RawMaterialsGross",
+   "account_nm": "원재료, 총액",
+   "thstrm_amount": "7638887047"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_SuppliesGross",
+   "account_nm": "저장품, 총액",
+   "thstrm_amount": "8412698535"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_WorkInProgressGross",
+   "account_nm": "재공품, 총액",
+   "thstrm_amount": "5357447092"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_OtherCurrentAssets",
+   "account_nm": "기타 유동 자산",
+   "thstrm_amount": "6539139795"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "-표준계정코드 미사용-",
+   "account_nm": "선급금",
+   "thstrm_amount": "5919839991"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "-표준계정코드 미사용-",
+   "account_nm": "선급비용",
+   "thstrm_amount": "619299804"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_ShorttermDepositsNotClassifiedAsCashEquivalents",
+   "account_nm": "단기금융상품",
+   "thstrm_amount": "1520750000"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_TradeAndOtherCurrentReceivables",
+   "account_nm": "단기대여금및수취채권",
+   "thstrm_amount": "425985133"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_ShortTermAccruedIncome",
+   "account_nm": "미수수익",
+   "thstrm_amount": "12868064"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_ShortTermLoans",
+   "account_nm": "단기대여금, 총액",
+   "thstrm_amount": "2730000"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_ShortTermOtherReceivables",
+   "account_nm": "미수금",
+   "thstrm_amount": "410387069"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_NoncurrentAssets",
+   "account_nm": "비유동 자산",
+   "thstrm_amount": "75304202337"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_LongTermDepositsNotClassifiedAsCashEquivalents",
+   "account_nm": "장기금융상품",
+   "thstrm_amount": "798500000"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_LongTermLoansGross",
+   "account_nm": "장기대여금, 총액",
+   "thstrm_amount": "257000000"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "-표준계정코드 미사용-",
+   "account_nm": "감가상각누계액(사용권자산)",
+   "thstrm_amount": "665383426"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "-표준계정코드 미사용-",
+   "account_nm": "손상차손누계액(사용권자산)",
+   "thstrm_amount": "380469187"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "-표준계정코드 미사용-",
+   "account_nm": "손상차손누계액(무형자산)",
+   "thstrm_amount": "438568660"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_DeferredTaxAssets",
+   "account_nm": "이연법인세자산",
+   "thstrm_amount": "819099484"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_IntangibleAssetsOtherThanGoodwill",
+   "account_nm": "무형자산",
+   "thstrm_amount": "652730043"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_InvestmentProperty",
+   "account_nm": "투자부동산",
+   "thstrm_amount": "3714075178"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "-표준계정코드 미사용-",
+   "account_nm": "토지",
+   "thstrm_amount": "2525804437"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "-표준계정코드 미사용-",
+   "account_nm": "건물",
+   "thstrm_amount": "3107682382"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "-표준계정코드 미사용-",
+   "account_nm": "감가상각누계액",
+   "thstrm_amount": "1919411641"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_NoncurrentFinancialAssetsAtFairValueThroughProfitOrLossDesignatedUponInitialRecognition",
+   "account_nm": "당기손익-공정가치측정금융자산",
+   "thstrm_amount": "148824171"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_NoncurrentFinancialAssetsMeasuredAtFairValueThroughOtherComprehensiveIncome",
+   "account_nm": "기타포괄손익-공정가치측정금융자산",
+   "thstrm_amount": "231779772"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_OtherNoncurrentAssets",
+   "account_nm": "기타 비유동 자산",
+   "thstrm_amount": "644862734"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_PropertyPlantAndEquipment",
+   "account_nm": "유형자산",
+   "thstrm_amount": "66865280498"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_AccumulatedDepreciationBuildingsGross",
+   "account_nm": "감가상각누계액, 건물",
+   "thstrm_amount": "24534010814"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_AccumulatedDepreciationMachineryGross",
+   "account_nm": "감가상각누계액, 기계장치",
+   "thstrm_amount": "25047846163"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_AccumulatedDepreciationStructureGross",
+   "account_nm": "감가상각누계액, 구축물",
+   "thstrm_amount": "2714322597"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_AccumulatedDepreciationToolsAndEquipmentGross",
+   "account_nm": "감가상각누계액, 공구와기구",
+   "thstrm_amount": "57965399482"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_AccumulatedDepreciationVehiclesGross",
+   "account_nm": "감가상각누계액, 차량운반구",
+   "thstrm_amount": "574141982"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_AccumulatedImpairmentLossMachineryGross",
+   "account_nm": "손상차손누계액, 기계장치",
+   "thstrm_amount": "2671657804"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_AccumulatedImpairmentLossToolsAndEquipmentGross",
+   "account_nm": "손상차손누계액, 공구와기구",
+   "thstrm_amount": "5505580005"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_AccumulatedImpairmentLossVehiclesGross",
+   "account_nm": "손상차손누계액, 차량운반구",
+   "thstrm_amount": "82540261"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_BuildingsGross",
+   "account_nm": "건물, 총액",
+   "thstrm_amount": "52433011561"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_ConstructionInProgressGross",
+   "account_nm": "건설중인자산, 총액",
+   "thstrm_amount": "7409883"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_GovernmentGrantsLandGross",
+   "account_nm": "정부보조금, 토지",
+   "thstrm_amount": "5000000000"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_GovernmentGrantsMachineryGross",
+   "account_nm": "정부보조금, 기계장치",
+   "thstrm_amount": "351637500"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_LandGross",
+   "account_nm": "토지, 총액",
+   "thstrm_amount": "34409319951"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_MachineryGross",
+   "account_nm": "기계장치, 총액",
+   "thstrm_amount": "33194546307"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_StructureGross",
+   "account_nm": "구축물, 총액",
+   "thstrm_amount": "3665803914"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_ToolsAndEquipmentGross",
+   "account_nm": "공구와기구비품",
+   "thstrm_amount": "66671880192"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_VehiclesGross",
+   "account_nm": "차량운반구, 총액",
+   "thstrm_amount": "930445298"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_RightofuseAssets",
+   "account_nm": "사용권자산",
+   "thstrm_amount": "2656471730"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_Equity",
+   "account_nm": "자본총계",
+   "thstrm_amount": "33071656665"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_EquityAttributableToOwnersOfParent",
+   "account_nm": "지배기업의 소유주에게 귀속되는 자본",
+   "thstrm_amount": "32785159410"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_CapitalSurplus",
+   "account_nm": "자본잉여금",
+   "thstrm_amount": "32560170018"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_OtherCapitalSurplus",
+   "account_nm": "기타자본잉여금",
+   "thstrm_amount": "-401469143"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "-표준계정코드 미사용-",
+   "account_nm": "재평가적립금",
+   "thstrm_amount": "13943203461"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_SharePremium",
+   "account_nm": "주식발행초과금",
+   "thstrm_amount": "19018435700"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_ElementsOfOtherStockholdersEquity",
+   "account_nm": "기타자본구성요소",
+   "thstrm_amount": "-634251560"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_TreasuryShares",
+   "account_nm": "자기주식",
+   "thstrm_amount": "634251560"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_OtherComprehensiveIncomeLossAccumulatedAmount",
+   "account_nm": "기타포괄손익누계액",
+   "thstrm_amount": "-2967889736"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_GainsCumulativeEffectForeignCurrencyTranslation",
+   "account_nm": "해외사업환산이익",
+   "thstrm_amount": "-2767031113"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_ReserveOfGainsOnFinancialAssetsMeasuredAtFairValueThroughOtherComprehensiveIncome",
+   "account_nm": "기타포괄손익 -공정가치측정 금융자산평가손익",
+   "thstrm_amount": "-200858623"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_IssuedCapital",
+   "account_nm": "자본금",
+   "thstrm_amount": "16425000000"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_IssuedCapitalOfCommonStock",
+   "account_nm": "보통주자본금",
+   "thstrm_amount": "16425000000"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_RetainedEarnings",
+   "account_nm": "이익잉여금(결손금)",
+   "thstrm_amount": "-12597869312"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_RetainedEarningsBeforeAppropriationsAccumulatedDeficitBeforeDisposition",
+   "account_nm": "미처분이익잉여금(미처리결손금)",
+   "thstrm_amount": "-13597869312"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_VoluntaryReserves",
+   "account_nm": "임의적립금",
+   "thstrm_amount": "1000000000"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_NoncontrollingInterests",
+   "account_nm": "비지배지분",
+   "thstrm_amount": "286497255"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_EquityAndLiabilities",
+   "account_nm": "자본과부채총계",
+   "thstrm_amount": "150356820535"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_CurrentLiabilities",
+   "account_nm": "유동 부채",
+   "thstrm_amount": "105006547105"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_PaymentsOfIncomeTaxesPayable",
+   "account_nm": "미지급법인세",
+   "thstrm_amount": "38413519"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_ShortTermTradePayables",
+   "account_nm": "매입채무",
+   "thstrm_amount": "13568625209"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "-표준계정코드 미사용-",
+   "account_nm": "환불부채",
+   "thstrm_amount": "36585478"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_CurrentLeaseLiabilities",
+   "account_nm": "유동성리스부채",
+   "thstrm_amount": "652351287"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_CurrentPortionOfLongtermBorrowings",
+   "account_nm": "유동성장기차입금",
+   "thstrm_amount": "7916666660"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_CurrentProvisions",
+   "account_nm": "유동 충당부채",
+   "thstrm_amount": "677506809"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_CurrentProvisionsForProductWarranties",
+   "account_nm": "판매보증충당부채",
+   "thstrm_amount": "658826340"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_ShorttermMiscellaneousOtherProvisions",
+   "account_nm": "금융보증부채",
+   "thstrm_amount": "18680469"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_DividendsPayable",
+   "account_nm": "미지급배당금",
+   "thstrm_amount": "4129180"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_OtherCurrentLiabilities",
+   "account_nm": "기타유동부채",
+   "thstrm_amount": "979679582"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "-표준계정코드 미사용-",
+   "account_nm": "선수금",
+   "thstrm_amount": "688704555"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "-표준계정코드 미사용-",
+   "account_nm": "이연수익",
+   "thstrm_amount": "109599438"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "-표준계정코드 미사용-",
+   "account_nm": "예수금",
+   "thstrm_amount": "181375589"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_ShorttermBorrowings",
+   "account_nm": "단기차입금(사채 포함)",
+   "thstrm_amount": "74024673371"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_TradeAndOtherCurrentPayables",
+   "account_nm": "미지급금및기타부채",
+   "thstrm_amount": "7107916010"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_ShortTermAccruedExpenses",
+   "account_nm": "미지급비용",
+   "thstrm_amount": "3916204269"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_ShortTermOtherGuaranteeDepositReceived",
+   "account_nm": "수입보증금",
+   "thstrm_amount": "2715000000"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_ShortTermOtherPayables",
+   "account_nm": "미지급금",
+   "thstrm_amount": "526120438"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "-표준계정코드 미사용-",
+   "account_nm": "현재가치할인차금",
+   "thstrm_amount": "49408697"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_Liabilities",
+   "account_nm": "부채총계",
+   "thstrm_amount": "117285163870"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_NoncurrentLiabilities",
+   "account_nm": "비유동 부채",
+   "thstrm_amount": "12278616765"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_LongTermBorrowingsGross",
+   "account_nm": "장기차입금(사채 포함), 총액",
+   "thstrm_amount": "2262538159"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_PostemploymentBenefitObligations",
+   "account_nm": "순확정급여부채",
+   "thstrm_amount": "8062257461"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_FairValueOfPlanAssets",
+   "account_nm": "사외적립자산의공정가치",
+   "thstrm_amount": "11179045064"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_InvestedAssetForPostemploymentBenefitContraAccount",
+   "account_nm": "국민연금전환금",
+   "thstrm_amount": "1570600"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_PresentValueOfDefinedBenefitObligation",
+   "account_nm": "확정급여채무",
+   "thstrm_amount": "19242873125"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_NoncurrentLeaseLiabilities",
+   "account_nm": "비유동리스부채",
+   "thstrm_amount": "511887725"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_OtherNoncurrentFinancialLiabilities",
+   "account_nm": "기타 비유동 금융부채",
+   "thstrm_amount": "6912048"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_NonCurrentDerivativeLiabilities",
+   "account_nm": "비유동파생상품부채",
+   "thstrm_amount": "6912048"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "ifrs-full_OtherNoncurrentLiabilities",
+   "account_nm": "기타비유동부채",
+   "thstrm_amount": "1435021372"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "dart_NonCurrentEmissionLiabilities",
+   "account_nm": "수입보증금",
+   "thstrm_amount": "1500000000"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "-표준계정코드 미사용-",
+   "account_nm": "선수수익",
+   "thstrm_amount": "28460666"
+  },
+  {
+   "sj_div": "BS",
+   "account_id": "-표준계정코드 미사용-",
+   "account_nm": "현재가치할인차금",
+   "thstrm_amount": "93439294"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_OperatingIncomeLoss",
+   "account_nm": "영업이익(손실)",
+   "thstrm_amount": "-1944161096",
+   "thstrm_add_amount": "-2555817818"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_OtherGains",
+   "account_nm": "기타수익",
+   "thstrm_amount": "706314930",
+   "thstrm_add_amount": "756153512"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_GainsOnDisposalsOfIntangibleAssets",
+   "account_nm": "무형자산처분이익",
+   "thstrm_amount": "458814267",
+   "thstrm_add_amount": "458814267"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_MiscellaneousIncome",
+   "account_nm": "잡이익",
+   "thstrm_amount": "244548663",
+   "thstrm_add_amount": "244548663"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "ifrs-full_GainsOnDisposalsOfPropertyPlantAndEquipment",
+   "account_nm": "유형자산처분이익",
+   "thstrm_amount": "2952000",
+   "thstrm_add_amount": "52790582"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_OtherLosses",
+   "account_nm": "기타비용",
+   "thstrm_amount": "87905874",
+   "thstrm_add_amount": "225783090"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_Donations",
+   "account_nm": "기부금",
+   "thstrm_amount": "150000",
+   "thstrm_add_amount": "10300000"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_ImpairmentLossesOnIntangibleAssets",
+   "account_nm": "무형자산손상차손",
+   "thstrm_amount": "0",
+   "thstrm_add_amount": "0"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_LossesOnDispositionOfReceivables",
+   "account_nm": "매출채권매각손실",
+   "thstrm_amount": "10809236",
+   "thstrm_add_amount": "15410757"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_MiscellaneousLosses",
+   "account_nm": "잡손실",
+   "thstrm_amount": "71796138",
+   "thstrm_add_amount": "167158384"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_WritedownsOfPropertyPlantAndEquipment",
+   "account_nm": "유형자산손상차손",
+   "thstrm_amount": "5150500",
+   "thstrm_add_amount": "28200500"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "ifrs-full_LossesOnDisposalsOfPropertyPlantAndEquipment",
+   "account_nm": "유형자산처분손실",
+   "thstrm_amount": "0",
+   "thstrm_add_amount": "4713449"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_TotalSellingGeneralAdministrativeExpenses",
+   "account_nm": "판매비와관리비",
+   "thstrm_amount": "8246529415",
+   "thstrm_add_amount": "15717586171"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_AdvertisingExpensesSellingGeneralAdministrativeExpenses",
+   "account_nm": "광고선전비, 판관비",
+   "thstrm_amount": "123943905",
+   "thstrm_add_amount": "231178043"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_AfterServiceExpensesSellingGeneralAdministrativeExpenses",
+   "account_nm": "납후봉사비, 판관비",
+   "thstrm_amount": "63055913",
+   "thstrm_add_amount": "208047358"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_AmortisationExpenseSellingGeneralAdministrativeExpenses",
+   "account_nm": "무형자산상각비, 판관비",
+   "thstrm_amount": "6389968",
+   "thstrm_add_amount": "10935735"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_BadDebtExpensesSellingGeneralAdministrativeExpenses",
+   "account_nm": "대손상각비(대손충당금환입), 판관비",
+   "thstrm_amount": "39823116",
+   "thstrm_add_amount": "-879666145"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_CommissionsSellingGeneralAdministrativeExpenses",
+   "account_nm": "제수수료, 판관비",
+   "thstrm_amount": "2138509762",
+   "thstrm_add_amount": "4281863798"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_CommunicationExpensesSellingGeneralAdministrativeExpenses",
+   "account_nm": "통신비, 판관비",
+   "thstrm_amount": "54684715",
+   "thstrm_add_amount": "111709109"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_DepreciationExpenseSellingGeneralAdministrativeExpenses",
+   "account_nm": "감가상각비, 판관비",
+   "thstrm_amount": "198142899",
+   "thstrm_add_amount": "395943573"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_EmployeeBenefitsSellingGeneralAdministrativeExpenses",
+   "account_nm": "복리후생비, 판관비",
+   "thstrm_amount": "491673800",
+   "thstrm_add_amount": "943722799"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_EntertainmentExpensesSellingGeneralAdministrativeExpenses",
+   "account_nm": "접대비, 판관비",
+   "thstrm_amount": "126820920",
+   "thstrm_add_amount": "247549578"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_FreightExpensesSellingGeneralAdministrativeExpenses",
+   "account_nm": "운반비, 판관비",
+   "thstrm_amount": "301483945",
+   "thstrm_add_amount": "621937418"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_InsurancePremiumsSellingGeneralAdministrativeExpenses",
+   "account_nm": "보험료, 판관비",
+   "thstrm_amount": "127416194",
+   "thstrm_add_amount": "238520069"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_MiscellaneousExpenses",
+   "account_nm": "잡비, 판관비",
+   "thstrm_amount": "60377901",
+   "thstrm_add_amount": "120030563"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_OrdinaryDevelopmentExpenseSellingGeneralAdministrativeExpenses",
+   "account_nm": "경상개발비, 판관비",
+   "thstrm_amount": "125491509",
+   "thstrm_add_amount": "212497667"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_PackingExpensesSellingGeneralAdministrativeExpenses",
+   "account_nm": "포장비, 판관비",
+   "thstrm_amount": "18422556",
+   "thstrm_add_amount": "45702936"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_ProvisionForSeveranceIndemnities",
+   "account_nm": "퇴직급여, 판관비",
+   "thstrm_amount": "340553949",
+   "thstrm_add_amount": "767084249"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_PublicationExpensesSellingGeneralAdministrativeExpenses",
+   "account_nm": "도서인쇄비, 판관비",
+   "thstrm_amount": "9100190",
+   "thstrm_add_amount": "21343241"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_RentalExpensesSellingGeneralAdministrativeExpenses",
+   "account_nm": "임차료, 판관비",
+   "thstrm_amount": "32102929",
+   "thstrm_add_amount": "85926680"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_RepairExpensesSellingGeneralAdministrativeExpenses",
+   "account_nm": "수선비, 판관비",
+   "thstrm_amount": "110767639",
+   "thstrm_add_amount": "117716517"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_SalariesWages",
+   "account_nm": "급여, 판관비",
+   "thstrm_amount": "2882963668",
+   "thstrm_add_amount": "6226911345"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_SamplesExpensesSellingGeneralAdministrativeExpenses",
+   "account_nm": "견본품비, 판관비",
+   "thstrm_amount": "183457204",
+   "thstrm_add_amount": "104215565"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_SupplyExpensesSellingGeneralAdministrativeExpenses",
+   "account_nm": "소모품비, 판관비",
+   "thstrm_amount": "157220139",
+   "thstrm_add_amount": "283267435"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_TaxesDuesSellingGeneralAdministrativeExpenses",
+   "account_nm": "세금과공과, 판관비",
+   "thstrm_amount": "112349617",
+   "thstrm_add_amount": "177696159"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_TrainingExpensesSellingGeneralAdministrativeExpenses",
+   "account_nm": "교육훈련비, 판관비",
+   "thstrm_amount": "4945120",
+   "thstrm_add_amount": "6335120"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_TravelExpensesSellingGeneralAdministrativeExpenses",
+   "account_nm": "여비교통비, 판관비",
+   "thstrm_amount": "187087255",
+   "thstrm_add_amount": "454007408"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_UtilityExpensesSellingGeneralAdministrativeExpenses",
+   "account_nm": "동력용수비, 판관비",
+   "thstrm_amount": "74828102",
+   "thstrm_add_amount": "198809480"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_VehicleMaintenanceExpensesSellingGeneralAdministrativeExpenses",
+   "account_nm": "차량유지비, 판관비",
+   "thstrm_amount": "102413931",
+   "thstrm_add_amount": "206413327"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_WarehouseExpensesSellingGeneralAdministrativeExpenses",
+   "account_nm": "보관료, 판관비",
+   "thstrm_amount": "1393351",
+   "thstrm_add_amount": "3250052"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "-표준계정코드 미사용-",
+   "account_nm": "난방비, 판관비",
+   "thstrm_amount": "207503",
+   "thstrm_add_amount": "2281799"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "-표준계정코드 미사용-",
+   "account_nm": "사용권자산상각비, 판관비",
+   "thstrm_amount": "170901715",
+   "thstrm_add_amount": "272355293"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "ifrs-full_ComprehensiveIncome",
+   "account_nm": "총포괄손익",
+   "thstrm_amount": "-2700979103",
+   "thstrm_add_amount": "-5108101437"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "ifrs-full_ComprehensiveIncomeAttributableToNoncontrollingInterests",
+   "account_nm": "비지배지분",
+   "thstrm_amount": "-18524784",
+   "thstrm_add_amount": "-48500323"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "ifrs-full_ComprehensiveIncomeAttributableToOwnersOfParent",
+   "account_nm": "지배기업 소유주 지분",
+   "thstrm_amount": "-2682454319",
+   "thstrm_add_amount": "-5059601114"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "ifrs-full_CostOfSales",
+   "account_nm": "매출원가",
+   "thstrm_amount": "27711212539",
+   "thstrm_add_amount": "55211550032"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_CostOfSalesFromSaleOfGoods",
+   "account_nm": "상품매출원가",
+   "thstrm_amount": "12213120852",
+   "thstrm_add_amount": "24516217023"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_CostOfSalesFromSaleOfGoodsProduct",
+   "account_nm": "제품매출원가",
+   "thstrm_amount": "15375806499",
+   "thstrm_add_amount": "30237912577"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_OtherCostOfSales",
+   "account_nm": "기타매출원가",
+   "thstrm_amount": "149860278",
+   "thstrm_add_amount": "499895362"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "-표준계정코드 미사용-",
+   "account_nm": "관세환급금",
+   "thstrm_amount": "-27575090",
+   "thstrm_add_amount": "-42474930"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "ifrs-full_BasicEarningsLossPerShare",
+   "account_nm": "기본주당순손익",
+   "thstrm_amount": "-129",
+   "thstrm_add_amount": "-214"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "ifrs-full_DilutedEarningsLossPerShare",
+   "account_nm": "희석주당순손익",
+   "thstrm_amount": "-129",
+   "thstrm_add_amount": "-214"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "ifrs-full_FinanceCosts",
+   "account_nm": "금융비용",
+   "thstrm_amount": "1215285105",
+   "thstrm_add_amount": "2526619435"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_InterestExpenseFinanceExpense",
+   "account_nm": "이자비용(금융원가)",
+   "thstrm_amount": "1188124233",
+   "thstrm_add_amount": "2443482345"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_LossesOnForeignCurrencyTransactionsFiancialExpense",
+   "account_nm": "외환차손",
+   "thstrm_amount": "49392111",
+   "thstrm_add_amount": "71411827"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_LossesOnForeignExchangeTranslationsFinancialExpense",
+   "account_nm": "외화환산손실",
+   "thstrm_amount": "3999178",
+   "thstrm_add_amount": "11725263"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "-표준계정코드 미사용-",
+   "account_nm": "채무보증제수수료",
+   "thstrm_amount": "-26230417",
+   "thstrm_add_amount": "0"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "ifrs-full_FinanceIncome",
+   "account_nm": "금융수익",
+   "thstrm_amount": "428996266",
+   "thstrm_add_amount": "1275167438"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_DividendIncomeNonOperating",
+   "account_nm": "배당금수익",
+   "thstrm_amount": "855000",
+   "thstrm_add_amount": "855000"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_GainsOnAdjustmentOfDebtsFinancialIncome",
+   "account_nm": "채무보증수익",
+   "thstrm_amount": "7519275",
+   "thstrm_add_amount": "7519275"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_GainsOnForeignCurrencyTransactionsFiancialIncome",
+   "account_nm": "외환차익",
+   "thstrm_amount": "154623977",
+   "thstrm_add_amount": "272812624"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_GainsOnForeignExchangeTranslationsFinancialIncome",
+   "account_nm": "외화환산이익",
+   "thstrm_amount": "236727301",
+   "thstrm_add_amount": "930415068"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_GainsOnValuationOfDerivativeFinancialInstrumentsFinancialIncome",
+   "account_nm": "파생상품평가이익(금융수익)",
+   "thstrm_amount": "20741092",
+   "thstrm_add_amount": "44425943"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_InterestIncomeFinanceIncome",
+   "account_nm": "이자수익(금융수익)",
+   "thstrm_amount": "8529621",
+   "thstrm_add_amount": "19139528"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "ifrs-full_GrossProfit",
+   "account_nm": "매출총이익",
+   "thstrm_amount": "6302368319",
+   "thstrm_add_amount": "13161768353"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "ifrs-full_IncomeTaxExpenseContinuingOperations",
+   "account_nm": "법인세비용(수익)",
+   "thstrm_amount": "-143177499",
+   "thstrm_add_amount": "-312525"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "ifrs-full_OtherComprehensiveIncome",
+   "account_nm": "기타포괄손익",
+   "thstrm_amount": "-732115723",
+   "thstrm_add_amount": "-1831514569"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "ifrs-full_OtherComprehensiveIncomeThatWillBeReclassifiedToProfitOrLossNetOfTax",
+   "account_nm": "당기손익으로 재분류될 수 있는 항목(세후기타포괄손익)",
+   "thstrm_amount": "-649256316",
+   "thstrm_add_amount": "-1857211717"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "ifrs-full_GainsLossesOnExchangeDifferencesOnTranslationNetOfTax",
+   "account_nm": "해외사업환산손익",
+   "thstrm_amount": "-649256316",
+   "thstrm_add_amount": "-1857211717"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "ifrs-full_OtherComprehensiveIncomeThatWillNotBeReclassifiedToProfitOrLossNetOfTax",
+   "account_nm": "당기손익으로 재분류되지 않는 항목",
+   "thstrm_amount": "-82859407",
+   "thstrm_add_amount": "25697148"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "-표준계정코드 미사용-",
+   "account_nm": "기타포괄손익법인세효과",
+   "thstrm_amount": "10241051",
+   "thstrm_add_amount": "6323820"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "-표준계정코드 미사용-",
+   "account_nm": "기타포괄손익-공정가치 측정 금융자산평가 손익",
+   "thstrm_amount": "-93100458",
+   "thstrm_add_amount": "19373328"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "ifrs-full_OtherComprehensiveIncomeBeforeTaxGainsLossesOnRemeasurementsOfDefinedBenefitPlans",
+   "account_nm": "순확정급여부채의 재측정요소",
+   "thstrm_amount": "0",
+   "thstrm_add_amount": "0"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "ifrs-full_ProfitLoss",
+   "account_nm": "반기순이익(손실)",
+   "thstrm_amount": "-1968863380",
+   "thstrm_add_amount": "-3276586868"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "ifrs-full_ProfitLossAttributableToNoncontrollingInterests",
+   "account_nm": "비지배지분",
+   "thstrm_amount": "-18524784",
+   "thstrm_add_amount": "-48500323"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "ifrs-full_ProfitLossAttributableToOwnersOfParent",
+   "account_nm": "지배기업 소유주 지분",
+   "thstrm_amount": "-1950338596",
+   "thstrm_add_amount": "-3228086545"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "ifrs-full_ProfitLossBeforeTax",
+   "account_nm": "법인세비용차감전순이익(손실)",
+   "thstrm_amount": "-2112040879",
+   "thstrm_add_amount": "-3276899393"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "ifrs-full_Revenue",
+   "account_nm": "매출액",
+   "thstrm_amount": "34013580858",
+   "thstrm_add_amount": "68373318385"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_RevenueFromSaleOfGoodsMerchandise",
+   "account_nm": "상품매출액",
+   "thstrm_amount": "16291366501",
+   "thstrm_add_amount": "32903574517"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "dart_RevenueFromSaleOfGoodsProduct",
+   "account_nm": "제품매출액",
+   "thstrm_amount": "17158608209",
+   "thstrm_add_amount": "34245461394"
+  },
+  {
+   "sj_div": "CIS",
+   "account_id": "ifrs-full_OtherRevenue",
+   "account_nm": "기타매출",
+   "thstrm_amount": "563606148",
+   "thstrm_add_amount": "1224282474"
+  }
+ ]
+}

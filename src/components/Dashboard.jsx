@@ -35,6 +35,12 @@ import {
 import { buildMarketCards, buildMarketSummary, buildMarketImpact, quarterEndPrd } from '../utils/marketIndicators';
 import { fetchDartData } from '../utils/dartApi';
 import { getLatestFiledPeriod, previousPeriod } from '../utils/filingPeriod';
+import {
+  getStatement as getStatementOf,
+  isOfsFallback as isOfsFallbackOf,
+  isComputable as isComputableOf,
+  computeValue,
+} from '../utils/financials';
 
 // 분기 정렬 헬퍼
 const sortQuarters = (qList) => {
@@ -93,6 +99,14 @@ const roundM = (v) => Math.round(v) || 0;
 // DART 013(해당 보고서 없음) 응답만 '데이터 없음'으로 캐시 — fetchDartData의 013 오류 문구 기준
 const isNoDataError = (e) => /미공시|데이터가 없습니다|조회된 데이터가 없습니다/.test(e?.message || '');
 const fmtM = (v) => roundM(v).toLocaleString('ko-KR');
+// 시세 기준 시각: 한국 시간 "11.13 15:30"
+const quoteTimeFormat = new Intl.DateTimeFormat('ko-KR', {
+  timeZone: 'Asia/Seoul', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false,
+});
+const fmtQuoteTime = (ms) => {
+  const p = Object.fromEntries(quoteTimeFormat.formatToParts(new Date(ms)).map(x => [x.type, x.value]));
+  return `${p.month}.${p.day} ${p.hour}:${p.minute}`;
+};
 
 // 비교 기업 - corpCode: DART 고유번호(company.json 검증), stockTicker: Yahoo 티커(.KS 코스피 / .KQ 코스닥)
 const companies = [
@@ -143,6 +157,8 @@ export default function Dashboard() {
   const [dartError, setDartError] = useState(null); // DART 연동 실패 에러 상태
   const [cfsUnavailableSet, setCfsUnavailableSet] = useState(new Set());
   const apiCacheRef = useRef(new Map());
+  const [dartSyncId, setDartSyncId] = useState(0); // 재무 조회 성공 시 증가 → 다년도 추이 자동 조회 트리거
+  const trendReqRef = useRef(0); // 겹친 다년도 조회 중 마지막 요청만 상태 표시에 반영
   const [trendYears, setTrendYears] = useState(3);
   const [trendMetric, setTrendMetric] = useState('sales');
   const [isTrendLoading, setIsTrendLoading] = useState(false);
@@ -220,6 +236,7 @@ export default function Dashboard() {
               high52w: meta.fiftyTwoWeekHigh,
               low52w: meta.fiftyTwoWeekLow,
               ticker: company.stockTicker.split('.')[0],
+              quoteTime: meta.regularMarketTime ? meta.regularMarketTime * 1000 : null, // 마지막 체결 시각(ms)
             };
           } catch (e) {
             console.warn(`[Stock] ${company.stockTicker}:`, e.message);
@@ -338,6 +355,7 @@ export default function Dashboard() {
         const failedCfsCount = localCfsUnavail.size;
         const missing = activeCompanies.filter(c => !newFinancialData[targetQuarterStr]?.[c.id]).map(c => c.name);
         setDartStatus('SUCCESS');
+        setDartSyncId(n => n + 1);
         setDartStatusText(
           `[DART] ${year}년 ${quarter} 동기화 완료 — ${fetchedCount}/${activeCompanies.length}개 기업`
           + (missing.length ? `, 미공시: ${missing.join('·')}` : '')
@@ -384,6 +402,8 @@ export default function Dashboard() {
   // 다년도 추이 일괄 조회
   // ---------------------------------------------------------
   const handleFetchTrendData = async () => {
+    const reqId = ++trendReqRef.current;
+    const isLatest = () => reqId === trendReqRef.current;
     setIsTrendLoading(true);
     // 현재 화면에 확정된 기간(activeYear/activeQuarter) 기준으로 과거 연도 동일 분기 누계를 조회
     const rCodeMap = { '1Q': '11013', '2Q': '11012', '3Q': '11014', '4Q': '11011' };
@@ -413,7 +433,7 @@ export default function Dashboard() {
             }
           }
           currentOp++;
-          setTrendStatusText(`다년도 재무제표 조회 중 (${currentOp}/${totalOps})`);
+          if (isLatest()) setTrendStatusText(`다년도 재무제표 조회 중 (${currentOp}/${totalOps})`);
           if (data) {
             const qKey = `${year} ${activeQuarter}`;
             fetched[qKey] = fetched[qKey] || {};
@@ -431,9 +451,17 @@ export default function Dashboard() {
       });
       return next;
     });
+    if (!isLatest()) return; // 이후 시작된 조회가 상태를 마무리
     setIsTrendLoading(false);
     setTrendStatusText(`다년도 추이 조회 완료 (${activeYear}년 기준 최근 ${trendYears}년, 매년 ${activeQuarter} 누계)`);
   };
+
+  // 재무 조회가 성공하면(접속 시 자동 조회 포함) 같은 분기 기준으로 다년도 추이도 자동 조회. 조회 범위(3·5년) 변경 시에도 재조회
+  useEffect(() => {
+    if (dartSyncId === 0) return;
+    handleFetchTrendData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dartSyncId, trendYears]);
 
   // ---------------------------------------------------------
   // 캐시 초기화
@@ -495,46 +523,12 @@ export default function Dashboard() {
   // 당분기 vs 누계액(누적값) 수학적 역산 연산기 구현
   // ---------------------------------------------------------
   // 종속회사가 없어 연결재무를 작성하지 않는 회사는 연결 모드에서 별도 수치로 대체 (연결=별도)
-  const getStatement = (companyId, quarterStr, fsDiv) => {
-    const entry = financialData[quarterStr]?.[companyId];
-    const hasCfs = Object.keys(entry?.cfs || {}).length > 0;
-    if (fsDiv === 'cfs' && !hasCfs) return entry?.ofs || {};
-    return entry?.[fsDiv] || {};
-  };
-  const isOfsFallback = (companyId, quarterStr) => {
-    const entry = financialData[quarterStr]?.[companyId];
-    return Object.keys(entry?.cfs || {}).length === 0 && Object.keys(entry?.ofs || {}).length > 0;
-  };
-  // 해당 분기 공시가 있고, 당분기 모드면 역산에 필요한 직전 분기 공시도 있어야 값을 표시 (없으면 0이 아니라 '미공시')
-  const isComputable = (companyId, quarterStr, fsDiv) => {
-    const has = (qs) => Object.keys(getStatement(companyId, qs, fsDiv)).length > 0;
-    if (!has(quarterStr)) return false;
-    const [year, q] = quarterStr.split(' ');
-    if (isCumulative || q === '1Q') return true;
-    return has(`${year} ${Number(q[0]) - 1}Q`);
-  };
-
-  const getComputedValue = (companyId, quarterStr, metric, fsDiv) => {
-    const currentVal = getStatement(companyId, quarterStr, fsDiv)[metric] ?? 0;
-
-    if (metric === 'debtRatio' || metric === 'equity' || metric === 'currentAssets' || metric === 'currentLiabilities') return currentVal;
-    if (isCumulative) return currentVal;
-
-    const [year, q] = quarterStr.split(' ');
-    if (q === '1Q') {
-      return currentVal;
-    }
-
-    let prevQKey = '';
-    if (q === '2Q') prevQKey = `${year} 1Q`;
-    else if (q === '3Q') prevQKey = `${year} 2Q`;
-    else if (q === '4Q') prevQKey = `${year} 3Q`;
-
-    const prevVal = getStatement(companyId, prevQKey, fsDiv)[metric] ?? 0;
-
-    // 음수 역산값도 공시 원본(환입·재분류)을 반영한 결과이므로 보정하지 않음
-    return currentVal - prevVal;
-  };
+  // 계산 로직은 src/utils/financials.js (단위 테스트 대상). 여기서는 현재 상태를 넘겨 호출만 함
+  const getStatement = (companyId, quarterStr, fsDiv) => getStatementOf(financialData, companyId, quarterStr, fsDiv);
+  const isOfsFallback = (companyId, quarterStr) => isOfsFallbackOf(financialData, companyId, quarterStr);
+  // 계산 불가(해당 분기 또는 역산용 직전 분기 미공시)면 0이 아니라 '미공시'로 표시
+  const isComputable = (companyId, quarterStr, fsDiv) => isComputableOf(financialData, companyId, quarterStr, fsDiv, isCumulative);
+  const getComputedValue = (companyId, quarterStr, metric, fsDiv) => computeValue(financialData, companyId, quarterStr, metric, fsDiv, isCumulative);
 
   // ---------------------------------------------------------
   // 차트 최종 바인딩 데이터 생성
@@ -1005,9 +999,9 @@ export default function Dashboard() {
           return isTrendEmpty ? (
             <div className="h-[280px] flex items-center justify-center">
               <div className="text-center text-slate-500">
-                <TrendingUp className="w-10 h-10 mx-auto mb-2 opacity-30" />
-                <p className="text-sm font-semibold">데이터 없음</p>
-                <p className="text-xs mt-1">다년도 일괄 조회를 실행하세요.</p>
+                <TrendingUp className={`w-10 h-10 mx-auto mb-2 opacity-30 ${isTrendLoading || isDartLoading ? 'animate-pulse' : ''}`} />
+                <p className="text-sm font-semibold">{isTrendLoading || isDartLoading ? '다년도 데이터 조회 중...' : '데이터 없음'}</p>
+                <p className="text-xs mt-1">{isTrendLoading || isDartLoading ? '재무 조회가 끝나면 자동으로 표시됩니다.' : '비교할 수 있는 연도가 2개 미만입니다. 다년도 일괄 조회로 다시 시도하세요.'}</p>
               </div>
             </div>
           ) : (
@@ -1080,6 +1074,9 @@ export default function Dashboard() {
                         <span>52W 저: ₩{s.low52w?.toLocaleString('ko-KR') ?? '-'}</span>
                         <span>고: ₩{s.high52w?.toLocaleString('ko-KR') ?? '-'}</span>
                       </div>
+                    )}
+                    {s.quoteTime && (
+                      <div className="mt-1 text-[9px] text-slate-500 text-right">{fmtQuoteTime(s.quoteTime)} 기준</div>
                     )}
                   </>
                 ) : (

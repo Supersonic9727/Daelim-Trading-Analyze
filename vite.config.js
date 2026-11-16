@@ -30,6 +30,19 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react(), localApiFunctions(['stock', 'kosis'])],
+    build: {
+      rollupOptions: {
+        output: {
+          // 라이브러리를 별도 파일로 분리: 앱 코드만 바뀐 배포에서는 브라우저 캐시를 그대로 재사용
+          manualChunks(id) {
+            if (!id.includes('node_modules')) return undefined
+            if (/node_modules[\\/](react|react-dom|scheduler)[\\/]/.test(id)) return 'react'
+            if (id.includes('lucide-react')) return 'icons'
+            return 'charts' // recharts와 그 의존성(d3, redux 등)
+          },
+        },
+      },
+    },
     server: {
       proxy: {
         '/api-dart': {

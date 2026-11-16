@@ -10,8 +10,8 @@
 | 영역 | 내용 | 데이터 |
 |---|---|---|
 | 재무 비교 차트 | 매출, 영업이익률, 판관비, 경상손익, 총포괄손익, 부채비율 (분기별) | Open DART |
-| 연간 다년도 추이 | 최근 3·5년 같은 분기의 누계 비교 | Open DART |
-| 주가 현황 | 현재가, 전일 종가 대비 등락, 1개월 추이, 52주 고저 | Yahoo Finance (약 15~20분 지연) |
+| 연간 다년도 추이 | 최근 3·5년 같은 분기의 누계 비교 (재무 조회 후 자동 조회) | Open DART |
+| 주가 현황 | 현재가, 전일 종가 대비 등락, 1개월 추이, 52주 고저, 시세 기준 시각(KST) | Yahoo Finance (약 15~20분 지연) |
 | 주택·건설 시장 지표 | 8대 공식 통계 (아래 표), 시장 동향 요약, 건자재 기업 영향 분석 | KOSIS 국가통계포털 |
 | 재무 수치 테이블 | 13개 항목, CSV 내보내기 | Open DART |
 | SWOT 분석 | 경쟁사별 대림통상 관점 SWOT | 직접 작성한 정성 자료 |
@@ -56,7 +56,8 @@ npm run dev
 ```
 
 - 개발 서버는 `/api-dart`(DART), `/api/kosis`, `/api/stock`을 로컬에서 그대로 처리합니다([vite.config.js](vite.config.js)).
-- 검사와 빌드는 `npm run lint`, `npm run build`로 실행합니다.
+- 검사·테스트·빌드는 `npm run lint`, `npm test`, `npm run build`로 실행합니다.
+- 테스트(Vitest)는 `src/utils/*.test.js`에 있습니다. 재무 파싱과 당분기 역산은 실제 DART 응답(`src/utils/__fixtures__`, 대림통상 2026년 1분기·반기 연결)으로 검증하고, 제출기한과 시장 지표 해석은 기준 사례로 검증합니다.
 
 ## 배포
 
@@ -74,7 +75,7 @@ npm run dev
 
 ## 재무 데이터 계산 규칙
 
-파싱은 [src/utils/dartApi.js](src/utils/dartApi.js), 계산은 `Dashboard.jsx`의 `getComputedValue`에서 합니다.
+파싱은 [src/utils/dartApi.js](src/utils/dartApi.js), 당분기 역산과 연결→별도 대체는 [src/utils/financials.js](src/utils/financials.js)에서 합니다.
 
 - **단위**: 백만원. 원 단위 정밀도로 보관하고 화면에 표시할 때만 반올림합니다.
 - **계정 매칭**: IFRS 계정 ID → 한글 계정명 완전 일치 → 부분 일치 순서로 찾습니다. 부분 일치에서는 '자본과부채총계', '비유동○○' 계정을 제외합니다.
